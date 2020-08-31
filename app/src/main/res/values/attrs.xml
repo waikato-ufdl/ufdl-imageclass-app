@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ds">
+        <attr name="backgroundColor"  format="color"/>
+        <attr name="textColor"  format="color"/>
+        <attr name="tintColor"  format="color"/>
+        <attr name="buttonColor"  format="color"/>
+        <attr name="navMenuBackgroundColour"  format="color"/>
+        <attr name="navMenuIconColours"  format="color"/>
+        <attr name="toolBarColour"  format="color"/>
+        <attr name="editTextBackgroundColour"  format="color"/>
+        <attr name="editTextOutlineColour"  format="color"/>
+    </declare-styleable>
+</resources>

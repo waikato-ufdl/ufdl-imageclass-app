@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Thumb of the Dark Mode Switch when the switch is not checked -->
+    <item android:state_checked="false">
+        <shape android:shape="oval">
+            <solid android:color="@color/white"/>
+            <size android:width="@dimen/switchThumbSize"
+                android:height="@dimen/switchThumbSize"/>
+            <stroke android:color="@color/grey"
+                android:width="@dimen/strokeWidth"/>
+        </shape>
+    </item>
+
+    <!-- Thumb of the Dark Mode Switch when the switch is checked -->
+    <item android:state_checked="true">
+        <shape android:shape="oval">
+            <solid android:color="@color/white"/>
+            <size android:width="@dimen/switchThumbSize"
+                android:height="@dimen/switchThumbSize"/>
+            <stroke android:color="@color/orange"
+                android:width="@dimen/strokeWidth"/>
+        </shape>
+    </item>
+</selector>

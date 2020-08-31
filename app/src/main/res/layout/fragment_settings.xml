@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:layout_marginLeft="25dp"
+    android:layout_marginRight="25dp"
+    tools:context=".ui.settings.SettingsFragment">
+
+
+    <TextView
+        android:id="@+id/settingsHeading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:textAlignment="center"
+        android:textColor="?attr/textColor"
+        android:textSize="50dp"
+        android:layout_marginBottom="40dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/URL"
+        android:textSize= "@dimen/settingsLabelSizes"
+        android:textColor="@color/orange"
+        android:layout_above="@id/URL"
+        />
+
+    <EditText
+        android:id="@+id/URL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/inputTextSize"
+        android:fontFamily=""
+        android:padding="10dp"
+        android:background="@drawable/edit_text_design"
+        android:textColor="?attr/textColor"
+        android:textColorHint="@color/grey"
+        android:hint="@string/URL"
+        android:layout_below="@+id/settingsHeading"
+        android:layout_marginBottom="40dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/username"
+        android:textSize="@dimen/settingsLabelSizes"
+        android:textColor="@color/orange"
+        android:textColorHint="@color/grey"
+        android:hint="@string/username"
+        android:layout_above="@id/Username"
+        />
+
+    <EditText
+        android:id="@+id/Username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/inputTextSize"
+        android:padding="10dp"
+        android:background="@drawable/edit_text_design"
+        android:textColor="?attr/textColor"
+        android:textColorHint="@color/grey"
+        android:hint="@string/username"
+        android:layout_below="@+id/URL"
+        android:layout_marginBottom="40dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/password"
+        android:textSize="@dimen/settingsLabelSizes"
+        android:textColor="@color/orange"
+        android:textColorHint="@color/grey"
+        android:hint="@string/password"
+        android:layout_above="@id/Password"
+        />
+
+    <EditText
+        android:id="@+id/Password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/inputTextSize"
+        android:padding="10dp"
+        android:background="@drawable/edit_text_design"
+        android:textColor="?attr/textColor"
+        android:inputType="textPassword"
+        android:textColorHint="@color/grey"
+        android:hint="@string/password"
+        android:layout_below="@+id/Username"
+        android:layout_marginBottom="40dp"/>
+
+    <Switch
+        android:id="@+id/themeSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:showText="true"
+        android:switchPadding="@dimen/switchPadding"
+        android:text="@string/darkMode"
+        android:textColor="?attr/textColor"
+        android:textOff="Off"
+        android:textOn="On"
+        android:textSize="@dimen/settingsLabelSizes"
+        android:thumb="@drawable/thumb"
+        android:track="@drawable/track"
+        android:layout_below="@id/Password"
+        android:layout_marginBottom="40dp"/>
+
+    <Button
+        android:id="@+id/SettingsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:background="@drawable/button_design"
+        android:padding="10dp"
+        android:text="Save &amp; Exit"
+        android:textSize="@dimen/buttonTextSize"
+        android:layout_below="@id/themeSwitch"/>
+
+</RelativeLayout>
