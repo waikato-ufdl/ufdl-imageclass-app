@@ -16,4 +16,10 @@
         android:name="com.example.myapplication.ui.gallery.GalleryFragment"
         android:label="@string/menu_manage"
         tools:layout="@layout/fragment_gallery" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.myapplication.ui.settings.SettingsFragment"
+        android:label="@string/menu_settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>

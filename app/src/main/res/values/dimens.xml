@@ -5,4 +5,14 @@
     <dimen name="nav_header_vertical_spacing">8dp</dimen>
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="switchThumbSize">32dp</dimen>
+    <dimen name="switchTrackCornersRadius">100dp</dimen>
+    <dimen name="strokeWidth">1dp</dimen>
+    <dimen name="switchPadding">10dp</dimen>
+    <dimen name="buttonTextSize">15sp</dimen>
+    <dimen name="editTextCornerRadius">1dp</dimen>
+    <dimen name="inputTextSize">20sp</dimen>
+    <dimen name="settingsLabelSizes">18dp</dimen>
+
+
 </resources>
