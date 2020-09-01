@@ -3,6 +3,8 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.service.autofill.Dataset;
+import android.util.Log;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
@@ -18,18 +20,27 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
+//import com.github.waikatoufdl.ufdl4j.Client;
+//import com.github.waikatoufdl.ufdl4j.action.Users.User;
+//import com.github.waikatoufdl.ufdl4j.action.Teams.Team;
+//import com.github.waikatoufdl.ufdl4j.action.Projects.Project;
+//import com.github.waikatoufdl.ufdl4j.action.Datasets.Dataset;
+//import com.github.waikatoufdl.ufdl4j.action.Licenses.License;
+//import com.github.waikatoufdl.ufdl4j.action.Log.LogEntry;
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private Button buttonSettings;
     private static final int VERIFY_PERMISSIONS_REQUEST = 1;
+    private DatabaseHelper databaseHelper;
+//    private Client client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Utility.setContext(this);
         setTheme(Utility.getTheme());
+        databaseHelper = new DatabaseHelper(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -47,6 +58,18 @@ public class MainActivity extends AppCompatActivity {
             //ask user to grant permissions
             verifyPermissions(Utility.PERMISSIONS);
         }
+
+//        System.out.println("--> connecting to backend");
+//
+//        client = new Client("http://127.0.0.1:8000", "admin", "admin");
+//
+//        System.out.println("--> listing datasets");
+//        try {
+//            for (Dataset dataset: Client.datasets().list())
+//                Log.d("DATASET", dataset.toString());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
 

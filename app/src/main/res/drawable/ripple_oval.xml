@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+
+        <shape  android:shape="oval" >
+            <corners android:radius="28dp" />
+
+            <gradient
+                android:startColor="@android:color/transparent"
+                android:centerColor="#33333333"
+                android:endColor="@android:color/transparent"
+                android:type="radial"
+                android:gradientRadius="29dp"/>
+        </shape>
+    </item>
+</layer-list>
+    <!-- Background -->
+<!--    <item>-->
+<!--        <shape android:shape="oval" >-->
+<!--            <solid android:color="#99000000" />-->
+<!--            <corners android:radius="3dp" />-->
+<!--        </shape>-->
+<!--    </item>-->
+<!--</layer-list>-->
+
+<!--<ripple xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:color="?android:colorControlHighlight">-->
+<!--    <item>-->
+<!--        <shape android:shape="oval">-->
+<!--            <solid android:color="#99000000"></solid>-->
+<!--            <corners android:radius="28dp"></corners>-->
+<!--        </shape>-->
+<!--    </item>-->
+<!--</ripple>-->

@@ -15,4 +15,18 @@
     <string name="password">Password</string>
     <string name="URL">URL</string>
     <string name="darkMode">DARK MODE</string>
+    <string name="add_dataset">Add Dataset</string>
+
+    <string name="license_prompt">Choose a license</string>
+
+    <string-array name="license_array">
+        <item>Malaysia</item>
+        <item>United States</item>
+        <item>Indonesia</item>
+        <item>France</item>
+        <item>Italy</item>
+        <item>Singapore</item>
+        <item>New Zealand</item>
+        <item>India</item>
+    </string-array>
 </resources>

@@ -1,0 +1,186 @@
+[
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\navigation_mobile_navigation.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\navigation\\mobile_navigation.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\layout_activity_main.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable-ldpi_ic_uow_logo.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\generated\\res\\pngs\\release\\drawable-ldpi\\ic_uow_logo.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\layout_nav_header_main.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\layout\\nav_header_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable-anydpi-v24_ic_uow_logo.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\generated\\res\\pngs\\release\\drawable-anydpi-v24\\ic_uow_logo.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\layout_fragment_slideshow.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\layout\\fragment_slideshow.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable-xxxhdpi_ic_uow_logo.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\generated\\res\\pngs\\release\\drawable-xxxhdpi\\ic_uow_logo.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable-mdpi_ic_uow_logo.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\generated\\res\\pngs\\release\\drawable-mdpi\\ic_uow_logo.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\layout_fragment_gallery.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\layout\\fragment_gallery.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable-xxhdpi_ic_uow_logo.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\generated\\res\\pngs\\release\\drawable-xxhdpi\\ic_uow_logo.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\layout_content_main.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\layout\\content_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher_round.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable_ic_menu_gallery.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\drawable\\ic_menu_gallery.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable_ic_menu_settings.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\drawable\\ic_menu_settings.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_round.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\mipmap-mdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher_round.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\color_nav_menu_item.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\color\\nav_menu_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\layout_fragment_settings.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\layout\\fragment_settings.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\menu_activity_main_drawer.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\menu\\activity_main_drawer.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher_round.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher_round.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable_side_nav_bar.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\drawable\\side_nav_bar.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\menu_main.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\menu\\main.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\layout_fragment_home.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\layout\\fragment_home.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable_button_design.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\drawable\\button_design.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable-xhdpi_ic_uow_logo.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\generated\\res\\pngs\\release\\drawable-xhdpi\\ic_uow_logo.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\mipmap-hdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable-hdpi_ic_uow_logo.png.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\generated\\res\\pngs\\release\\drawable-hdpi\\ic_uow_logo.png"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable_dataset_folder.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\drawable\\dataset_folder.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable_ic_menu_camera.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\drawable\\ic_menu_camera.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\xml_file_paths.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\xml\\file_paths.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable_ripple_oval.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\drawable\\ripple_oval.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\layout_app_bar_main.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\layout\\app_bar_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable_thumb.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\drawable\\thumb.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable_ic_menu_slideshow.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\drawable\\ic_menu_slideshow.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable_edit_text_design.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\drawable\\edit_text_design.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable_add_circle.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\drawable\\add_circle.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable_ic_launcher_background.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\drawable\\ic_launcher_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable_track.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\drawable\\track.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\build\\intermediates\\res\\merged\\release\\drawable-v24_ic_launcher_foreground.xml.flat",
+        "source": "C:\\Users\\Jorda\\AndroidStudioProjects\\MyApplication\\app\\src\\main\\res\\drawable-v24\\ic_launcher_foreground.xml"
+    }
+]

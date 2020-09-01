@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="15dp"
+    android:padding="10dp"
+    android:background="@drawable/popup_background">
+
+    <TextView
+        android:id="@+id/dataset_name_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DATASET NAME"
+        android:textSize= "@dimen/settingsLabelSizes"
+        android:layout_marginTop="15dp"
+        android:textColor="@color/colorAccent"
+        />
+
+    <EditText
+        android:id="@+id/dataset_name_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/inputTextSize"
+        android:fontFamily=""
+        android:padding="10dp"
+        android:background="@drawable/edit_text_design"
+        android:textColor="?attr/textColor"
+        android:textColorHint="@color/grey"
+        android:hint="Dataset Name"
+        android:layout_marginBottom="20dp"
+        android:layout_below="@id/dataset_name_title"/>
+
+    <TextView
+        android:id="@+id/dataset_project_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PROJECT"
+        android:textSize="@dimen/settingsLabelSizes"
+        android:textColor="@color/colorAccent"
+        android:textColorHint="@color/grey"
+        android:hint="Project"
+        android:layout_above="@+id/dataset_project_text"
+        />
+
+    <EditText
+        android:id="@+id/dataset_project_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/inputTextSize"
+        android:padding="10dp"
+        android:background="@drawable/edit_text_design"
+        android:textColor="?attr/textColor"
+        android:textColorHint="@color/grey"
+        android:hint="Project"
+        android:layout_below="@+id/dataset_name_title"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:id="@+id/dataset_license_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LICENCE"
+        android:textSize="@dimen/settingsLabelSizes"
+        android:textColor="@color/colorAccent"
+        android:textColorHint="@color/grey"
+        android:hint="License"
+        android:layout_above="@+id/dataset_license_spinner"
+        />
+
+    <Spinner
+        android:id="@+id/dataset_license_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/license_array"
+        android:prompt="@string/license_prompt"/>
+
+    <Switch
+        android:id="@+id/themeSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:showText="true"
+        android:switchPadding="@dimen/switchPadding"
+        android:text="PUBLIC"
+        android:textColor="?attr/textColor"
+        android:textOff="Off"
+        android:textOn="On"
+        android:textSize="@dimen/settingsLabelSizes"
+        android:thumb="@drawable/thumb"
+        android:track="@drawable/track"
+        android:layout_below="@id/Password"
+        android:layout_marginBottom="40dp"/>
+
+    <Button
+        android:id="@+id/SettingsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:background="@drawable/button_design"
+        android:padding="10dp"
+        android:text="CREATE DATASET"
+        android:textSize="@dimen/buttonTextSize"
+        android:layout_below="@id/themeSwitch"/>
+
+</LinearLayout>

@@ -24,6 +24,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+    }
 }
 
 dependencies {
@@ -39,4 +42,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.2'
+    implementation 'org.apache.httpcomponents:httpmime:4.5.2'
+//    compile 'com.github.waikato-ufdl:ufdl4j-image:0.0.1-SNAPSHOT'
 }

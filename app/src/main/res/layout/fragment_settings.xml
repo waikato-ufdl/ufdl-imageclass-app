@@ -11,23 +11,24 @@
     tools:context=".ui.settings.SettingsFragment">
 
 
-    <TextView
-        android:id="@+id/settingsHeading"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Settings"
-        android:textAlignment="center"
-        android:textColor="?attr/textColor"
-        android:textSize="50dp"
-        android:layout_marginBottom="40dp" />
+<!--    <TextView-->
+<!--        android:id="@+id/settingsHeading"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Settings"-->
+<!--        android:textAlignment="center"-->
+<!--        android:textColor="?attr/textColor"-->
+<!--        android:textSize="50dp"-->
+<!--        android:layout_marginBottom="40dp" />-->
 
     <TextView
+        android:id="@+id/URLHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/URL"
         android:textSize= "@dimen/settingsLabelSizes"
-        android:textColor="@color/orange"
-        android:layout_above="@id/URL"
+        android:layout_marginTop="15dp"
+        android:textColor="@color/colorAccent"
         />
 
     <EditText
@@ -41,15 +42,15 @@
         android:textColor="?attr/textColor"
         android:textColorHint="@color/grey"
         android:hint="@string/URL"
-        android:layout_below="@+id/settingsHeading"
-        android:layout_marginBottom="40dp"/>
+        android:layout_marginBottom="40dp"
+        android:layout_below="@id/URLHeader"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/username"
         android:textSize="@dimen/settingsLabelSizes"
-        android:textColor="@color/orange"
+        android:textColor="@color/colorAccent"
         android:textColorHint="@color/grey"
         android:hint="@string/username"
         android:layout_above="@id/Username"
@@ -73,7 +74,7 @@
         android:layout_height="wrap_content"
         android:text="@string/password"
         android:textSize="@dimen/settingsLabelSizes"
-        android:textColor="@color/orange"
+        android:textColor="@color/colorAccent"
         android:textColorHint="@color/grey"
         android:hint="@string/password"
         android:layout_above="@id/Password"
