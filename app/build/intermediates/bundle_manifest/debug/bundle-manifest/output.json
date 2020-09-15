@@ -21,7 +21,7 @@
       "properties": {
         "packageId": "com.example.myapplication",
         "split": "",
-        "minSdkVersion": "23"
+        "minSdkVersion": "26"
       }
     }
   ]

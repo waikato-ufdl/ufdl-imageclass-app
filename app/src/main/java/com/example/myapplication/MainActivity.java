@@ -10,6 +10,9 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import com.example.myapplication.ui.settings.Utility;
+import com.github.waikatoufdl.ufdl4j.Client;
+import com.github.waikatoufdl.ufdl4j.action.Licenses;
+import com.github.waikatoufdl.ufdl4j.auth.MemoryOnlyStorage;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -20,13 +23,7 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-//import com.github.waikatoufdl.ufdl4j.Client;
-//import com.github.waikatoufdl.ufdl4j.action.Users.User;
-//import com.github.waikatoufdl.ufdl4j.action.Teams.Team;
-//import com.github.waikatoufdl.ufdl4j.action.Projects.Project;
-//import com.github.waikatoufdl.ufdl4j.action.Datasets.Dataset;
-//import com.github.waikatoufdl.ufdl4j.action.Licenses.License;
-//import com.github.waikatoufdl.ufdl4j.action.Log.LogEntry;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,23 +55,38 @@ public class MainActivity extends AppCompatActivity {
             //ask user to grant permissions
             verifyPermissions(Utility.PERMISSIONS);
         }
+    }
 
-//        System.out.println("--> connecting to backend");
-//
-//        client = new Client("http://127.0.0.1:8000", "admin", "admin");
-//
-//        System.out.println("--> listing datasets");
-//        try {
-//            for (Dataset dataset: Client.datasets().list())
-//                Log.d("DATASET", dataset.toString());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+    /**
+     * A method to establish a connection to the UFDL backend
+     */
+    public void connectToServer()
+    {
+        Client client;
+
+        //establish a connection to the UFDL backend using server URL, username, password. Need to also provide a tokenStorageHandler to
+        //handle the storage and retrieval of the access and refresh tokens which will be used in API calls.
+        client = new Client("http://127.0.0.1:8000", "admin", "admin", new MemoryOnlyStorage());
+
+        //an example to see whether we are able to retrieve the list of licenses from the backend
+        try {
+            System.out.println("\nDatasets:");
+            for (Licenses.License license: client.licenses().list()) {
+                System.out.println(license.getName());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
     private void runActivity()
     {
+
+        //start a thread to connect to the server
+        Thread t = new Thread(() -> connectToServer());
+        t.start();
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 //        FloatingActionButton fab = findViewById(R.id.fab);

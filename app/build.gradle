@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.myapplication"
-        minSdkVersion 23
+        minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -42,7 +42,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation 'org.apache.httpcomponents:httpclient:4.5.2'
-    implementation 'org.apache.httpcomponents:httpmime:4.5.2'
-//    compile 'com.github.waikato-ufdl:ufdl4j-image:0.0.1-SNAPSHOT'
+
+    //UFDL API Dependency
+    implementation 'com.github.waikato-ufdl:ufdl4j-image:0.0.1-SNAPSHOT'
+    implementation 'com.squareup.okhttp3:okhttp:3.0.1'
 }
