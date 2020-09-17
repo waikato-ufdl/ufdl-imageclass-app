@@ -45,57 +45,58 @@
 27-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:17:9-54
 28        android:supportsRtl="true"
 28-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:18:9-35
-29        android:theme="@style/AppTheme"
-29-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:19:9-40
-30        android:usesCleartextTraffic="true" >
-30-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:16:9-44
-31        <activity
-31-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:20:9-29:20
-32            android:name="com.example.myapplication.MainActivity"
-32-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:21:13-41
-33            android:label="@string/app_name"
-33-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:22:13-45
-34            android:theme="@style/AppTheme.NoActionBar" >
-34-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:23:13-56
-35            <intent-filter>
-35-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:24:13-28:29
-36                <action android:name="android.intent.action.MAIN" />
-36-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:25:17-69
-36-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:25:25-66
-37
-38                <category android:name="android.intent.category.LAUNCHER" />
-38-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:27:17-77
-38-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:27:27-74
-39            </intent-filter>
-40        </activity>
-41
-42        <provider
-42-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:31:9-39:20
-43            android:name="androidx.core.content.FileProvider"
-43-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:32:13-62
-44            android:authorities="com.example.android.fileprovider"
-44-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:33:13-67
-45            android:exported="false"
-45-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:34:13-37
-46            android:grantUriPermissions="true" >
-46-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:35:13-47
-47            <meta-data
-47-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:36:13-38:64
-48                android:name="android.support.FILE_PROVIDER_PATHS"
-48-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:37:17-67
-49                android:resource="@xml/file_paths" />
-49-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:38:17-51
-50        </provider>
-51        <provider
-51-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:23:9-27:43
-52            android:name="androidx.lifecycle.ProcessLifecycleOwnerInitializer"
-52-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:24:13-79
-53            android:authorities="com.example.myapplication.lifecycle-process"
-53-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:25:13-69
-54            android:exported="false"
-54-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:26:13-37
-55            android:multiprocess="true" />
-55-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:27:13-40
-56    </application>
-57
-58</manifest>
+29        android:testOnly="true"
+30        android:theme="@style/AppTheme"
+30-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:19:9-40
+31        android:usesCleartextTraffic="true" >
+31-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:16:9-44
+32        <activity
+32-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:20:9-29:20
+33            android:name="com.example.myapplication.MainActivity"
+33-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:21:13-41
+34            android:label="@string/app_name"
+34-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:22:13-45
+35            android:theme="@style/AppTheme.NoActionBar" >
+35-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:23:13-56
+36            <intent-filter>
+36-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:24:13-28:29
+37                <action android:name="android.intent.action.MAIN" />
+37-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:25:17-69
+37-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:25:25-66
+38
+39                <category android:name="android.intent.category.LAUNCHER" />
+39-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:27:17-77
+39-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:27:27-74
+40            </intent-filter>
+41        </activity>
+42
+43        <provider
+43-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:31:9-39:20
+44            android:name="androidx.core.content.FileProvider"
+44-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:32:13-62
+45            android:authorities="com.example.android.fileprovider"
+45-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:33:13-67
+46            android:exported="false"
+46-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:34:13-37
+47            android:grantUriPermissions="true" >
+47-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:35:13-47
+48            <meta-data
+48-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:36:13-38:64
+49                android:name="android.support.FILE_PROVIDER_PATHS"
+49-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:37:17-67
+50                android:resource="@xml/file_paths" />
+50-->/home/yug/StudioProjects/app/src/main/AndroidManifest.xml:38:17-51
+51        </provider>
+52        <provider
+52-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:23:9-27:43
+53            android:name="androidx.lifecycle.ProcessLifecycleOwnerInitializer"
+53-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:24:13-79
+54            android:authorities="com.example.myapplication.lifecycle-process"
+54-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:25:13-69
+55            android:exported="false"
+55-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:26:13-37
+56            android:multiprocess="true" />
+56-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:27:13-40
+57    </application>
+58
+59</manifest>
