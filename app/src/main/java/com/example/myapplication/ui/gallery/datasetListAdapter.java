@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.gallery;
 
 import android.content.Context;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.text.HtmlCompat;
 
 import com.example.myapplication.R;
 import com.github.waikatoufdl.ufdl4j.action.Datasets;
@@ -65,16 +67,34 @@ public class datasetListAdapter extends ArrayAdapter<Datasets.Dataset> {
             holder = (ViewHolder) convertView.getTag();
         }
 
+        //set the label colours to light blue
+        String datasetNameLabel = getColoredSpanned("Dataset Name: ");
+        String projectNameLabel = getColoredSpanned("Project name: ");
+        String tagLabel = getColoredSpanned("Tags: ");
+
+
         //set the view holder variable text
-        holder.datasetName.setText("Dataset Name: " + datasetName);
-        holder.projectName.setText("Project name: " + projectName);
-        holder.datasetTags.setText("Tags:" + datasetTags);
+        holder.datasetName.setText(HtmlCompat.fromHtml(datasetNameLabel + datasetName, HtmlCompat.FROM_HTML_MODE_LEGACY));
+        holder.projectName.setText(HtmlCompat.fromHtml(projectNameLabel + projectName, HtmlCompat.FROM_HTML_MODE_LEGACY));
+        holder.datasetTags.setText(HtmlCompat.fromHtml(tagLabel + datasetTags, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
         return convertView;
     }
 
     /**
-     * ViewHolder class to hold view objects
+     * method to colour substrings of one text view
+     * @param text The text to colour
+     * @return
+     */
+    private String getColoredSpanned(String text) {
+        String col = "#989898";
+        String format = "<font color=" + col + ">" + text + "</font>";
+        return format;
+    }
+
+    /**
+     * view holder object stores each of the component views inside the tag field of the layout
+     * making it possible to immediately access them without the needing to look them up repeatedly
      */
     static class ViewHolder
     {

@@ -44,10 +44,6 @@
         "source": "/home/yug/StudioProjects/app/src/main/res/layout/content_main.xml"
     },
     {
-        "merged": "/home/yug/StudioProjects/app/build/intermediates/res/merged/debug/drawable_dataset_folder_icon.xml.flat",
-        "source": "/home/yug/StudioProjects/app/src/main/res/drawable/dataset_folder_icon.xml"
-    },
-    {
         "merged": "/home/yug/StudioProjects/app/build/intermediates/res/merged/debug/navigation_mobile_navigation.xml.flat",
         "source": "/home/yug/StudioProjects/app/src/main/res/navigation/mobile_navigation.xml"
     },
