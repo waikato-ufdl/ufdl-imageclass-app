@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
@@ -246,8 +247,15 @@ public class HomeFragment extends Fragment {
         super.onViewStateRestored(savedInstanceState);
 
         if(savedInstanceState != null) {
-            currentPhotoPath = savedInstanceState.getString("photoPath");
-            displayScaledImage();
+            try {
+                currentPhotoPath = savedInstanceState.getString("photoPath");
+
+                if(currentPhotoPath != null) {
+                    displayScaledImage();
+                }
+            }
+            catch (Exception ex){
+            }
         }
     }
 }

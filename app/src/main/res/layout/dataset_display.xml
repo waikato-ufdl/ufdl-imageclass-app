@@ -24,19 +24,25 @@
             android:padding="5dp">
 
             <TextView
+                android:id="@+id/dataseName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="DATASET NAME"/>
+                android:text="DATASET NAME"
+                android:textColor="?attr/textColor"/>
 
             <TextView
+                android:id="@+id/projectName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Project"/>
+                android:text="Project"
+                android:textColor="?attr/textColor"/>
 
             <TextView
+                android:id="@+id/datasetTags"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tag(s)"/>
+                android:text="Tag(s)"
+                android:textColor="?attr/textColor"/>
 
         </LinearLayout>
 

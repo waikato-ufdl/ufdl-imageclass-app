@@ -1465,6 +1465,7 @@ drawable btn_radio_on_mtrl
 drawable btn_radio_on_to_off_mtrl_animation
 drawable button_design
 drawable dataset_folder
+drawable dataset_folder_icon
 drawable design_bottom_navigation_item_background
 drawable design_fab_background
 drawable design_ic_visibility
@@ -1627,6 +1628,8 @@ id coordinator
 id custom
 id customPanel
 id cut
+id dataseName
+id datasetTags
 id dataset_folder
 id dataset_license_spinner
 id dataset_license_title
@@ -1689,6 +1692,7 @@ id left
 id line1
 id line3
 id listMode
+id listViewDatasets
 id list_item
 id masked
 id media_actions
@@ -1751,6 +1755,7 @@ id percent
 id pin
 id progress_circular
 id progress_horizontal
+id projectName
 id radio
 id right
 id right_icon
@@ -1822,7 +1827,6 @@ id textEnd
 id textSpacerNoButtons
 id textSpacerNoTitle
 id textStart
-id text_gallery
 id text_input_end_icon
 id text_input_start_icon
 id text_slideshow
@@ -2055,6 +2059,7 @@ string error_icon_content_description
 string exposed_dropdown_menu_content_description
 string fab_transformation_scrim_behavior
 string fab_transformation_sheet_behavior
+string hello_blank_fragment
 string hide_bottom_view_on_scroll_behavior
 string icon_content_description
 string item_view_role_description

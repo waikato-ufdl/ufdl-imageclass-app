@@ -16,6 +16,8 @@ import android.widget.Switch;
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.ui.home.HomeFragment;
+import com.google.android.material.internal.NavigationMenu;
+import com.google.android.material.navigation.NavigationView;
 
 
 public class SettingsFragment extends Fragment {
@@ -75,13 +77,7 @@ public class SettingsFragment extends Fragment {
         buttonToMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                HomeFragment frag = new HomeFragment();
-                getFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.nav_host_fragment, frag)
-                        .addToBackStack(null)
-                        .commit();
+                Navigation.findNavController(view).popBackStack();
             }
         });
 
