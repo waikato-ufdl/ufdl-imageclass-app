@@ -12,6 +12,10 @@
         "source": "/home/yug/StudioProjects/app/src/main/res/menu/main.xml"
     },
     {
+        "merged": "/home/yug/StudioProjects/app/build/intermediates/res/merged/debug/drawable-xhdpi_loading_image.png.flat",
+        "source": "/home/yug/StudioProjects/app/src/main/res/drawable-xhdpi/loading_image.png"
+    },
+    {
         "merged": "/home/yug/StudioProjects/app/build/intermediates/res/merged/debug/layout_dataset_display.xml.flat",
         "source": "/home/yug/StudioProjects/app/src/main/res/layout/dataset_display.xml"
     },
@@ -38,6 +42,10 @@
     {
         "merged": "/home/yug/StudioProjects/app/build/intermediates/res/merged/debug/layout_fragment_gallery.xml.flat",
         "source": "/home/yug/StudioProjects/app/src/main/res/layout/fragment_gallery.xml"
+    },
+    {
+        "merged": "/home/yug/StudioProjects/app/build/intermediates/res/merged/debug/drawable_progress_animation.xml.flat",
+        "source": "/home/yug/StudioProjects/app/src/main/res/drawable/progress_animation.xml"
     },
     {
         "merged": "/home/yug/StudioProjects/app/build/intermediates/res/merged/debug/layout_content_main.xml.flat",

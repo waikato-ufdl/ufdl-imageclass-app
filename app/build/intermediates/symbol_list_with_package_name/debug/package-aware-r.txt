@@ -1483,6 +1483,7 @@ drawable ic_mtrl_chip_checked_black
 drawable ic_mtrl_chip_checked_circle
 drawable ic_mtrl_chip_close_circle
 drawable ic_uow_logo
+drawable loading_image
 drawable material_ic_calendar_black_24dp
 drawable material_ic_clear_black_24dp
 drawable material_ic_edit_black_24dp
@@ -1513,6 +1514,7 @@ drawable notification_template_icon_low_bg
 drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
 drawable popup_background
+drawable progress_animation
 drawable ripple_oval
 drawable side_nav_bar
 drawable test_custom_background
