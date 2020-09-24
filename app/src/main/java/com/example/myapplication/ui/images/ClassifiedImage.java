@@ -34,4 +34,8 @@ public class ClassifiedImage {
     {
         return BitmapFactory.decodeByteArray(imageArray, 0, imageArray.length);
     }
+
+    public byte[] getImageArray() {
+        return imageArray;
+    }
 }

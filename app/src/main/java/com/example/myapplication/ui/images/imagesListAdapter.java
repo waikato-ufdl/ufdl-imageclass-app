@@ -57,7 +57,7 @@ public class imagesListAdapter extends ArrayAdapter<ClassifiedImage> {
 
         Glide.with(getContext())
                 .asBitmap()
-                .load(images.get(position).getImage())
+                .load(images.get(position).getImageArray())
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.image);
 
