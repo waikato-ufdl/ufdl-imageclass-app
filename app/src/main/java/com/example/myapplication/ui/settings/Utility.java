@@ -4,6 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.example.myapplication.R;
+import com.example.myapplication.ui.images.ClassifiedImage;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * This is a class that will be used to store and retrieve user settings from shared storage
@@ -15,6 +19,7 @@ public class Utility {
                                                 Manifest.permission.READ_EXTERNAL_STORAGE,
                                                 Manifest.permission.CAMERA};
 
+    private static HashMap<Integer, ArrayList<ClassifiedImage>> imagesCollection = new HashMap<>();
 
 
     public static SharedPreferences getPrefs(Context context) {
@@ -64,5 +69,24 @@ public class Utility {
 
         //else, return light theme
         return R.style.AppTheme;
+    }
+
+    /**
+     * Store an image list into the hashmap (imagesCollection)
+     * @param key   : The primary key (int) of the dataset for which the image list belongs
+     * @param value : An arraylist of ClassifiedImages to store
+     */
+    public static void saveImageList(Integer key, ArrayList<ClassifiedImage> value)
+    {
+        imagesCollection.put(key, value);
+    }
+
+    public static ArrayList<ClassifiedImage> getImageList(Integer key)
+    {
+        if(imagesCollection.containsKey(key)) {
+            return imagesCollection.get(key);
+        }
+
+        return null;
     }
 }

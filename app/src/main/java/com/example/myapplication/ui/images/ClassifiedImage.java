@@ -35,6 +35,10 @@ public class ClassifiedImage {
         return BitmapFactory.decodeByteArray(imageArray, 0, imageArray.length);
     }
 
+    /**
+     * Method to retrieve the image array
+     * @return
+     */
     public byte[] getImageArray() {
         return imageArray;
     }
