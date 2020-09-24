@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat;
 import com.example.myapplication.ui.settings.Utility;
 import com.github.waikatoufdl.ufdl4j.Client;
 import com.github.waikatoufdl.ufdl4j.action.Datasets;
+import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
 import com.github.waikatoufdl.ufdl4j.action.Licenses;
 import com.github.waikatoufdl.ufdl4j.auth.MemoryOnlyStorage;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -28,6 +29,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -71,20 +74,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //establish a connection to the UFDL backend using server URL, username, password. Need to also provide a tokenStorageHandler to
         //handle the storage and retrieval of the access and refresh tokens which will be used in API calls.
         client = new Client("http://127.0.0.1:8000", "admin", "admin", new MemoryOnlyStorage());
+        //ArrayList<byte[]> images = new ArrayList<>();
 
+
+        /*
         //an example to see whether we are able to retrieve the list of licenses from the backend
         try {
-            System.out.println("\nDatasets:");
+            ImageClassificationDatasets action = client.action(ImageClassificationDatasets.class);
+            //System.out.println("\nDatasets:");
             for (Datasets.Dataset dataset : client.datasets().list()) {
-                System.out.println(dataset.getName());
+                //System.out.println(dataset.getName());
             }
 
+            Map<String, List<String>>  categories = action.getCategories(3);
+
+            for(Map.Entry<String, List<String>> entry: categories.entrySet()) {
+                System.out.println(entry.getKey());
+                images.add(client.datasets().getFile(3, entry.getKey()));
+            }
+
+            System.out.println(images.size());
+
+
             for (Licenses.License license : client.licenses().list()) {
-                System.out.println(license.getName());
+                //System.out.println(license.getName());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+         */
     }
 
 
@@ -119,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.settingsFragment)
+                R.id.nav_home, R.id.nav_gallery, R.id.settingsFragment, R.id.imagesFragment)
                 .setDrawerLayout(drawerLayout)
                 .build();
 

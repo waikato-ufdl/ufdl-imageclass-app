@@ -6,17 +6,20 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.Navigation;
 
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
@@ -30,7 +33,6 @@ import static androidx.core.content.ContextCompat.getSystemService;
 
 public class GalleryFragment extends Fragment {
     private ImageButton btnNewDataset;
-    private ArrayList<Datasets.Dataset> dataset;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,13 +70,26 @@ public class GalleryFragment extends Fragment {
             //must start a thread to retrieve the dataset information as networking operations cannot be done on the main thread
             Thread t = new Thread(() -> {
                 try {
-                    dataset = (ArrayList) ((MainActivity) getActivity()).getClient().datasets().list();
+                    final ArrayList<Datasets.Dataset> dataset = (ArrayList) ((MainActivity) getActivity()).getClient().datasets().list();
 
                     //must populate the listview on the main thread
                     getActivity().runOnUiThread(() -> {
                         ListView mListView = (ListView) root.findViewById(R.id.listViewDatasets);
                         datasetListAdapter adapter = new datasetListAdapter(getContext(), R.layout.dataset_display, dataset);
                         mListView.setAdapter(adapter);
+
+                        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                                Bundle bundle = new Bundle();
+                                bundle.putInt("datasetPK", dataset.get(position).getPK());
+
+
+                                //move to the images fragment to display this images fragment
+                                Navigation.findNavController(view).navigate(R.id.action_nav_gallery_to_imagesFragment, bundle);
+                            }
+                        });
                     });
 
                 } catch (Exception e) {

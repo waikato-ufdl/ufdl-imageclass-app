@@ -1585,6 +1585,7 @@ id action_menu_presenter
 id action_mode_bar
 id action_mode_bar_stub
 id action_mode_close_button
+id action_nav_gallery_to_imagesFragment
 id action_text
 id actions
 id activity_chooser_view_content
@@ -1670,7 +1671,10 @@ id floating
 id forever
 id ghost_view
 id ghost_view_holder
+id glide_custom_view_target_tag
 id gone
+id gridImageView
+id gridTextView
 id group_divider
 id groups
 id hideable
@@ -1680,7 +1684,9 @@ id icon
 id icon_group
 id ifRoom
 id image
+id imageGrid
 id imageView
+id imagesFragment
 id info
 id invisible
 id italic
@@ -1944,8 +1950,10 @@ layout design_text_input_end_icon
 layout design_text_input_start_icon
 layout fragment_gallery
 layout fragment_home
+layout fragment_images
 layout fragment_settings
 layout fragment_slideshow
+layout image_display
 layout mtrl_alert_dialog
 layout mtrl_alert_dialog_actions
 layout mtrl_alert_dialog_title
@@ -2058,6 +2066,7 @@ string error_icon_content_description
 string exposed_dropdown_menu_content_description
 string fab_transformation_scrim_behavior
 string fab_transformation_sheet_behavior
+string hello_blank_fragment
 string hide_bottom_view_on_scroll_behavior
 string icon_content_description
 string item_view_role_description

@@ -1,25 +1,18 @@
 package com.example.myapplication.ui.gallery;
 
 import android.content.Context;
-import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.text.HtmlCompat;
-
 import com.example.myapplication.R;
 import com.github.waikatoufdl.ufdl4j.action.Datasets;
-
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class datasetListAdapter extends ArrayAdapter<Datasets.Dataset> {
     private Context mContext;
