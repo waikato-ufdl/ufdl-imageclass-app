@@ -77,32 +77,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //ArrayList<byte[]> images = new ArrayList<>();
 
 
-        /*
+
         //an example to see whether we are able to retrieve the list of licenses from the backend
         try {
-            ImageClassificationDatasets action = client.action(ImageClassificationDatasets.class);
-            //System.out.println("\nDatasets:");
-            for (Datasets.Dataset dataset : client.datasets().list()) {
-                //System.out.println(dataset.getName());
-            }
+//            ImageClassificationDatasets action = client.action(ImageClassificationDatasets.class);
+//            //System.out.println("\nDatasets:");
+//            for (Datasets.Dataset dataset : client.datasets().list()) {
+//                //System.out.println(dataset.getName());
+//            }
+//
+//            Map<String, List<String>>  categories = action.getCategories(3);
+//
+//            for(Map.Entry<String, List<String>> entry: categories.entrySet()) {
+//                System.out.println(entry.getKey());
+//                images.add(client.datasets().getFile(3, entry.getKey()));
+//            }
+//
+//            System.out.println(images.size());
 
-            Map<String, List<String>>  categories = action.getCategories(3);
-
-            for(Map.Entry<String, List<String>> entry: categories.entrySet()) {
-                System.out.println(entry.getKey());
-                images.add(client.datasets().getFile(3, entry.getKey()));
-            }
-
-            System.out.println(images.size());
-
-
+            String licName = "";
             for (Licenses.License license : client.licenses().list()) {
-                //System.out.println(license.getName());
+                licName = license.getName();
+                System.out.println(licName);
+                databaseHelper.insertLicenses(licName);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-         */
+
     }
 
 

@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "/home/yug/StudioProjects/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-small-v4/values-small-v4.xml",
+            "outputFile": "/home/jordan/StudioProjects/374/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-small-v4/values-small-v4.xml",
             "map": [
                 {
-                    "source": "/home/yug/.gradle/caches/transforms-2/files-2.1/d776e52f087aabc381b0b4907fc988e8/material-1.2.0/res/values-small-v4/values-small-v4.xml",
+                    "source": "/home/jordan/.gradle/caches/transforms-2/files-2.1/d776e52f087aabc381b0b4907fc988e8/material-1.2.0/res/values-small-v4/values-small-v4.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",

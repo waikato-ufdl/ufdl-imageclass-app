@@ -27,6 +27,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String IMAGE_COL_5 = "DATASET_ID";
     public static final String IMAGE_COL_6 = "IMAGE_SYNC_OPERATIONS";
 
+    public static final String TABLE_LICENSE = "license_table";
+    public static final String LICENSE_COL_1 = "LICENSE_NAME";
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
     }
@@ -42,7 +45,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 DATASET_COL_5 + " INTEGER DEFAULT 1 NOT NULL, " +
                 DATASET_COL_6 + " TEXT, " +
                 DATASET_COL_7 + " TEXT, " +
-                DATASET_COL_8 + " TEXT)");
+                DATASET_COL_8 + " TEXT, " +
+                        "FOREIGN KEY (" + DATASET_COL_6 + ")" +
+                        "REFERENCES " + TABLE_LICENSE + " (" + LICENSE_COL_1 + "))"
+                );
 
         sqLiteDatabase.execSQL("create table " +
                 TABLE_IMAGE + " (" +
@@ -55,6 +61,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         "FOREIGN KEY (" + IMAGE_COL_5 + ")" +
                         "REFERENCES " + TABLE_DATASET + " (" + DATASET_COL_1 + "))"
                 );
+
+        sqLiteDatabase.execSQL("create table " +
+                TABLE_LICENSE + " (" +
+                LICENSE_COL_1 + " TEXT PRIMARY KEY)");
     }
 
     @Override
@@ -62,6 +72,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("drop table if exists " + TABLE_DATASET);
         sqLiteDatabase.execSQL("drop table if exists " + TABLE_IMAGE);
         onCreate(sqLiteDatabase);
+    }
+
+    public Cursor getLicenses() {
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        Cursor result = sqLiteDatabase.rawQuery("select * from " + TABLE_LICENSE, null);
+        return result;
+    }
+
+    public boolean insertLicenses(String licenseName){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(LICENSE_COL_1, licenseName);
+        long result = sqLiteDatabase.insert(TABLE_LICENSE, null, contentValues);
+        if (result == -1){
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public Cursor getDatasets() {
@@ -86,11 +114,51 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return true;
     }
 
+    public boolean updateDataset(String name, String project, Boolean private_dataset, String license, String tags) {
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DATASET_COL_3, name);
+        contentValues.put(DATASET_COL_4, project);
+        contentValues.put(DATASET_COL_5, private_dataset);
+        contentValues.put(DATASET_COL_6, license);
+        contentValues.put(DATASET_COL_7, tags);
+        contentValues.put(DATASET_COL_8, "update");
+        sqLiteDatabase.update(TABLE_DATASET, contentValues, DATASET_COL_3 + " = ?", new String[] {name});
+        return true;
+    }
+
     public boolean deleteDataset(String name) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(DATASET_COL_8, "delete");
         sqLiteDatabase.update(TABLE_DATASET, contentValues, DATASET_COL_3 + " = ?", new String[] {name});
+        return true;
+    }
+
+    public boolean insertImage(String name, String category, String full_path, String thumbnail_path, int dataset_id) {
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(IMAGE_COL_1, name);
+        contentValues.put(IMAGE_COL_2, category);
+        contentValues.put(IMAGE_COL_3, full_path);
+        contentValues.put(IMAGE_COL_4, thumbnail_path);
+        contentValues.put(IMAGE_COL_5, dataset_id);
+        contentValues.put(IMAGE_COL_6, "add");
+        long result = sqLiteDatabase.insert(TABLE_IMAGE, null, contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
+
+    public boolean updateImage(String name, String category, int dataset_id) {
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(IMAGE_COL_1, name);
+        contentValues.put(IMAGE_COL_2, category);
+        contentValues.put(IMAGE_COL_5, dataset_id);
+        contentValues.put(IMAGE_COL_6, "update");
+        sqLiteDatabase.update(TABLE_IMAGE, contentValues, IMAGE_COL_1 + " = ?", new String[] {name});
         return true;
     }
 

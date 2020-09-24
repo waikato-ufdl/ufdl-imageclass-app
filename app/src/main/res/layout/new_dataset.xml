@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_margin="15dp"
     android:padding="10dp"
-    android:background="@drawable/popup_background">
+    android:background="?attr/backgroundColor">
 
     <TextView
         android:id="@+id/dataset_name_title"
@@ -52,7 +52,7 @@
         android:textColor="?attr/textColor"
         android:textColorHint="@color/grey"
         android:hint="Project"
-        android:layout_below="@+id/dataset_name_title"
+        android:layout_below="@+id/dataset_project_title"
         android:layout_marginBottom="20dp" />
 
     <TextView
@@ -72,7 +72,35 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:entries="@array/license_array"
-        android:prompt="@string/license_prompt"/>
+        android:prompt="@string/license_prompt"
+        android:padding="10dp"
+        android:layout_marginBottom="20dp"
+        />
+
+    <TextView
+        android:id="@+id/dataset_tags"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TAGS (OPTIONAL)"
+        android:textSize="@dimen/settingsLabelSizes"
+        android:textColor="@color/colorAccent"
+        android:textColorHint="@color/grey"
+        android:hint="Tags"
+        android:layout_above="@+id/dataset_tags_text"
+        />
+
+    <EditText
+        android:id="@+id/dataset_tags_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/inputTextSize"
+        android:padding="10dp"
+        android:background="@drawable/edit_text_design"
+        android:textColor="?attr/textColor"
+        android:textColorHint="@color/grey"
+        android:hint="Tags"
+        android:layout_below="@+id/dataset_name_title"
+        android:layout_marginBottom="20dp" />
 
     <Switch
         android:id="@+id/themeSwitch"

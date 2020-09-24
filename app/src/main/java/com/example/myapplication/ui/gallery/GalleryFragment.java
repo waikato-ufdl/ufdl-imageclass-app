@@ -7,10 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +32,8 @@ import java.util.ArrayList;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 import static androidx.core.content.ContextCompat.getSystemService;
+import static com.example.myapplication.R.array.license_array;
+import static com.example.myapplication.R.layout.spinner_item;
 
 public class GalleryFragment extends Fragment {
     private ImageButton btnNewDataset;
@@ -74,7 +78,7 @@ public class GalleryFragment extends Fragment {
 
                     //must populate the listview on the main thread
                     getActivity().runOnUiThread(() -> {
-                        ListView mListView = (ListView) root.findViewById(R.id.listViewDatasets);
+                        ListView mListView = (ListView) root.findViewById(R.id.list_view_datasets);
                         datasetListAdapter adapter = new datasetListAdapter(getContext(), R.layout.dataset_display, dataset);
                         mListView.setAdapter(adapter);
 
@@ -112,10 +116,17 @@ public class GalleryFragment extends Fragment {
                     null);
             // create a 300px width and 470px height PopupWindow
             final PopupWindow popupWindow = new PopupWindow(layout,
-                    LinearLayout.LayoutParams.FILL_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT, true);
+
             // display the popup in the center
             popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
+
+            Spinner licenseSpinner = (Spinner) v.findViewById(R.id.dataset_license_spinner);
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
+                    spinner_item);
+            dataAdapter.setDropDownViewResource(spinner_item);
+            licenseSpinner.setAdapter(dataAdapter);
         } catch (Exception e) {
             e.printStackTrace();
         }
