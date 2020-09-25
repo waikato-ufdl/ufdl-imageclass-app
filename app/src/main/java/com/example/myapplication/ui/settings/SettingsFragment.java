@@ -10,6 +10,7 @@ import androidx.navigation.Navigation;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,9 @@ public class SettingsFragment extends Fragment {
     EditText username;
     EditText password;
     EditText serverURL;
+    String prevUsername;
+    String prevPassword;
+    String prevServerURL;
 
     public SettingsFragment()
     {
@@ -115,9 +119,13 @@ public class SettingsFragment extends Fragment {
                 //only exit if the required fields are not empty
                 if(valid) {
 
-                    //save user details before exiting & also establish a connection to the API
-                    saveSettings();
-                    Utility.connectToServer();
+                    //if the user has changed their details
+                    if(detailsHaveChanged()) {
+                        //save user details before exiting & also establish a connection to the API using the settings information
+                        saveSettings();
+                        Utility.connectToServer();
+                    }
+
                     Navigation.findNavController(view).popBackStack();
                 }
             }
@@ -127,18 +135,25 @@ public class SettingsFragment extends Fragment {
         return v;
     }
 
+    public boolean detailsHaveChanged()
+    {
+        return (!prevUsername.equals(username.getText().toString().trim())|
+                !prevPassword.equals(password.getText().toString().trim())|
+                !prevServerURL.equals(serverURL.getText().toString().trim()));
+    }
+
     /**
      * Method to retrieve a user's stored settings & display them to the EditTexts
      */
     public void retrieveSavedSettings()
     {
-        String user = (Utility.loadUsername() != null) ? Utility.loadUsername() : "";
-        String pass = (Utility.loadPassword() != null) ? Utility.loadPassword() : "";
-        String URL = (Utility.loadServerURL() != null) ? Utility.loadServerURL() : "";
+        prevUsername = (Utility.loadUsername() != null) ? Utility.loadUsername() : "";
+        prevPassword = (Utility.loadPassword() != null) ? Utility.loadPassword() : "";
+        prevServerURL = (Utility.loadServerURL() != null) ? Utility.loadServerURL() : "";
 
-        username.setText(user);
-        password.setText(pass);
-        serverURL.setText(URL);
+        username.setText(prevUsername);
+        password.setText(prevPassword);
+        serverURL.setText(prevServerURL);
     }
 
     /**

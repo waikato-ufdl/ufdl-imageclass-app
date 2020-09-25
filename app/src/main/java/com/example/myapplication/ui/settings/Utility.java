@@ -3,7 +3,9 @@ import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.ui.images.ClassifiedImage;
 import com.github.waikatoufdl.ufdl4j.Client;
@@ -171,15 +173,12 @@ public class Utility {
      */
     public static void connectToServer()
     {
-        if(client == null) {
-            client = new Client(loadServerURL(), loadUsername(), loadPassword(), new MemoryOnlyStorage());
-        }
+        client = new Client(loadServerURL(), loadUsername(), loadPassword(), new MemoryOnlyStorage());
     }
 
     public static Client getClient()
     {
         return client;
     }
-
 
 }

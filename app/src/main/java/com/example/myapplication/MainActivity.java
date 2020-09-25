@@ -5,9 +5,12 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import com.example.myapplication.ui.settings.Utility;
+import com.github.waikatoufdl.ufdl4j.action.Licenses;
 import com.google.android.material.navigation.NavigationView;
 import androidx.core.view.GravityCompat;
 import androidx.navigation.NavController;
@@ -17,6 +20,9 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import java.net.ConnectException;
+import java.net.UnknownHostException;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -79,15 +85,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            System.out.println(images.size());
 
             String licName = "";
-            for (Licenses.License license : client.licenses().list()) {
+            for (Licenses.License license : Utility.getClient().licenses().list()) {
                 licName = license.getName();
                 System.out.println(licName);
                 databaseHelper.insertLicenses(licName);
             }
-        } catch (Exception e) {
+        } catch (IllegalStateException e) {
+            showToast("Please check your username, password and server URL details in settings");
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
+    }
 
+    /**
+     * A method to display a toast message
+     * @param message
+     */
+    public void showToast(String message)
+    {
+        runOnUiThread(() -> {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void runActivity()

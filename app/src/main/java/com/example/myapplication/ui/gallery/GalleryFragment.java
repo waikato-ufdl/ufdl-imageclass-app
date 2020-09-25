@@ -66,8 +66,6 @@ public class GalleryFragment extends Fragment {
 
         //check that the user settings are not empty
         checkSettings(view);
-        displayDatasets(view);
-
     }
 
     /**
@@ -81,6 +79,10 @@ public class GalleryFragment extends Fragment {
         {
             //navigate to settings and make them enter these details
             Navigation.findNavController(view).navigate(R.id.action_nav_gallery_to_settingsFragment);
+        }
+        else
+        {
+            displayDatasets(view);
         }
     }
 
@@ -115,18 +117,21 @@ public class GalleryFragment extends Fragment {
                             }
                         });
                     });
-
-                } catch (Exception e) {
+                }
+                catch (IllegalStateException e) {
+                    ((MainActivity) getActivity()).showToast("Please check your username, password and server URL details in settings");
+                }
+                catch (Exception e) {
                     e.printStackTrace();
                 }
             });
             t.start();
 
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     public void initiateNewDatasetWindow(View v) {
         try {
