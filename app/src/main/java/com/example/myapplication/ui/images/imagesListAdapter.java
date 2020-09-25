@@ -52,15 +52,19 @@ public class imagesListAdapter extends ArrayAdapter<ClassifiedImage> {
         }
         else
         {
+            //reference the view from memory
             holder = (ViewHolder) convertView.getTag();
         }
 
+        //use glide to load image into the image view for display
         Glide.with(getContext())
                 .asBitmap()
                 .load(images.get(position).getImageArray())
+                .placeholder(R.drawable.progress_animation)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.image);
 
+        //set the textview to show the classification label
         holder.classification.setText(images.get(position).getClassification());
 
         return convertView;
@@ -71,7 +75,4 @@ public class imagesListAdapter extends ArrayAdapter<ClassifiedImage> {
         ImageView image;
         TextView classification;
     }
-
-
-
 }

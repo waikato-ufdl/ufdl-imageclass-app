@@ -43,7 +43,7 @@
         android:textColorHint="@color/grey"
         android:hint="@string/URL"
         android:layout_marginBottom="40dp"
-        android:layout_below="@id/URLHeader"/>
+        android:layout_below="@id/URLHeader" />
 
     <TextView
         android:layout_width="wrap_content"

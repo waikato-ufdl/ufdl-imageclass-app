@@ -20,6 +20,8 @@ import androidx.core.content.FileProvider;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.Navigation;
+
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.ui.settings.Utility;
@@ -70,6 +72,9 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        //check if this is the first time the user is User is using this app (their settings will be empty)
+        checkSettings(view);
+
         //initialise the view components
         capturedImage = (ImageView) view.findViewById(R.id.cameraImage);
         captureButton = (Button) view.findViewById(R.id.captureImageButton);
@@ -86,6 +91,20 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+    }
+
+    /**
+     * Method to check whether the required settings have been set, if not, move to settings fragment
+     * @param view
+     */
+    public void checkSettings(View view)
+    {
+        //if these main user settings are empty, this must be the user's first time using this app
+        if(Utility.loadUsername() == null | Utility.loadPassword() == null | Utility.loadServerURL() == null)
+        {
+            //navigate to settings and make them enter these details
+            Navigation.findNavController(view).navigate(R.id.action_nav_home_to_settingsFragment);
+        }
     }
 
     @Override
