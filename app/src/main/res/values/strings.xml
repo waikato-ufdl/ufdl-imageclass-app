@@ -30,4 +30,7 @@
         <item>India</item>
     </string-array>
 
+    <!-- Context Menu for Image Management -->
+    <string name="Delete">Delete</string>
+
 </resources>

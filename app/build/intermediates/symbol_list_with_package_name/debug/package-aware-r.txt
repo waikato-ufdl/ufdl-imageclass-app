@@ -1472,6 +1472,7 @@ drawable design_ic_visibility_off
 drawable design_password_eye
 drawable design_snackbar_background
 drawable edit_text_design
+drawable ic_baseline_delete_24
 drawable ic_launcher_background
 drawable ic_launcher_foreground
 drawable ic_menu_camera
@@ -1580,6 +1581,7 @@ id action_bar_subtitle
 id action_bar_title
 id action_container
 id action_context_bar
+id action_delete
 id action_divider
 id action_image
 id action_menu_divider
@@ -1690,6 +1692,7 @@ id icon
 id icon_group
 id ifRoom
 id image
+id imageCheckBox
 id imageGrid
 id imageView
 id imagesFragment
@@ -2025,11 +2028,13 @@ layout text_view_with_line_height_from_style
 layout text_view_with_theme_line_height
 layout text_view_without_line_height
 menu activity_main_drawer
+menu context_menu
 menu main
 mipmap ic_launcher
 mipmap ic_launcher_round
 navigation mobile_navigation
 plurals mtrl_badge_content_description
+string Delete
 string URL
 string abc_action_bar_home_description
 string abc_action_bar_up_description

@@ -6,7 +6,7 @@
 
     <ImageView
         android:id="@+id/gridImageView"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
         app:layout_constraintWidth_default="percent"
@@ -15,6 +15,17 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         />
+
+    <CheckBox
+        android:id="@+id/imageCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/gridImageView"
+        app:layout_constraintRight_toRightOf="@id/gridImageView"
+        android:visibility="gone"
+        android:buttonTint="@color/colorPrimary"/>
+
+
 
         <TextView
             android:id="@+id/gridTextView"

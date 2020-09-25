@@ -1,11 +1,13 @@
 package com.example.myapplication.ui.images;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -46,6 +48,7 @@ public class imagesListAdapter extends ArrayAdapter<ClassifiedImage> {
             holder = new ViewHolder();;
             holder.image = (ImageView) convertView.findViewById(R.id.gridImageView);
             holder.classification = (TextView) convertView.findViewById(R.id.gridTextView);
+            holder.checkBox = (CheckBox) convertView.findViewById(R.id.imageCheckBox);
 
             //stores the view in memory
             convertView.setTag(holder);
@@ -67,6 +70,19 @@ public class imagesListAdapter extends ArrayAdapter<ClassifiedImage> {
         //set the textview to show the classification label
         holder.classification.setText(images.get(position).getClassification());
 
+        //if the user is in action mode (multi select mode)
+        if(ImagesFragment.isActionMode)
+        {
+            //show the checkboxes
+            holder.checkBox.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            //else don't show checkboxes on image
+            holder.checkBox.setVisibility(View.GONE);
+        }
+
+
         return convertView;
     }
 
@@ -74,5 +90,6 @@ public class imagesListAdapter extends ArrayAdapter<ClassifiedImage> {
     {
         ImageView image;
         TextView classification;
+        CheckBox checkBox;
     }
 }

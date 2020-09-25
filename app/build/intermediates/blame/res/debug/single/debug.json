@@ -48,20 +48,24 @@
         "source": "/home/yug/374/app/src/main/res/layout/fragment_home.xml"
     },
     {
-        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/navigation_mobile_navigation.xml.flat",
-        "source": "/home/yug/374/app/src/main/res/navigation/mobile_navigation.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_spinner_item.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/spinner_item.xml"
     },
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_menu_settings.xml.flat",
         "source": "/home/yug/374/app/src/main/res/drawable/ic_menu_settings.xml"
     },
     {
-        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_spinner_item.xml.flat",
-        "source": "/home/yug/374/app/src/main/res/layout/spinner_item.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/navigation_mobile_navigation.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/navigation/mobile_navigation.xml"
     },
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_dataset_folder.xml.flat",
         "source": "/home/yug/374/app/src/main/res/drawable/dataset_folder.xml"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/menu_context_menu.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/menu/context_menu.xml"
     },
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_edit_text_design.xml.flat",
@@ -106,6 +110,10 @@
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-xhdpi_ic_launcher.png.flat",
         "source": "/home/yug/374/app/src/main/res/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_baseline_delete_24.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/ic_baseline_delete_24.xml"
     },
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_menu_slideshow.xml.flat",

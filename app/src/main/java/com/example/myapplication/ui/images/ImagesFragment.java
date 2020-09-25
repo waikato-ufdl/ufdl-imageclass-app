@@ -11,11 +11,18 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AbsListView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toolbar;
 
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
@@ -28,8 +35,10 @@ import java.util.Map;
 
 
 public class ImagesFragment extends Fragment {
-    ArrayList<ClassifiedImage> images;
-    int datasetKey;
+    private ArrayList<ClassifiedImage> images;
+    private int datasetKey;
+    public static boolean isActionMode = false;
+
 
     public ImagesFragment() {
         // Required empty public constructor
@@ -53,6 +62,10 @@ public class ImagesFragment extends Fragment {
     private void setupImageGrid()
     {
         GridView gridView = getView().findViewById(R.id.imageGrid);
+
+        gridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
+        gridView.setMultiChoiceModeListener(modeListener);
+
         imagesListAdapter adapter = new imagesListAdapter(getContext(), R.layout.image_display, images);
         gridView.setAdapter(adapter);
     }
@@ -116,5 +129,42 @@ public class ImagesFragment extends Fragment {
             Utility.saveImageList(datasetKey, images);
         });
     }
+
+
+    GridView.MultiChoiceModeListener modeListener = new GridView.MultiChoiceModeListener() {
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                //inflate the context menu
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(R.menu.context_menu, menu);
+
+                //users are now in the contextual action mode where they can multi select images & delete
+                isActionMode = true;
+
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                isActionMode = false;
+            }
+
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+
+            }
+        };
+
 
 }
