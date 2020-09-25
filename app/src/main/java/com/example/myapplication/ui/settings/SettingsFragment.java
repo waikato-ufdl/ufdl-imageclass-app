@@ -116,8 +116,8 @@ public class SettingsFragment extends Fragment {
 
                 boolean valid = checkDetailsEntered();
 
-                //only exit if the required fields are not empty
-                if(valid) {
+                //only exit if the required fields are not empty & also check if the URL is valid
+                if(valid & Utility.isValidURL(serverURL.getText().toString().trim())) {
 
                     //if the user has changed their details
                     if(detailsHaveChanged()) {
@@ -127,6 +127,11 @@ public class SettingsFragment extends Fragment {
                     }
 
                     Navigation.findNavController(view).popBackStack();
+                }
+                else
+                {
+                    //if the URL is invalid, inform the user about the issue
+                    serverURL.setError("Invalid URL");
                 }
             }
         });

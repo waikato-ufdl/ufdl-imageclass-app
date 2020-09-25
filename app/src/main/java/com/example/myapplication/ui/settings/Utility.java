@@ -3,6 +3,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.util.Patterns;
 import android.widget.Toast;
 
 import com.example.myapplication.MainActivity;
@@ -11,6 +12,7 @@ import com.example.myapplication.ui.images.ClassifiedImage;
 import com.github.waikatoufdl.ufdl4j.Client;
 import com.github.waikatoufdl.ufdl4j.auth.MemoryOnlyStorage;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -171,14 +173,32 @@ public class Utility {
      * Method to connect to the UFDL backend using the user's details which are stored in settings.  Need to also provide a tokenStorageHandler to
      * handle the storage and retrieval of the access and refresh tokens which will be used in API calls.
      */
-    public static void connectToServer()
-    {
+    public static void connectToServer() {
         client = new Client(loadServerURL(), loadUsername(), loadPassword(), new MemoryOnlyStorage());
     }
 
+    /**
+     * Getter method to retrieve client
+     * @return
+     */
     public static Client getClient()
     {
         return client;
     }
 
+    /**
+     * Method to check whether a URL is valid
+     * @param URL
+     * @return
+     */
+    public static boolean isValidURL(String URL)
+    {
+        return Patterns.WEB_URL.matcher(URL).matches();
+    }
+
+    public static boolean authenticationFailed()
+    {
+        String[] data = client.toString().split(" ");
+        return data[data.length-1].equals("access=") | data[data.length-1].equals("tokens=null");
+    }
 }

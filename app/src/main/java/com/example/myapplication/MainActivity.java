@@ -66,9 +66,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //ArrayList<byte[]> images = new ArrayList<>();
 
 
-
-        //an example to see whether we are able to retrieve the list of licenses from the backend
-        try {
+        if(!Utility.authenticationFailed()) {
+            //an example to see whether we are able to retrieve the list of licenses from the backend
+            try {
 //            ImageClassificationDatasets action = client.action(ImageClassificationDatasets.class);
 //            //System.out.println("\nDatasets:");
 //            for (Datasets.Dataset dataset : client.datasets().list()) {
@@ -84,18 +84,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //
 //            System.out.println(images.size());
 
-            String licName = "";
-            for (Licenses.License license : Utility.getClient().licenses().list()) {
-                licName = license.getName();
-                System.out.println(licName);
-                databaseHelper.insertLicenses(licName);
+                String licName = "";
+                for (Licenses.License license : Utility.getClient().licenses().list()) {
+                    licName = license.getName();
+                    System.out.println(licName);
+                    databaseHelper.insertLicenses(licName);
+                }
+            } catch (IllegalStateException e) {
+                showToast("Please check your username, password and server URL details in settings");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (IllegalStateException e) {
-            showToast("Please check your username, password and server URL details in settings");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
         }
     }
 

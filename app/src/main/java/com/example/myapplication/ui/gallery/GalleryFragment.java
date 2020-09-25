@@ -82,7 +82,11 @@ public class GalleryFragment extends Fragment {
         }
         else
         {
-            displayDatasets(view);
+            //only continue if the client is connected to the API
+            if(!Utility.authenticationFailed());
+            {
+                displayDatasets(view);
+            }
         }
     }
 
