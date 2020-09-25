@@ -48,9 +48,6 @@ public class GalleryFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_gallery, container, false);
 
-        displayDatasets(root);
-       
-                
         btnNewDataset = root.findViewById(R.id.fab_add_dataset);
         btnNewDataset.setOnClickListener(view -> {
             initiateNewDatasetWindow(view);
@@ -59,6 +56,29 @@ public class GalleryFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        //check that the user settings are not empty
+        checkSettings(view);
+        displayDatasets(view);
+
+    }
+
+    /**
+     * Method to check whether the required settings have been set, if not, move to settings fragment
+     * @param view
+     */
+    public void checkSettings(View view)
+    {
+        //if these main user settings are empty, this must be the user's first time using this app
+        if(Utility.loadUsername() == null | Utility.loadPassword() == null | Utility.loadServerURL() == null)
+        {
+            //navigate to settings and make them enter these details
+            Navigation.findNavController(view).navigate(R.id.action_nav_gallery_to_settingsFragment);
+        }
+    }
 
     /**
      * Method to populate the listview with the dataset information
@@ -70,7 +90,7 @@ public class GalleryFragment extends Fragment {
             //must start a thread to retrieve the dataset information as networking operations cannot be done on the main thread
             Thread t = new Thread(() -> {
                 try {
-                    final ArrayList<Datasets.Dataset> dataset = (ArrayList) ((MainActivity) getActivity()).getClient().datasets().list();
+                    final ArrayList<Datasets.Dataset> dataset = (ArrayList) (Utility.getClient().datasets().list());
 
                     //must populate the listview on the main thread
                     getActivity().runOnUiThread(() -> {
@@ -86,7 +106,7 @@ public class GalleryFragment extends Fragment {
                                 bundle.putInt("datasetPK", dataset.get(position).getPK());
 
 
-                                //move to the images fragment to display this images fragment
+                                //move to the images fragment to display this dataset's images
                                 Navigation.findNavController(view).navigate(R.id.action_nav_gallery_to_imagesFragment, bundle);
                             }
                         });

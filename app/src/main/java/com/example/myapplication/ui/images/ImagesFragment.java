@@ -93,14 +93,14 @@ public class ImagesFragment extends Fragment {
         if(images == null) {
             images = new ArrayList<>();
             //retrieve categories as this contains the image names + classifications that we need
-            ImageClassificationDatasets action = ((MainActivity) getActivity()).getClient().action(ImageClassificationDatasets.class);
+            ImageClassificationDatasets action = Utility.getClient().action(ImageClassificationDatasets.class);
             Map<String, List<String>> categories = action.getCategories(datasetKey);
 
             //iterate through the map of categories
             for (Map.Entry<String, List<String>> entry : categories.entrySet()) {
 
                 //retrieve the byte array of images from the API using the dataset's primary key + image name
-                img = ((MainActivity) getActivity()).getClient().datasets().getFile(datasetKey, entry.getKey());
+                img = Utility.getClient().datasets().getFile(datasetKey, entry.getKey());
 
                 //create a classifiedImage object using image name and classification label and add it to the images arrayList
                 images.add(new ClassifiedImage(img, entry.getValue().get(index)));

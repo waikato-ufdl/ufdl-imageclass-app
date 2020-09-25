@@ -3,22 +3,12 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
-
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import com.example.myapplication.ui.settings.Utility;
-import com.github.waikatoufdl.ufdl4j.Client;
-import com.github.waikatoufdl.ufdl4j.action.Datasets;
-import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
-import com.github.waikatoufdl.ufdl4j.action.Licenses;
-import com.github.waikatoufdl.ufdl4j.auth.MemoryOnlyStorage;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
-
 import androidx.core.view.GravityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -27,10 +17,6 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -41,7 +27,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DatabaseHelper databaseHelper;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
-    private Client client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,9 +56,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * A method to establish a connection to the UFDL backend
      */
     public void connectToServer() {
-        //establish a connection to the UFDL backend using server URL, username, password. Need to also provide a tokenStorageHandler to
-        //handle the storage and retrieval of the access and refresh tokens which will be used in API calls.
-        client = new Client("http://127.0.0.1:8000", "admin", "admin", new MemoryOnlyStorage());
+        Utility.connectToServer();
         //ArrayList<byte[]> images = new ArrayList<>();
 
 
@@ -105,19 +88,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
          */
     }
 
-
-    public Client getClient()
-    {
-        return client;
-    }
-
     private void runActivity()
     {
-        //start a thread to connect to the server
-        Thread t = new Thread(() -> connectToServer());
-        t.start();
-
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 //        FloatingActionButton fab = findViewById(R.id.fab);
@@ -145,6 +117,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration );
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        //if the user has used this application before, use their details to connect to the API
+        if(Utility.loadUsername() != null & Utility.loadPassword() != null & Utility.loadServerURL() != null) {
+            //start a thread to connect to the server
+            Thread t = new Thread(() -> connectToServer());
+            t.start();
+        }
     }
 
 
