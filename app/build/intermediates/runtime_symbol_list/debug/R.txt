@@ -1692,7 +1692,7 @@ int id icon_group 0x7f0900a6
 int id ifRoom 0x7f0900a7
 int id image 0x7f0900a8
 int id imageCheckBox 0x7f0900a9
-int id imageGrid 0x7f0900aa
+int id imageRecyclerView 0x7f0900aa
 int id imageView 0x7f0900ab
 int id imagesFragment 0x7f0900ac
 int id info 0x7f0900ad

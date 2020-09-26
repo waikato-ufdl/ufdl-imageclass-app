@@ -3,11 +3,13 @@ package com.example.myapplication.ui.images;
 import android.content.Context;
 import android.graphics.Color;
 import android.media.Image;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 
 import java.util.ArrayList;
@@ -82,7 +85,6 @@ public class imagesListAdapter extends ArrayAdapter<ClassifiedImage> {
             holder.checkBox.setVisibility(View.GONE);
         }
 
-
         return convertView;
     }
 
@@ -92,4 +94,5 @@ public class imagesListAdapter extends ArrayAdapter<ClassifiedImage> {
         TextView classification;
         CheckBox checkBox;
     }
+
 }

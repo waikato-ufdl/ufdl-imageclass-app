@@ -1693,7 +1693,7 @@ id icon_group
 id ifRoom
 id image
 id imageCheckBox
-id imageGrid
+id imageRecyclerView
 id imageView
 id imagesFragment
 id info

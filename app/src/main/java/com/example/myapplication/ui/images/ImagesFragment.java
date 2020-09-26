@@ -2,6 +2,7 @@ package com.example.myapplication.ui.images;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.Image;
 import android.os.Bundle;
 
@@ -20,8 +21,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toolbar;
 
 import com.example.myapplication.MainActivity;
@@ -38,6 +41,10 @@ public class ImagesFragment extends Fragment {
     private ArrayList<ClassifiedImage> images;
     private int datasetKey;
     public static boolean isActionMode = false;
+    public static ArrayList<ClassifiedImage> selectedImages = new ArrayList<>();
+    public static ActionMode actionMode = null;
+    private RecyclerView recyclerView;
+    private ImageListAdapter adapter;
 
 
     public ImagesFragment() {
@@ -61,13 +68,23 @@ public class ImagesFragment extends Fragment {
      */
     private void setupImageGrid()
     {
+        /*
         GridView gridView = getView().findViewById(R.id.imageGrid);
 
         gridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
         gridView.setMultiChoiceModeListener(modeListener);
 
+
         imagesListAdapter adapter = new imagesListAdapter(getContext(), R.layout.image_display, images);
         gridView.setAdapter(adapter);
+
+         */
+
+        recyclerView = getView().findViewById(R.id.imageRecyclerView);
+        adapter = new ImageListAdapter(getContext(), images);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.setAdapter(adapter );
     }
 
 
@@ -102,21 +119,28 @@ public class ImagesFragment extends Fragment {
         byte[] img;
         int index = 0;
 
-        //if the images list is empty than this dataset has never been visited before so create a new image list and retrieve images from backend using API
-        if(images == null) {
-            images = new ArrayList<>();
+        //setup the image grid
+        setupImageGrid();
+
+        //if the images list is empty than this dataset has never been visited before retrieve images from backend using API
+        if(images.isEmpty()) {
             //retrieve categories as this contains the image names + classifications that we need
             ImageClassificationDatasets action = Utility.getClient().action(ImageClassificationDatasets.class);
             Map<String, List<String>> categories = action.getCategories(datasetKey);
 
             //iterate through the map of categories
             for (Map.Entry<String, List<String>> entry : categories.entrySet()) {
+                System.out.println(entry.getKey());
+                System.out.println(entry.getValue());
+
 
                 //retrieve the byte array of images from the API using the dataset's primary key + image name
                 img = Utility.getClient().datasets().getFile(datasetKey, entry.getKey());
 
                 //create a classifiedImage object using image name and classification label and add it to the images arrayList
                 images.add(new ClassifiedImage(img, entry.getValue().get(index)));
+
+                getActivity().runOnUiThread(() -> {adapter.notifyDataSetChanged();});
                 index++;
             }
         }
@@ -131,6 +155,7 @@ public class ImagesFragment extends Fragment {
     }
 
 
+    /*
     GridView.MultiChoiceModeListener modeListener = new GridView.MultiChoiceModeListener() {
 
             @Override
@@ -141,6 +166,7 @@ public class ImagesFragment extends Fragment {
 
                 //users are now in the contextual action mode where they can multi select images & delete
                 isActionMode = true;
+                actionMode = mode;
 
                 return true;
             }
@@ -158,6 +184,10 @@ public class ImagesFragment extends Fragment {
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 isActionMode = false;
+                actionMode = null;
+
+                //clear selected images if user exits the action mode
+                selectedImages.clear();
             }
 
             @Override
@@ -166,5 +196,5 @@ public class ImagesFragment extends Fragment {
             }
         };
 
-
+     */
 }
