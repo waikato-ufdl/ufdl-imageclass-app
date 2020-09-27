@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 public class ClassifiedImage {
     private byte[] imageArray;
     private String classification;
+    private boolean selected;
 
     /**
      * Constructor for a classified Image object
@@ -16,6 +17,7 @@ public class ClassifiedImage {
     {
         imageArray = imgArray;
         classification = label;
+        selected = false;
     }
 
     /**
@@ -41,5 +43,13 @@ public class ClassifiedImage {
      */
     public byte[] getImageArray() {
         return imageArray;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

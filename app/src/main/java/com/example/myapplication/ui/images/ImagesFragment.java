@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -43,7 +44,6 @@ public class ImagesFragment extends Fragment {
     public static boolean isActionMode = false;
     public static ArrayList<ClassifiedImage> selectedImages = new ArrayList<>();
     public static ActionMode actionMode = null;
-    private RecyclerView recyclerView;
     private ImageListAdapter adapter;
 
 
@@ -68,23 +68,12 @@ public class ImagesFragment extends Fragment {
      */
     private void setupImageGrid()
     {
-        /*
-        GridView gridView = getView().findViewById(R.id.imageGrid);
-
-        gridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
-        gridView.setMultiChoiceModeListener(modeListener);
-
-
-        imagesListAdapter adapter = new imagesListAdapter(getContext(), R.layout.image_display, images);
-        gridView.setAdapter(adapter);
-
-         */
-
-        recyclerView = getView().findViewById(R.id.imageRecyclerView);
-        adapter = new ImageListAdapter(getContext(), images);
+        //get the recycler view, set it's layout to a gridlayout with 2 columns & then set the adapter
+        RecyclerView recyclerView = getView().findViewById(R.id.imageRecyclerView);
+        adapter = new ImageListAdapter(this, getContext(), images);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(gridLayoutManager);
-        recyclerView.setAdapter(adapter );
+        recyclerView.setAdapter(adapter);
     }
 
 
@@ -140,61 +129,13 @@ public class ImagesFragment extends Fragment {
                 //create a classifiedImage object using image name and classification label and add it to the images arrayList
                 images.add(new ClassifiedImage(img, entry.getValue().get(index)));
 
-                getActivity().runOnUiThread(() -> {adapter.notifyDataSetChanged();});
+                //update the recycler view
+                getActivity().runOnUiThread(() -> {adapter.notifyItemInserted(images.size()-1);});
                 index++;
             }
-        }
 
-        //we must setup the image gridview on the main UI thread
-        getActivity().runOnUiThread(() ->
-        {
-            //setup image grid and store the image list in Utility so we do not have to make an API request next time
-            setupImageGrid();
+            //once all the processing has been done, save the image list
             Utility.saveImageList(datasetKey, images);
-        });
+        }
     }
-
-
-    /*
-    GridView.MultiChoiceModeListener modeListener = new GridView.MultiChoiceModeListener() {
-
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                //inflate the context menu
-                MenuInflater inflater = mode.getMenuInflater();
-                inflater.inflate(R.menu.context_menu, menu);
-
-                //users are now in the contextual action mode where they can multi select images & delete
-                isActionMode = true;
-                actionMode = mode;
-
-                return true;
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                return false;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {
-                isActionMode = false;
-                actionMode = null;
-
-                //clear selected images if user exits the action mode
-                selectedImages.clear();
-            }
-
-            @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-
-            }
-        };
-
-     */
 }

@@ -10,6 +10,7 @@
     <string name="menu_capture">CAPTURE</string>
     <string name="menu_manage">MANAGE</string>
     <string name="menu_settings">SETTINGS</string>
+    <string name="fragment_images">IMAGES</string>
 
     <string name="username">Username</string>
     <string name="password">Password</string>
