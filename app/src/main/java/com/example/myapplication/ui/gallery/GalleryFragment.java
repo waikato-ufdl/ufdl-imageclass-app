@@ -7,6 +7,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
@@ -150,6 +151,9 @@ public class GalleryFragment extends Fragment {
             // display the popup in the center
             popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
 
+            //darken the background behind the popup window
+            darkenBackground(popupWindow);
+
             Spinner licenseSpinner = (Spinner) v.findViewById(R.id.dataset_license_spinner);
             ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
                     spinner_item);
@@ -158,5 +162,19 @@ public class GalleryFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * A method to darken the background when a popup window is displayed
+     * @param popupWindow The popup window being displayed
+     */
+    public static void darkenBackground(PopupWindow popupWindow) {
+        View container = popupWindow.getContentView().getRootView();
+        Context context = popupWindow.getContentView().getContext();
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager.LayoutParams layoutParams = (WindowManager.LayoutParams) container.getLayoutParams();
+        layoutParams.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+        layoutParams.dimAmount = 0.5f;
+        windowManager.updateViewLayout(container, layoutParams);
     }
 }
