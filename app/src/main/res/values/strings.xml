@@ -17,6 +17,7 @@
     <string name="URL">URL</string>
     <string name="darkMode">DARK MODE</string>
     <string name="add_dataset">Add Dataset</string>
+    <string name="add_image">Add Image From Gallery</string>
 
     <string name="license_prompt">Choose a license</string>
 

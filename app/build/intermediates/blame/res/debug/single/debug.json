@@ -36,6 +36,10 @@
         "source": "/home/yug/374/app/src/main/res/layout/fragment_images.xml"
     },
     {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_add_image.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/add_image.xml"
+    },
+    {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-xxhdpi_ic_launcher.png.flat",
         "source": "/home/yug/374/app/src/main/res/mipmap-xxhdpi/ic_launcher.png"
     },
@@ -150,6 +154,10 @@
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_content_main.xml.flat",
         "source": "/home/yug/374/app/src/main/res/layout/content_main.xml"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_floating_button_background.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/floating_button_background.xml"
     },
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ripple_oval.xml.flat",

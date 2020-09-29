@@ -315,6 +315,7 @@ public class ImagesFragment extends Fragment {
             action = Utility.getClient().action(ImageClassificationDatasets.class);
             categories = action.getCategories(datasetKey);
             totalImages = categories.size();
+            processCategoryList(startIndex);
         }
 
         //if we haven't retrieved all images from the dataset yet
@@ -371,6 +372,36 @@ public class ImagesFragment extends Fragment {
         {
             retrievedAll = true;
             saveChanges();
+        }
+    }
+
+    /**
+     * This method will discard any images already process in the case that the user has went back to datasets and come back in
+     * @param loadedImages The number of images which have already been stored
+     */
+    public void processCategoryList(int loadedImages)
+    {
+        int index = 0;
+
+        //if no images have been processed, return
+        if(loadedImages == 0) {
+            return;
+        }
+
+        //iterate through the category entry set
+        for (Iterator<Map.Entry<String, List<String>>> entryIterator = categories.entrySet().iterator();
+             entryIterator.hasNext(); ) {
+
+            Map.Entry<String, List<String>> entry = entryIterator.next();
+
+            //discard all entries that have been processed
+            if(index < loadedImages) {
+                entryIterator.remove();
+                index++;
+            }
+            else {
+                return;
+            }
         }
     }
 }
