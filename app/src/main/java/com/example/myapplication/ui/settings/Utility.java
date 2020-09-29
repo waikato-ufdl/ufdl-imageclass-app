@@ -101,7 +101,7 @@ public class Utility {
             return imagesCollection.get(key);
         }
 
-        return null;
+        return new ArrayList<>();
     }
 
     /**

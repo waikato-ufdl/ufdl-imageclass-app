@@ -2,6 +2,7 @@ package com.example.myapplication.ui.gallery;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -111,10 +112,8 @@ public class GalleryFragment extends Fragment {
                         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                                 Bundle bundle = new Bundle();
                                 bundle.putInt("datasetPK", dataset.get(position).getPK());
-
 
                                 //move to the images fragment to display this dataset's images
                                 Navigation.findNavController(view).navigate(R.id.action_nav_gallery_to_imagesFragment, bundle);

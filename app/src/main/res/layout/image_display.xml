@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="0.5dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
         android:id="@+id/gridImageView"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
         app:layout_constraintWidth_default="percent"
@@ -16,7 +17,17 @@
         app:layout_constraintLeft_toLeftOf="parent"
         />
 
-        <TextView
+    <CheckBox
+        android:id="@+id/imageCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/gridImageView"
+        app:layout_constraintRight_toRightOf="@id/gridImageView"
+        android:visibility="gone"
+        android:buttonTint="@color/colorPrimary"/>
+
+
+    <TextView
             android:id="@+id/gridTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -28,6 +39,7 @@
             android:text="label"
             android:textColor="?attr/textColor"
             app:layout_constraintTop_toBottomOf="@id/gridImageView"
-            app:layout_constraintLeft_toLeftOf="@id/gridImageView"/>
+            app:layout_constraintLeft_toLeftOf="@id/gridImageView"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
