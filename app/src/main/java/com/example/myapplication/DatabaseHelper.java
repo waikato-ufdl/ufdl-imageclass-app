@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "UFDL.db";
@@ -36,6 +37,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        Log.d("onCreate: ", "CREATING DATASET TABLE");
         sqLiteDatabase.execSQL("create table " +
                 TABLE_DATASET + " (" +
                 DATASET_COL_1 + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -50,6 +52,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         "REFERENCES " + TABLE_LICENSE + " (" + LICENSE_COL_1 + "))"
                 );
 
+        Log.d("onCreate: ", "CREATING IMAGE TABLE");
         sqLiteDatabase.execSQL("create table " +
                 TABLE_IMAGE + " (" +
                 IMAGE_COL_1 + " TEXT PRIMARY KEY, " +
@@ -62,6 +65,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         "REFERENCES " + TABLE_DATASET + " (" + DATASET_COL_1 + "))"
                 );
 
+        Log.d("onCreate: ", "CREATING LICENSE TABLE");
         sqLiteDatabase.execSQL("create table " +
                 TABLE_LICENSE + " (" +
                 LICENSE_COL_1 + " TEXT PRIMARY KEY)");
@@ -71,113 +75,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         sqLiteDatabase.execSQL("drop table if exists " + TABLE_DATASET);
         sqLiteDatabase.execSQL("drop table if exists " + TABLE_IMAGE);
+        sqLiteDatabase.execSQL("drop table if exists " + TABLE_LICENSE);
         onCreate(sqLiteDatabase);
     }
-
-    public Cursor getLicenses() {
-        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        Cursor result = sqLiteDatabase.rawQuery("select * from " + TABLE_LICENSE, null);
-        return result;
-    }
-
-    public boolean insertLicenses(String licenseName){
-        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(LICENSE_COL_1, licenseName);
-        long result = sqLiteDatabase.insert(TABLE_LICENSE, null, contentValues);
-        if (result == -1){
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public Cursor getDatasets() {
-        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        Cursor result = sqLiteDatabase.rawQuery("select * from " + TABLE_DATASET, null);
-        return result;
-    }
-
-    public boolean createDataset(String name, String project, Boolean private_dataset, String license, String tags) {
-        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DATASET_COL_3, name);
-        contentValues.put(DATASET_COL_4, project);
-        contentValues.put(DATASET_COL_5, private_dataset);
-        contentValues.put(DATASET_COL_6, license);
-        contentValues.put(DATASET_COL_7, tags);
-        contentValues.put(DATASET_COL_8, "create");
-        long result = sqLiteDatabase.insert(TABLE_DATASET, null, contentValues);
-        if(result == -1)
-            return false;
-        else
-            return true;
-    }
-
-    public boolean updateDataset(String name, String project, Boolean private_dataset, String license, String tags) {
-        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DATASET_COL_3, name);
-        contentValues.put(DATASET_COL_4, project);
-        contentValues.put(DATASET_COL_5, private_dataset);
-        contentValues.put(DATASET_COL_6, license);
-        contentValues.put(DATASET_COL_7, tags);
-        contentValues.put(DATASET_COL_8, "update");
-        sqLiteDatabase.update(TABLE_DATASET, contentValues, DATASET_COL_3 + " = ?", new String[] {name});
-        return true;
-    }
-
-    public boolean deleteDataset(String name) {
-        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DATASET_COL_8, "delete");
-        sqLiteDatabase.update(TABLE_DATASET, contentValues, DATASET_COL_3 + " = ?", new String[] {name});
-        return true;
-    }
-
-    public boolean insertImage(String name, String category, String full_path, String thumbnail_path, int dataset_id) {
-        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(IMAGE_COL_1, name);
-        contentValues.put(IMAGE_COL_2, category);
-        contentValues.put(IMAGE_COL_3, full_path);
-        contentValues.put(IMAGE_COL_4, thumbnail_path);
-        contentValues.put(IMAGE_COL_5, dataset_id);
-        contentValues.put(IMAGE_COL_6, "add");
-        long result = sqLiteDatabase.insert(TABLE_IMAGE, null, contentValues);
-        if(result == -1)
-            return false;
-        else
-            return true;
-    }
-
-    public boolean updateImage(String name, String category, int dataset_id) {
-        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(IMAGE_COL_1, name);
-        contentValues.put(IMAGE_COL_2, category);
-        contentValues.put(IMAGE_COL_5, dataset_id);
-        contentValues.put(IMAGE_COL_6, "update");
-        sqLiteDatabase.update(TABLE_IMAGE, contentValues, IMAGE_COL_1 + " = ?", new String[] {name});
-        return true;
-    }
-
-    public Cursor getImages(Integer dataset_id) {
-        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        Cursor result = sqLiteDatabase.rawQuery("select * from " + TABLE_IMAGE + " where " + DATASET_COL_1 + " = ?", new String[] {dataset_id.toString()});
-        return result;
-    }
-
-    public boolean deleteImage(String name) {
-        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DATASET_COL_8, "delete");
-        sqLiteDatabase.update(TABLE_IMAGE, contentValues, IMAGE_COL_6 + " = ?", new String[] {name});
-        return true;
-    }
-
-//    public boolean deleteImageLocal(String name) {
-//        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-//        return sqLiteDatabase.delete(TABLE_IMAGE, )
-//    }
 }
