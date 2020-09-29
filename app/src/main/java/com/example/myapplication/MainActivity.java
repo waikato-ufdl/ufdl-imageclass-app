@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private AppBarConfiguration mAppBarConfiguration;
     private Button buttonSettings;
     private static final int VERIFY_PERMISSIONS_REQUEST = 1;
-    private DatabaseHelper databaseHelper;
+    private DBManager dbManager;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
 
@@ -38,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         Utility.setContext(this);
         setTheme(Utility.getTheme());
-        databaseHelper = new DatabaseHelper(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -56,6 +56,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //ask user to grant permissions
             verifyPermissions(Utility.PERMISSIONS);
         }
+
+        dbManager = new DBManager(this);
+        dbManager.open();
     }
 
     /**
@@ -83,12 +86,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            }
 //
 //            System.out.println(images.size());
-
+                Log.d("connectToServer: ", "INSERTING LICENSES");
                 String licName = "";
                 for (Licenses.License license : Utility.getClient().licenses().list()) {
                     licName = license.getName();
                     System.out.println(licName);
-                    databaseHelper.insertLicenses(licName);
+                    dbManager.insertLicenses(licName);
                 }
             } catch (IllegalStateException e) {
                 showToast("Please check your username, password and server URL details in settings");
