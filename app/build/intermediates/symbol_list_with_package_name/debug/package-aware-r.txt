@@ -1767,6 +1767,7 @@ id password_toggle
 id peekHeight
 id percent
 id pin
+id progressBar
 id progress_circular
 id progress_horizontal
 id projectName

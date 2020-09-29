@@ -27,6 +27,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.ui.home.HomeViewModel;
+import com.example.myapplication.ui.settings.Utility;
+import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
 
 import java.util.ArrayList;
 
@@ -82,6 +84,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
 
             //set textview background colour
             holder.classification.setBackgroundColor(Color.RED);
+            holder.classification.setTextColor(Color.WHITE);
         }
         else
         {
@@ -90,6 +93,10 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
 
             //set textview background colour
             holder.classification.setBackgroundColor(Color.TRANSPARENT);
+
+            if(!Utility.loadDarkModeState()) {
+                holder.classification.setTextColor(Color.BLACK);
+            }
         }
 
         //on long press of an image we want to invoke the action mode
@@ -128,6 +135,22 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
 
                         @Override
                         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                            //handles the click of an action mode item
+
+                            //get menu id
+                            int id = item.getItemId();
+
+                            //check which menu item was clicked
+                            switch (id)
+                            {
+                                case R.id.action_delete:
+                                    //when user presses delete
+                                    deleteImages();
+
+                                    //finish action mode
+                                    mode.finish();
+                            }
+
                             return false;
                         }
 
@@ -143,7 +166,6 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
 
                             //clear selected images list & notify adapter
                             selectedImages.clear();
-
                             notifyDataSetChanged();
                         }
                     };
@@ -178,6 +200,41 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
     }
 
     /**
+     * Method to delete images from the list & backend
+     */
+    public void deleteImages()
+    {
+        for(ClassifiedImage image : selectedImages)
+        {
+            //remove image from list
+            images.remove(image);
+
+
+            //make an API request to delete an
+            Thread t = new Thread(() -> {
+                try {
+
+                    int datasetPK = ((ImagesFragment) fragment).getDatasetKey();
+                    ImageClassificationDatasets action = Utility.getClient().action(ImageClassificationDatasets.class);
+                    ArrayList<String> imageNames = new ArrayList<>();
+                    ArrayList<String> imageClassifications = new ArrayList<>();
+
+                    imageNames.add(image.getImageFileName());
+                    imageClassifications.add(image.getClassification());
+
+                    action.removeCategories(datasetPK, imageNames, imageClassifications);
+                    Utility.getClient().datasets().deleteFile(datasetPK, image.getImageFileName());
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            });
+            t.start();
+        }
+    }
+
+    /**
      * Method to handle image selection/deselection
      * @param holder
      */
@@ -199,7 +256,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
             selectedImages.remove(image);
         }
 
-        //update the view in the recycler view to show selection/deselection
+        //update the view in the recycler view to show selection/deselectionamily
         notifyItemChanged(holder.getAdapterPosition());
 
         //set text on view model
