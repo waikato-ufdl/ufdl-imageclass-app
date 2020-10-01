@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.images;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.ActionMode;
@@ -11,10 +12,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
@@ -31,6 +34,9 @@ import com.example.myapplication.ui.settings.Utility;
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 import static com.google.gson.reflect.TypeToken.get;
 
@@ -145,10 +151,13 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
                             {
                                 case R.id.action_delete:
                                     //when user presses delete
-                                    deleteImages();
+                                    deleteConfirmation(mode);
+                                    break;
 
-                                    //finish action mode
-                                    mode.finish();
+                                case R.id.action_relabel:
+                                    //when the user presses edit
+                                    editCategories(mode);
+                                    break;
                             }
 
                             return false;
@@ -209,27 +218,34 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
             //remove image from list
             images.remove(image);
 
-
-            //make an API request to delete an
+            //make an API request to delete an image
             Thread t = new Thread(() -> {
                 try {
 
                     int datasetPK = ((ImagesFragment) fragment).getDatasetKey();
                     ImageClassificationDatasets action = Utility.getClient().action(ImageClassificationDatasets.class);
-                    ArrayList<String> imageNames = new ArrayList<>();
-                    ArrayList<String> imageClassifications = new ArrayList<>();
 
-                    imageNames.add(image.getImageFileName());
-                    imageClassifications.add(image.getClassification());
-
-                    action.removeCategories(datasetPK, imageNames, imageClassifications);
-                    Utility.getClient().datasets().deleteFile(datasetPK, image.getImageFileName());
+                    //delete image file
+                    action.deleteFile(datasetPK, image.getImageFileName());
+                    Utility.saveImageList(datasetPK, images);
+                    return;
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
                 }
             });
+            t.start();
+        }
+        notifyDataSetChanged();
+
+        //set the deletion flag true in the image fragment
+        ((ImagesFragment) fragment).setDeleted(true);
+
+        //if the recycler view has less images than the page_limit, load in the same amount of images that have been deleted
+        if(images.size() < ((ImagesFragment) fragment).PAGE_LIMIT)
+        {
+            Thread t = new Thread(() -> {((ImagesFragment) fragment).processImages(); });
             t.start();
         }
     }
@@ -256,7 +272,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
             selectedImages.remove(image);
         }
 
-        //update the view in the recycler view to show selection/deselectionamily
+        //update the view in the recycler view to show selection/deselection
         notifyItemChanged(holder.getAdapterPosition());
 
         //set text on view model
@@ -282,5 +298,53 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
             classification = itemView.findViewById(R.id.gridTextView);
             checkBox = itemView.findViewById(R.id.imageCheckBox);
         }
+    }
+
+    public void deleteConfirmation(ActionMode mode)
+    {
+        new SweetAlertDialog(mContext, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Are you sure?")
+                .setContentText("You won't be able to recover the image(s) after deletion")
+                .setConfirmText("Delete")
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        //((ImagesFragment) fragment).setDeleted(true);
+                        deleteImages();
+                        sDialog
+                                .setTitleText("Deleted!")
+                                .setContentText("The selected images have been deleted!")
+                                .setConfirmText("OK")
+                                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                    @Override
+                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                        sDialog.dismissWithAnimation();
+                                        //finish action mode once a user has confirmed the deletion of images, else keep users in selection mode
+                                        mode.finish();
+                                    }
+                                })
+                                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                    }
+                })
+                .setCancelButton("Cancel", new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        sDialog.dismissWithAnimation();
+                    }
+                })
+                .show();
+    }
+
+
+    public void editCategories(ActionMode mode)
+    {
+        final EditText editText = new EditText(mContext);
+        new SweetAlertDialog(mContext, SweetAlertDialog.NORMAL_TYPE)
+                .setTitleText("Custom view")
+                .setConfirmText("Ok")
+                .setCustomView(editText)
+                .show();
+
+        mode.finish();
     }
 }

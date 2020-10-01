@@ -29,6 +29,7 @@ import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.ui.settings.Utility;
 import com.github.waikatoufdl.ufdl4j.action.Datasets;
+import com.github.waikatoufdl.ufdl4j.action.Generic;
 
 import java.util.ArrayList;
 
@@ -84,11 +85,16 @@ public class GalleryFragment extends Fragment {
         }
         else
         {
-            //only continue if the client is connected to the API
-            if(!Utility.authenticationFailed());
+            Thread t = new Thread(() ->
             {
-                displayDatasets(view);
-            }
+                //only continue if the client is connected to the API
+               if(!Utility.getClient().connection().authentication().getTokens().isValid());
+                {
+                    displayDatasets(view);
+                }
+            });
+            t.start();
+
         }
     }
 
@@ -169,8 +175,11 @@ public class GalleryFragment extends Fragment {
      * @param popupWindow The popup window being displayed
      */
     public static void darkenBackground(PopupWindow popupWindow) {
+        //get the popup view & context
         View container = popupWindow.getContentView().getRootView();
         Context context = popupWindow.getContentView().getContext();
+
+        //setup window manager layout parameters to dim the background & update the view
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         WindowManager.LayoutParams layoutParams = (WindowManager.LayoutParams) container.getLayoutParams();
         layoutParams.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;

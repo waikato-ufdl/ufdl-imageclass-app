@@ -10,7 +10,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import com.example.myapplication.ui.settings.Utility;
+import com.github.waikatoufdl.ufdl4j.Client;
 import com.github.waikatoufdl.ufdl4j.action.Licenses;
+import com.github.waikatoufdl.ufdl4j.auth.MemoryOnlyStorage;
 import com.google.android.material.navigation.NavigationView;
 import androidx.core.view.GravityCompat;
 import androidx.navigation.NavController;
@@ -23,6 +25,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import java.net.ConnectException;
 import java.net.UnknownHostException;
+
+import okhttp3.internal.Util;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -66,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //ArrayList<byte[]> images = new ArrayList<>();
 
 
+        /*
         if(!Utility.authenticationFailed()) {
             //an example to see whether we are able to retrieve the list of licenses from the backend
             try {
@@ -96,6 +101,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 e.printStackTrace();
             }
         }
+         */
+
     }
 
     /**
@@ -141,9 +148,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //if the user has used this application before, use their details to connect to the API
         if(Utility.loadUsername() != null & Utility.loadPassword() != null & Utility.loadServerURL() != null) {
+
+            System.out.println(Utility.loadServerURL() + " " + Utility.loadUsername() + " " + Utility.loadPassword());
             //start a thread to connect to the server
-            Thread t = new Thread(() -> connectToServer());
-            t.start();
+            Utility.connectToServer();
         }
     }
 

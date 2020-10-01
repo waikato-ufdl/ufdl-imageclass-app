@@ -18,7 +18,7 @@
         android:layout_gravity="bottom"/>
 
     <ImageButton
-        android:id="@+id/fab_add_dataset"
+        android:id="@+id/fab_add_images"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_marginBottom="15dp"

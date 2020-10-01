@@ -4,6 +4,10 @@
         "source": "/home/yug/374/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml"
     },
     {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_edit_icon.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/edit_icon.xml"
+    },
+    {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_image_display.xml.flat",
         "source": "/home/yug/374/app/src/main/res/layout/image_display.xml"
     },
@@ -36,10 +40,6 @@
         "source": "/home/yug/374/app/src/main/res/layout/fragment_images.xml"
     },
     {
-        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_add_image.xml.flat",
-        "source": "/home/yug/374/app/src/main/res/drawable/add_image.xml"
-    },
-    {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-xxhdpi_ic_launcher.png.flat",
         "source": "/home/yug/374/app/src/main/res/mipmap-xxhdpi/ic_launcher.png"
     },
@@ -48,20 +48,24 @@
         "source": "/home/yug/374/app/src/main/res/layout/fragment_settings.xml"
     },
     {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_add_image.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/add_image.xml"
+    },
+    {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_fragment_home.xml.flat",
         "source": "/home/yug/374/app/src/main/res/layout/fragment_home.xml"
     },
     {
-        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_spinner_item.xml.flat",
-        "source": "/home/yug/374/app/src/main/res/layout/spinner_item.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/navigation_mobile_navigation.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/navigation/mobile_navigation.xml"
     },
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_menu_settings.xml.flat",
         "source": "/home/yug/374/app/src/main/res/drawable/ic_menu_settings.xml"
     },
     {
-        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/navigation_mobile_navigation.xml.flat",
-        "source": "/home/yug/374/app/src/main/res/navigation/mobile_navigation.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_spinner_item.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/spinner_item.xml"
     },
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_dataset_folder.xml.flat",

@@ -15,6 +15,7 @@ import com.github.waikatoufdl.ufdl4j.auth.MemoryOnlyStorage;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 
 /**
  * This is a class that will be used to store and retrieve user settings from shared storage
@@ -27,6 +28,7 @@ public class Utility {
                                                 Manifest.permission.CAMERA};
 
     private static HashMap<Integer, ArrayList<ClassifiedImage>> imagesCollection = new HashMap<>();
+    private static HashMap<Integer, LinkedHashSet<ClassifiedImage>> uniqueImageCollection = new HashMap<>();
     private static Client client;
 
 
@@ -136,7 +138,6 @@ public class Utility {
         editor.commit();
     }
 
-
     /**
      * A method to retrieve a stored password from sharedPreferences
      * @return
@@ -158,7 +159,6 @@ public class Utility {
         editor.commit();
     }
 
-
     /**
      * A method to retrieve the server's URL from sharedPreference
      * @return
@@ -174,6 +174,8 @@ public class Utility {
      * handle the storage and retrieval of the access and refresh tokens which will be used in API calls.
      */
     public static void connectToServer() {
+        System.out.println(Utility.loadServerURL() + " " + Utility.loadUsername() + " " + Utility.loadPassword());
+
         client = new Client(loadServerURL(), loadUsername(), loadPassword(), new MemoryOnlyStorage());
     }
 
@@ -194,11 +196,5 @@ public class Utility {
     public static boolean isValidURL(String URL)
     {
         return Patterns.WEB_URL.matcher(URL).matches();
-    }
-
-    public static boolean authenticationFailed()
-    {
-        String[] data = client.toString().split(" ");
-        return data[data.length-1].equals("access=") | data[data.length-1].equals("tokens=null");
     }
 }

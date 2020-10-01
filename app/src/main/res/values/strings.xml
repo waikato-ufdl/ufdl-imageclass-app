@@ -34,5 +34,7 @@
 
     <!-- Context Menu for Image Management -->
     <string name="Delete">Delete</string>
+    <string name="error_gif">x or y bound size should be at least %1$dpx and file size should be no more than %2$sM</string>
+    <string name="edit_label">Edit Label</string>
 
 </resources>
