@@ -73,12 +73,9 @@ public class ImagesFragment extends Fragment {
     Boolean isScrolling = false;
     int currentItems, totalItems, scrolledItems;
     private boolean isLoading = false;
-
-    //lazy load 2.0 vars
     int totalImages;
     private int REQUEST_CODE = 1;
-    private boolean deleted = false;
-
+    private boolean datasetModified = false;
 
     //specify the number of images to load upon scroll
     public final int PAGE_LIMIT = 8;
@@ -277,8 +274,8 @@ public class ImagesFragment extends Fragment {
         String imageFileName;
 
         //if the start index is 0, then we have never loaded this dataset before
-        if (startIndex == 0 || categories == null || deleted) {
-            deleted = false;
+        if (startIndex == 0 || categories == null || datasetModified) {
+            datasetModified = false;
             //retrieve categories as this contains the image names + classifications that we need
             action = Utility.getClient().action(ImageClassificationDatasets.class);
             categories = action.getCategories(datasetKey);
@@ -309,7 +306,6 @@ public class ImagesFragment extends Fragment {
                     catch (Exception e) {
                         continue;
                     }
-
 
                     //create a classifiedImage object using image name and classification label and add it to the images arrayList
                     images.add(new ClassifiedImage(img, entry.getValue().get(0), imageFileName));
@@ -342,9 +338,12 @@ public class ImagesFragment extends Fragment {
         }
     }
 
-    //the number of images deleted
-    public void setDeleted(boolean bool)
+    /**
+     * A method to set the boolean value indicating whether a dataset change to the API has taken place
+     * @param bool true if a dataset has been modified
+     */
+    public void setDatasetModified(boolean bool)
     {
-        deleted = bool;
+        datasetModified = bool;
     }
 }

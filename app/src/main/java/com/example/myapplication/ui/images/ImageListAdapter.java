@@ -35,6 +35,7 @@ import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -156,7 +157,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
 
                                 case R.id.action_relabel:
                                     //when the user presses edit
-                                    editCategories(mode);
+                                    confirmEditCategories(mode);
                                     break;
                             }
 
@@ -209,7 +210,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
     }
 
     /**
-     * Method to delete images from the list & backend
+     * Method to delete all the selected images from recycler view & backend
      */
     public void deleteImages()
     {
@@ -239,8 +240,8 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
         }
         notifyDataSetChanged();
 
-        //set the deletion flag true in the image fragment
-        ((ImagesFragment) fragment).setDeleted(true);
+        //set the data set modified flag to true in the image fragment
+        ((ImagesFragment) fragment).setDatasetModified(true);
 
         //if the recycler view has less images than the page_limit, load in the same amount of images that have been deleted
         if(images.size() < ((ImagesFragment) fragment).PAGE_LIMIT)
@@ -300,6 +301,10 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
         }
     }
 
+    /**
+     * A method to confirm the deletion process via a popup before deleting images
+     * @param mode the action mode
+     */
     public void deleteConfirmation(ActionMode mode)
     {
         new SweetAlertDialog(mContext, SweetAlertDialog.WARNING_TYPE)
@@ -309,8 +314,10 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sDialog) {
-                        //((ImagesFragment) fragment).setDeleted(true);
+                        //if a user accepts the deletion, delete all the selected images
                         deleteImages();
+
+                        //show a successful deletion popup
                         sDialog
                                 .setTitleText("Deleted!")
                                 .setContentText("The selected images have been deleted!")
@@ -318,6 +325,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
                                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                     @Override
                                     public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                        //when the user clicks ok, dismiss the popup
                                         sDialog.dismissWithAnimation();
                                         //finish action mode once a user has confirmed the deletion of images, else keep users in selection mode
                                         mode.finish();
@@ -329,6 +337,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
                 .setCancelButton("Cancel", new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sDialog) {
+                        //if the user cancels deletion close the popup but leave them on the selection mode
                         sDialog.dismissWithAnimation();
                     }
                 })
@@ -336,15 +345,123 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
     }
 
 
-    public void editCategories(ActionMode mode)
-    {
+    public void confirmEditCategories(ActionMode mode) {
         final EditText editText = new EditText(mContext);
-        new SweetAlertDialog(mContext, SweetAlertDialog.NORMAL_TYPE)
-                .setTitleText("Custom view")
-                .setConfirmText("Ok")
+                new SweetAlertDialog(mContext, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Reclassify all selected images as: ")
+                .setConfirmText("Reclassify!")
                 .setCustomView(editText)
-                .show();
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        String newClassification = editText.getText().toString().trim();
 
-        mode.finish();
+                        //if a value has been entered
+                        if(newClassification.length() > 0) {
+                            //reclassify all selected images
+                            editImageCategories(newClassification);
+
+                            //show a success popup
+                            sweetAlertDialog
+                                    .setTitleText("Success!")
+                                    .setContentText("The selected images have been reclassified as: " + newClassification)
+                                    .setConfirmText("OK")
+                                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                        @Override
+                                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                            //when the user clicks ok, dismiss the popup
+                                            sweetAlertDialog.dismissWithAnimation();
+                                            //finish action mode once a user has confirmed the reclassification
+                                            mode.finish();
+                                        }
+                                    })
+                                    .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                        }
+                        else
+                            editText.setError("Please enter a classification label");
+                    }
+                })
+                .setCancelButton("Cancel", new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        //if the user clicks cancel close the popup but leave them on the selection mode
+                        sDialog.dismissWithAnimation();
+                    }
+                })
+                .show();
+    }
+
+    /**
+     * Method to edit image categories locally and on the API
+     * @param label the new classification label for the selected images
+     */
+    private void editImageCategories(String label)
+    {
+        int datasetPK = ((ImagesFragment) fragment).getDatasetKey();
+
+        //first go through and remove the category label for each of the images & then relabel them
+        removeCurrentCategories(datasetPK, label);
+        addCategories(datasetPK, label);
+
+        //set the data set modified flag to true in the image fragment
+        ((ImagesFragment) fragment).setDatasetModified(true);
+    }
+
+    /**
+     * A method to remove the current labels for the selected images
+     * @param datasetPK the dataset primary key to indicate which dataset the images belong to
+     * @param label the new classification label to set for the selected images
+     */
+    private void removeCurrentCategories(int datasetPK, String label)
+    {
+        for(ClassifiedImage image : selectedImages)
+        {
+            Thread t = new Thread(() -> {
+                try {
+                    ImageClassificationDatasets action = Utility.getClient().action(ImageClassificationDatasets.class);
+
+                    System.out.println(image.getClassification());
+
+                    //make an API request to remove current the categories for each image
+                    action.removeCategories(datasetPK, Arrays.asList(image.getImageFileName()), Arrays.asList(image.getClassification()));
+                    //action.addCategories(datasetPK, Arrays.asList(image.getImageFileName()), Arrays.asList(label));
+                    //reclassify all the selected images locally with the user defined label
+                    image.setClassificationLabel(label);
+                    Utility.saveImageList(datasetPK, images);
+                    return;
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            });
+            t.start();
+
+        }
+        notifyDataSetChanged();
+    }
+
+    /**
+     * A method to add categories to each of the selected images
+     * @param datasetPK the primary key of the dataset where the images belong
+     * @param label the new category to set for the images
+     */
+    private void addCategories(int datasetPK, String label)
+    {
+        Thread s = new Thread(() -> {
+            try {
+                //retrieve the image file names and make an API request to assign the new label to each of the images
+                ArrayList<String> imageFileNames = (ArrayList<String>) selectedImages.stream().map(i ->  i.getImageFileName()).collect(Collectors.toList());
+                ImageClassificationDatasets action = Utility.getClient().action(ImageClassificationDatasets.class);
+                action.addCategories(datasetPK, imageFileNames, Arrays.asList(label));
+                return;
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+
+        s.start();
     }
 }
