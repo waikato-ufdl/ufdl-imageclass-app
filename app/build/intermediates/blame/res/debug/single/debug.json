@@ -120,6 +120,10 @@
         "source": "/home/yug/374/app/src/main/res/mipmap-xhdpi/ic_launcher.png"
     },
     {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_baseline_search_24.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/ic_baseline_search_24.xml"
+    },
+    {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_baseline_delete_24.xml.flat",
         "source": "/home/yug/374/app/src/main/res/drawable/ic_baseline_delete_24.xml"
     },

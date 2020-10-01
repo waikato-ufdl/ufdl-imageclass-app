@@ -1620,6 +1620,7 @@ drawable gray_button_background
 drawable green_button_background
 drawable ic_arrow_drop_down_white_24dp
 drawable ic_baseline_delete_24
+drawable ic_baseline_search_24
 drawable ic_check_white_18dp
 drawable ic_empty_dracula
 drawable ic_empty_zhihu
@@ -1753,6 +1754,7 @@ id action_nav_gallery_to_imagesFragment
 id action_nav_gallery_to_settingsFragment
 id action_nav_home_to_settingsFragment
 id action_relabel
+id action_search
 id action_text
 id actions
 id activity_chooser_view_content
@@ -2379,6 +2381,7 @@ string path_password_eye_mask_strike_through
 string path_password_eye_mask_visible
 string path_password_strike_through
 string photo_grid_capture
+string search
 string search_menu_title
 string status_bar_notification_info_overflow
 string username

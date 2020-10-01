@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -84,6 +85,27 @@ public class ImagesFragment extends Fragment {
         // Required empty public constructor
     }
 
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        inflater.inflate(R.menu.main, menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) item.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +116,9 @@ public class ImagesFragment extends Fragment {
 
         //get Bundle from the previous fragment
         datasetKey = getArguments().getInt("datasetPK");
+
+        setHasOptionsMenu(true);
+
     }
 
     @Override
