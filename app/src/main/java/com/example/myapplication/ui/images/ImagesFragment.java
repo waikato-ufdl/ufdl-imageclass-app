@@ -9,9 +9,11 @@ import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -60,12 +62,14 @@ import static android.app.Activity.RESULT_OK;
 
 public class ImagesFragment extends Fragment {
     private ArrayList<ClassifiedImage> images;
+    private ArrayList<ClassifiedImage> filteredSearchList;
     private int datasetKey;
     private ImageListAdapter adapter;
     private RecyclerView recyclerView;
     private GridLayoutManager gridLayoutManager;
     private ProgressBar progressBar;
     private ImageButton addImages;
+    private SearchView searchView;
 
     //Lazy loading variables
     ImageClassificationDatasets action;
@@ -92,7 +96,7 @@ public class ImagesFragment extends Fragment {
 
         inflater.inflate(R.menu.main, menu);
         MenuItem item = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) item.getActionView();
+        searchView = (SearchView) item.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -101,10 +105,27 @@ public class ImagesFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                //filter the images to check for classified images with a specific label
+                search(newText);
                 return false;
             }
         });
+
+        item.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                adapter.searchCategory(images);
+                System.out.println("EHLLLLOOOOOOOOOOOOOOOOO");
+                return true;
+            }
+        });
     }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -118,7 +139,6 @@ public class ImagesFragment extends Fragment {
         datasetKey = getArguments().getInt("datasetPK");
 
         setHasOptionsMenu(true);
-
     }
 
     @Override
@@ -211,6 +231,7 @@ public class ImagesFragment extends Fragment {
                     scrolledItems = gridLayoutManager.findFirstVisibleItemPosition();
 
                     if(isScrolling && (currentItems + scrolledItems == totalItems) && !isLoading){
+
                         isScrolling = false;
                         isLoading = true;
 
@@ -370,5 +391,27 @@ public class ImagesFragment extends Fragment {
     public void setDatasetModified(boolean bool)
     {
         datasetModified = bool;
+    }
+
+    /**
+     * This method will be used to create the filtered list containing all images which match the keyword
+     * @param keyword
+     */
+    private void search(String keyword)
+    {
+        filteredSearchList = new ArrayList<>();
+
+        //iterate through the classified images
+        for (ClassifiedImage image: images)
+        {
+            //if the classification label contains the keyword entered by the user, add the image to the filtered list
+            if(image.getClassification().toLowerCase().contains(keyword.toLowerCase()))
+            {
+                filteredSearchList.add(image);
+            }
+        }
+
+        //display the filtered list
+        adapter.searchCategory(filteredSearchList);
     }
 }

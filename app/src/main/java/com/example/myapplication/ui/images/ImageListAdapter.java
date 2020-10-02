@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -35,6 +37,7 @@ import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -46,9 +49,11 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
     private Context mContext;
     private LayoutInflater mInflater;
     private ArrayList<ClassifiedImage> images;
-    private ArrayList<ClassifiedImage> selectedImages = new ArrayList<>();
-    private boolean isActionMode = false;
+    private ArrayList<ClassifiedImage> selectedImages;
+    private boolean isActionMode;
     ImagesFragmentViewModel imagesViewModel;
+    private ArrayList<ClassifiedImage> backup;
+
 
     public ImageListAdapter(Fragment frag, Context context, ArrayList<ClassifiedImage> imageList)
     {
@@ -56,6 +61,8 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
         mContext = context;
         mInflater = LayoutInflater.from(context);
         images = imageList;
+        isActionMode = false;
+        selectedImages =  new ArrayList<>();
     }
 
     @NonNull
@@ -464,4 +471,15 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
 
         s.start();
     }
+
+    /**
+     * A method to switch the adapter list to show another list. This will be used to switch between the full sized list and the filtered list.
+     * @param list
+     */
+    public void searchCategory(ArrayList<ClassifiedImage> list)
+    {
+        images = list;
+        notifyDataSetChanged();
+    }
+
 }

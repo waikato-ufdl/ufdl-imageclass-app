@@ -28,7 +28,6 @@ public class Utility {
                                                 Manifest.permission.CAMERA};
 
     private static HashMap<Integer, ArrayList<ClassifiedImage>> imagesCollection = new HashMap<>();
-    private static HashMap<Integer, LinkedHashSet<ClassifiedImage>> uniqueImageCollection = new HashMap<>();
     private static Client client;
 
 
