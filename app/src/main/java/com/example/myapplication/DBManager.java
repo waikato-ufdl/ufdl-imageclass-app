@@ -5,6 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBManager {
 
@@ -28,21 +32,48 @@ public class DBManager {
         dbHelper.close();
     }
 
-    public Cursor getLicenses() {
+    public List<String> getLicenses() {
 //        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
 //        Cursor result = sqLiteDatabase.rawQuery("select * from " + TABLE_LICENSE, null);
 //        return result;
-        String[] columns = new String[] {
-                DatabaseHelper.LICENSE_COL_1
-        };
-        Cursor cursor = database.query(DatabaseHelper.TABLE_LICENSE, columns, null, null, null, null, null);
-        if (cursor != null) {
-            cursor.moveToFirst();
+        Log.d("getLicenses: ", "Create ArrayList");
+        List<String> licenses = new ArrayList<String>();
+        Log.d("getLicenses: ", "Open DB");
+        open();
+        Log.d("getLicenses: ", "Select Query");
+        Cursor cursor = database.query(dbHelper.TABLE_LICENSE, new String[] {dbHelper.LICENSE_COL_2}, null, null, null, null, null, null);
+//        Cursor cursor = database.rawQuery("select * from " + dbHelper.TABLE_LICENSE, null);
+        Log.d("getLicenses: ", "Go through cursor list");
+        if (cursor.moveToFirst()) {
+            do {
+                licenses.add(cursor.getString(0));
+                Log.d("getLicenses: ", cursor.getString(0));
+            }while (cursor.moveToNext());
         }
-        return cursor;
+//        close();
+        Log.d("getLicenses: ", licenses.toString());
+        return licenses;
     }
 
-    public void insertLicenses(String licenseName){
+    public int getLicenseKey(String licenseName) {
+        open();
+        int result;
+        Log.d("getLicenseKey: ", "RUN CURSOR");
+        Cursor cursor = database.rawQuery("SELECT * FROM "+dbHelper.TABLE_LICENSE+" WHERE "+dbHelper.LICENSE_COL_2+" = '"+licenseName+"'", null);
+        Log.d("getLicenseKey: ", "CHECK FOR RESULT");
+        if (cursor.moveToFirst()) {
+            Log.d("getLicenseKey: ", "CURSOR FOUND RESULT");
+            result = cursor.getInt(cursor.getColumnIndex(dbHelper.LICENSE_COL_1));
+        } else {
+            Log.d("getLicenseKey: ", "CURSOR DIDNT FIND RESULT");
+            result = 0;
+        }
+        Log.d("getLicenseKey: ", "RESULT IS " + result);
+        cursor.close();
+        return result;
+    }
+
+    public void insertLicenses(int licenseKey, String licenseName){
 //        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
 //        ContentValues contentValues = new ContentValues();
 //        contentValues.put(LICENSE_COL_1, licenseName);
@@ -52,9 +83,90 @@ public class DBManager {
 //        } else {
 //            return true;
 //        }
+        open();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelper.LICENSE_COL_1, licenseName);
-        database.insert(DatabaseHelper.TABLE_LICENSE, null, contentValues);
+        contentValues.put(dbHelper.LICENSE_COL_1, licenseKey);
+        contentValues.put(dbHelper.LICENSE_COL_2, licenseName);
+        database.insert(dbHelper.TABLE_LICENSE, null, contentValues);
+        Log.d("insertLicenses: ", licenseKey + " " + licenseName + " INSERTED");
+//        close();
+    }
+
+    public List<String> getProjects() {
+//        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+//        Cursor result = sqLiteDatabase.rawQuery("select * from " + TABLE_LICENSE, null);
+//        return result;
+        Log.d("getProjects: ", "Create ArrayList");
+        List<String> projects = new ArrayList<String>();
+        Log.d("getProjects: ", "Open DB");
+        open();
+        Log.d("getProjects: ", "Select Query");
+        Cursor cursor = database.query(dbHelper.TABLE_PROJECT, new String[] {dbHelper.PROJECT_COL_2}, null, null, null, null, null, null);
+//        Cursor cursor = database.rawQuery("select * from " + dbHelper.TABLE_LICENSE, null);
+        Log.d("getProjects: ", "Go through cursor list");
+        if (cursor.moveToFirst()) {
+            do {
+                projects.add(cursor.getString(0));
+                Log.d("getProjects: ", cursor.getString(0));
+            }while (cursor.moveToNext());
+        }
+//        close();
+        Log.d("getProjects: ", projects.toString());
+        return projects;
+    }
+
+    public int getProjectKey(String projectName) {
+        open();
+        int result;
+        Log.d("getProjectKey: ", "RUN CURSOR");
+        Cursor cursor = database.rawQuery("SELECT * FROM "+dbHelper.TABLE_PROJECT+" WHERE "+dbHelper.PROJECT_COL_2+" = '"+projectName+"'", null);
+        Log.d("getProjectKey: ", "CHECK FOR RESULT");
+        if (cursor.moveToFirst()) {
+            Log.d("getProjectKey: ", "CURSOR FOUND RESULT");
+            result = cursor.getInt(cursor.getColumnIndex(dbHelper.PROJECT_COL_1));
+        } else {
+            Log.d("getProjectKey: ", "CURSOR DIDNT FIND RESULT");
+            result = 1;
+        }
+        Log.d("getProjectKey: ", "RESULT IS " + result);
+        cursor.close();
+        return result;
+    }
+
+    public String getProjectName(int projectKey) {
+        open();
+        String result;
+        Cursor cursor = database.rawQuery("SELECT * FROM "+dbHelper.TABLE_PROJECT+" WHERE "+dbHelper.PROJECT_COL_1+" = "+projectKey+"", null);
+        Log.d("getProjectName: ", "CHECK FOR RESULT");
+        if (cursor.moveToFirst()) {
+            Log.d("getProjectName: ", "CURSOR FOUND RESULT");
+            result = cursor.getString(cursor.getColumnIndex(dbHelper.PROJECT_COL_2));
+        } else {
+            Log.d("getProjectName: ", "CURSOR DIDNT FIND RESULT");
+            result = "Project Key Incorrect";
+        }
+        Log.d("getProjectKey: ", "RESULT IS " + result);
+        cursor.close();
+        return result;
+    }
+
+    public void insertProjects(int projectKey, String projectName){
+//        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+//        ContentValues contentValues = new ContentValues();
+//        contentValues.put(LICENSE_COL_1, licenseName);
+//        long result = sqLiteDatabase.insert(TABLE_LICENSE, null, contentValues);
+//        if (result == -1){
+//            return false;
+//        } else {
+//            return true;
+//        }
+        open();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(dbHelper.PROJECT_COL_1, projectKey);
+        contentValues.put(dbHelper.PROJECT_COL_2, projectName);
+        database.insert(dbHelper.TABLE_PROJECT, null, contentValues);
+        Log.d("insertLicenses: ", projectKey + " " + projectName + " INSERTED");
+//        close();
     }
 
     public Cursor getDatasets() {

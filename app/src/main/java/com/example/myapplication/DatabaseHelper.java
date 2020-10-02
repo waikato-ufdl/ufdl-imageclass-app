@@ -29,7 +29,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String IMAGE_COL_6 = "IMAGE_SYNC_OPERATIONS";
 
     public static final String TABLE_LICENSE = "license_table";
-    public static final String LICENSE_COL_1 = "LICENSE_NAME";
+    public static final String LICENSE_COL_1 = "LICENSE_PK";
+    public static final String LICENSE_COL_2 = "LICENSE_NAME";
+
+    public static final String TABLE_PROJECT = "project_table";
+    public static final String PROJECT_COL_1 = "PROJECT_PK";
+    public static final String PROJECT_COL_2 = "PROJECT_NAME";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -68,7 +73,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d("onCreate: ", "CREATING LICENSE TABLE");
         sqLiteDatabase.execSQL("create table " +
                 TABLE_LICENSE + " (" +
-                LICENSE_COL_1 + " TEXT PRIMARY KEY)");
+                LICENSE_COL_1 + " INTEGER PRIMARY KEY, " +
+                LICENSE_COL_2 + " TEXT)");
+
+        Log.d("onCreate: ", "CREATING PROJECT TABLE");
+        sqLiteDatabase.execSQL("create table " +
+                TABLE_PROJECT + " (" +
+                PROJECT_COL_1 + " INTEGER PRIMARY KEY, " +
+                PROJECT_COL_2 + " TEXT)");
     }
 
     @Override
@@ -76,6 +88,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("drop table if exists " + TABLE_DATASET);
         sqLiteDatabase.execSQL("drop table if exists " + TABLE_IMAGE);
         sqLiteDatabase.execSQL("drop table if exists " + TABLE_LICENSE);
+        sqLiteDatabase.execSQL("drop table if exists " + TABLE_PROJECT);
         onCreate(sqLiteDatabase);
     }
 }

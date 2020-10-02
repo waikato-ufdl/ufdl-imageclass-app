@@ -58,20 +58,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         dbManager = new DBManager(this);
-        dbManager.open();
     }
 
     /**
      * A method to establish a connection to the UFDL backend
      */
     public void connectToServer() {
+        Log.d("connectToServer: ", "RUNNING connectToServer()");
         Utility.connectToServer();
         //ArrayList<byte[]> images = new ArrayList<>();
 
 
-        if(!Utility.authenticationFailed()) {
-            //an example to see whether we are able to retrieve the list of licenses from the backend
-            try {
+//        if(!Utility.authenticationFailed()) {
+//            //an example to see whether we are able to retrieve the list of licenses from the backend
+//            try {
 //            ImageClassificationDatasets action = client.action(ImageClassificationDatasets.class);
 //            //System.out.println("\nDatasets:");
 //            for (Datasets.Dataset dataset : client.datasets().list()) {
@@ -86,19 +86,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            }
 //
 //            System.out.println(images.size());
-                Log.d("connectToServer: ", "INSERTING LICENSES");
-                String licName = "";
-                for (Licenses.License license : Utility.getClient().licenses().list()) {
-                    licName = license.getName();
-                    System.out.println(licName);
-                    dbManager.insertLicenses(licName);
-                }
-            } catch (IllegalStateException e) {
-                showToast("Please check your username, password and server URL details in settings");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+//
+//            } catch (IllegalStateException e) {
+//                showToast("Please check your username, password and server URL details in settings");
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     /**
