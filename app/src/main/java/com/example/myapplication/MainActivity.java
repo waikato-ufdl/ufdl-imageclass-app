@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
@@ -10,9 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import com.example.myapplication.ui.settings.Utility;
-import com.github.waikatoufdl.ufdl4j.Client;
 import com.github.waikatoufdl.ufdl4j.action.Licenses;
-import com.github.waikatoufdl.ufdl4j.auth.MemoryOnlyStorage;
 import com.google.android.material.navigation.NavigationView;
 import androidx.core.view.GravityCompat;
 import androidx.navigation.NavController;
@@ -26,15 +25,13 @@ import androidx.appcompat.widget.Toolbar;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
 
-import okhttp3.internal.Util;
-
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private AppBarConfiguration mAppBarConfiguration;
     private Button buttonSettings;
     private static final int VERIFY_PERMISSIONS_REQUEST = 1;
-    private DatabaseHelper databaseHelper;
+    private DBManager dbManager;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
 
@@ -42,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         Utility.setContext(this);
         setTheme(Utility.getTheme());
-        databaseHelper = new DatabaseHelper(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -60,20 +56,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //ask user to grant permissions
             verifyPermissions(Utility.PERMISSIONS);
         }
+
+        dbManager = new DBManager(this);
     }
 
     /**
      * A method to establish a connection to the UFDL backend
      */
     public void connectToServer() {
+        Log.d("connectToServer: ", "RUNNING connectToServer()");
         Utility.connectToServer();
         //ArrayList<byte[]> images = new ArrayList<>();
 
 
-        /*
-        if(!Utility.authenticationFailed()) {
-            //an example to see whether we are able to retrieve the list of licenses from the backend
-            try {
+//        if(!Utility.authenticationFailed()) {
+//            //an example to see whether we are able to retrieve the list of licenses from the backend
+//            try {
 //            ImageClassificationDatasets action = client.action(ImageClassificationDatasets.class);
 //            //System.out.println("\nDatasets:");
 //            for (Datasets.Dataset dataset : client.datasets().list()) {
@@ -88,21 +86,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            }
 //
 //            System.out.println(images.size());
-
-                String licName = "";
-                for (Licenses.License license : Utility.getClient().licenses().list()) {
-                    licName = license.getName();
-                    System.out.println(licName);
-                    databaseHelper.insertLicenses(licName);
-                }
-            } catch (IllegalStateException e) {
-                showToast("Please check your username, password and server URL details in settings");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-         */
-
+//
+//            } catch (IllegalStateException e) {
+//                showToast("Please check your username, password and server URL details in settings");
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     /**
@@ -148,9 +138,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //if the user has used this application before, use their details to connect to the API
         if(Utility.loadUsername() != null & Utility.loadPassword() != null & Utility.loadServerURL() != null) {
-
-            //establish a connection to the server
-            Utility.connectToServer();
+            //start a thread to connect to the server
+            Thread t = new Thread(() -> connectToServer());
+            t.start();
         }
     }
 
