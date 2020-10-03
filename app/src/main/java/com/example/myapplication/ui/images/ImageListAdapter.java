@@ -28,6 +28,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
@@ -80,16 +81,21 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         ClassifiedImage image = images.get(position);
-        //set the classification label
-        holder.classification.setText(image.getClassification());
 
-        //use glide to load image into the image view for display
-        Glide.with(mContext)
-                .asBitmap()
-                .load(image.getImageArray())
-                .placeholder(R.drawable.progress_animation)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(holder.image);
+        if(image != null)
+        {
+            //set the classification label
+            holder.classification.setText(image.getClassification());
+
+            Glide.with(mContext).clear(holder.image);
+
+            //use glide to load image into the image view for display
+            Glide.with(mContext)
+                    .asBitmap()
+                    .load(image.getImageArray())
+                    .placeholder(R.drawable.progress_animation)
+                    .into(holder.image);
+        }
 
         if(image.isSelected())
         {

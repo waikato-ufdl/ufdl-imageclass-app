@@ -173,8 +173,6 @@ public class Utility {
      * handle the storage and retrieval of the access and refresh tokens which will be used in API calls.
      */
     public static void connectToServer() {
-        System.out.println(Utility.loadServerURL() + " " + Utility.loadUsername() + " " + Utility.loadPassword());
-
         client = new Client(loadServerURL(), loadUsername(), loadPassword(), new MemoryOnlyStorage());
     }
 

@@ -57,6 +57,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
+
 import static android.app.Activity.RESULT_OK;
 
 
@@ -206,6 +208,7 @@ public class ImagesFragment extends Fragment {
         adapter = new ImageListAdapter(this, getContext(), images);
         gridLayoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(gridLayoutManager);
+        OverScrollDecoratorHelper.setUpOverScroll(recyclerView, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
         recyclerView.setAdapter(adapter);
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {

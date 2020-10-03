@@ -149,8 +149,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //if the user has used this application before, use their details to connect to the API
         if(Utility.loadUsername() != null & Utility.loadPassword() != null & Utility.loadServerURL() != null) {
 
-            System.out.println(Utility.loadServerURL() + " " + Utility.loadUsername() + " " + Utility.loadPassword());
-            //start a thread to connect to the server
+            //establish a connection to the server
             Utility.connectToServer();
         }
     }

@@ -56,4 +56,7 @@ dependencies {
 
     //sweet alert library for well designed alert dialogs
     implementation 'com.github.f0ris.sweetalert:library:1.6.2'
+
+    //this library will be used to setup the bounce back scroll animation
+    implementation 'me.everything:overscroll-decor-android:1.1.0'
 }

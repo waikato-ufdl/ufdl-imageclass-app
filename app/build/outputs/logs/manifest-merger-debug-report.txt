@@ -15,6 +15,7 @@ MERGED from [androidx.lifecycle:lifecycle-extensions:2.1.0] /home/yug/.gradle/ca
 MERGED from [com.github.bumptech.glide:glide:4.11.0] /home/yug/.gradle/caches/transforms-2/files-2.1/dc9123763d17d918a4b107f1f30e6b9e/jetified-glide-4.11.0/AndroidManifest.xml:2:1-12:12
 MERGED from [androidx.exifinterface:exifinterface:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/9f37555cfdc4e76361ebbfe8fbdb4d2e/exifinterface-1.1.0/AndroidManifest.xml:17:1-24:12
 MERGED from [com.github.f0ris.sweetalert:library:1.6.2] /home/yug/.gradle/caches/transforms-2/files-2.1/da69e5b27cfc7ce21312b93b5902dbe4/jetified-library-1.6.2/AndroidManifest.xml:2:1-13:12
+MERGED from [me.everything:overscroll-decor-android:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/ce0c3e02ff6574f74926720e57e29137/jetified-overscroll-decor-android-1.1.0/AndroidManifest.xml:2:1-11:12
 MERGED from [androidx.viewpager2:viewpager2:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/65b26ec11e574f5d68d3fe93c8217bcb/jetified-viewpager2-1.0.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.fragment:fragment:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/12c076570219bdc2a11e9d0df335391a/fragment-1.1.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.appcompat:appcompat-resources:1.2.0] /home/yug/.gradle/caches/transforms-2/files-2.1/ee9b51f71825564f346013ea1d4d0318/jetified-appcompat-resources-1.2.0/AndroidManifest.xml:17:1-24:12
@@ -26,12 +27,12 @@ MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /home/yug/.grad
 MERGED from [androidx.transition:transition:1.2.0] /home/yug/.gradle/caches/transforms-2/files-2.1/0b3eeae4c45c19949f040ae2f0516871/transition-1.2.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/32488318cfc756fa0f6ae91e625fa530/vectordrawable-animated-1.1.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/0878a65179abd6a1b5016c6981bce614/vectordrawable-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/6e57c04e98c372fcd8878b95a3d5645d/recyclerview-1.1.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.viewpager:viewpager:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/ebc8011c39d26c440b76466a9b971345/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.loader:loader:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/2118a7099009bdd29f0289728ee82c0d/loader-1.0.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-runtime:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/76cde7c9ba7d5ead4b8de81e9b386825/navigation-runtime-2.1.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.activity:activity:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/f52c60a67eb4c2183a64b296ae574169/jetified-activity-1.0.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/aa2f1cd22069a9bb65f1845d902d729f/slidingpanelayout-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.recyclerview:recyclerview:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/6e57c04e98c372fcd8878b95a3d5645d/recyclerview-1.1.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.customview:customview:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/d1ea25f3382273eed14315b543469208/customview-1.0.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/a083b9190df6cd0b2eed1b8d83acb3d5/swiperefreshlayout-1.0.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/f1f8381ec1e1c3f6b165a08612cfd883/asynclayoutinflater-1.0.0/AndroidManifest.xml:17:1-22:12
@@ -202,6 +203,8 @@ MERGED from [androidx.exifinterface:exifinterface:1.1.0] /home/yug/.gradle/cache
 MERGED from [androidx.exifinterface:exifinterface:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/9f37555cfdc4e76361ebbfe8fbdb4d2e/exifinterface-1.1.0/AndroidManifest.xml:20:5-22:41
 MERGED from [com.github.f0ris.sweetalert:library:1.6.2] /home/yug/.gradle/caches/transforms-2/files-2.1/da69e5b27cfc7ce21312b93b5902dbe4/jetified-library-1.6.2/AndroidManifest.xml:7:5-9:41
 MERGED from [com.github.f0ris.sweetalert:library:1.6.2] /home/yug/.gradle/caches/transforms-2/files-2.1/da69e5b27cfc7ce21312b93b5902dbe4/jetified-library-1.6.2/AndroidManifest.xml:7:5-9:41
+MERGED from [me.everything:overscroll-decor-android:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/ce0c3e02ff6574f74926720e57e29137/jetified-overscroll-decor-android-1.1.0/AndroidManifest.xml:7:5-9:41
+MERGED from [me.everything:overscroll-decor-android:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/ce0c3e02ff6574f74926720e57e29137/jetified-overscroll-decor-android-1.1.0/AndroidManifest.xml:7:5-9:41
 MERGED from [androidx.viewpager2:viewpager2:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/65b26ec11e574f5d68d3fe93c8217bcb/jetified-viewpager2-1.0.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.viewpager2:viewpager2:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/65b26ec11e574f5d68d3fe93c8217bcb/jetified-viewpager2-1.0.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.fragment:fragment:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/12c076570219bdc2a11e9d0df335391a/fragment-1.1.0/AndroidManifest.xml:20:5-22:41
@@ -224,6 +227,8 @@ MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/yug/.g
 MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/32488318cfc756fa0f6ae91e625fa530/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/0878a65179abd6a1b5016c6981bce614/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/0878a65179abd6a1b5016c6981bce614/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/6e57c04e98c372fcd8878b95a3d5645d/recyclerview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/6e57c04e98c372fcd8878b95a3d5645d/recyclerview-1.1.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.viewpager:viewpager:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/ebc8011c39d26c440b76466a9b971345/viewpager-1.0.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.viewpager:viewpager:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/ebc8011c39d26c440b76466a9b971345/viewpager-1.0.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.loader:loader:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/2118a7099009bdd29f0289728ee82c0d/loader-1.0.0/AndroidManifest.xml:20:5-44
@@ -234,8 +239,6 @@ MERGED from [androidx.activity:activity:1.0.0] /home/yug/.gradle/caches/transfor
 MERGED from [androidx.activity:activity:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/f52c60a67eb4c2183a64b296ae574169/jetified-activity-1.0.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/aa2f1cd22069a9bb65f1845d902d729f/slidingpanelayout-1.0.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/aa2f1cd22069a9bb65f1845d902d729f/slidingpanelayout-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.recyclerview:recyclerview:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/6e57c04e98c372fcd8878b95a3d5645d/recyclerview-1.1.0/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.recyclerview:recyclerview:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/6e57c04e98c372fcd8878b95a3d5645d/recyclerview-1.1.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.customview:customview:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/d1ea25f3382273eed14315b543469208/customview-1.0.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.customview:customview:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/d1ea25f3382273eed14315b543469208/customview-1.0.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/a083b9190df6cd0b2eed1b8d83acb3d5/swiperefreshlayout-1.0.0/AndroidManifest.xml:20:5-44
