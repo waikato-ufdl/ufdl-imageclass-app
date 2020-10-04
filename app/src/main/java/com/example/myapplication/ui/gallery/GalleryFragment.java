@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.gallery;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -36,6 +38,7 @@ import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.ui.settings.Utility;
 import com.github.waikatoufdl.ufdl4j.action.Datasets;
+import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +55,7 @@ public class GalleryFragment extends Fragment {
     private Switch datasetSwitch;
     private boolean datasetPublic = false;
     private String datasetNameText, datasetDescriptionText, datasetTagText;
+    private ImageClassificationDatasets action;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -116,6 +120,7 @@ public class GalleryFragment extends Fragment {
             //must start a thread to retrieve the dataset information as networking operations cannot be done on the main thread
             Thread t = new Thread(() -> {
                 try {
+                    action = Utility.getClient().action(ImageClassificationDatasets.class);
                     final ArrayList<Datasets.Dataset> dataset = (ArrayList) (Utility.getClient().datasets().list());
 
                     //must populate the listview on the main thread
@@ -158,6 +163,8 @@ public class GalleryFragment extends Fragment {
             //Inflate the view from a predefined XML layout
             View layout = inflater.inflate(R.layout.new_dataset,
                     null);
+
+
             // create a 300px width and 470px height PopupWindow
             final PopupWindow popupWindow = new PopupWindow(layout,
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -165,18 +172,16 @@ public class GalleryFragment extends Fragment {
 
             // display the popup in the center
             popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
+
+            //darken the background behind the popup window
+            darkenBackground(popupWindow);
+
             dbManager = new DBManager(getContext());
-            Log.d("initiateNewDatasetWindow: ", "Get Licenses from SQLite");
+
+            //get licenses & projects using database manager
             final List<String> spinnerArrayLicenses = dbManager.getLicenses();
             final List<String> spinnerArrayProjects = dbManager.getProjects();
 
-            Log.d("initiateNewDatasetWindow: ", "Create adapter");
-//            ArrayAdapter dataAdapter = new ArrayAdapter<String>(getActivity(),
-//                    spinner_item, licenses);
-//            Log.d("initiateNewDatasetWindow: ", "Set drop down resource");
-//            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            Log.d("initiateNewDatasetWindow: ", "Set adapter for spinner");
-//            licenseSpinner.setAdapter(dataAdapter);
             ArrayAdapter<String> spinnerArrayAdapterLicenses = new ArrayAdapter<String>
                     (getContext(), spinner_item,
                             spinnerArrayLicenses); //selected item will look like a spinner set from XML
@@ -188,44 +193,35 @@ public class GalleryFragment extends Fragment {
                             spinnerArrayProjects); //selected item will look like a spinner set from XML
             spinnerArrayAdapterPojects.setDropDownViewResource(android.R.layout
                     .simple_spinner_dropdown_item);
-            Log.d("initiateNewDatasetWindow: ", "Get spinner");
+
+            //initialise views
             Spinner spinnerLicenses = layout.findViewById(R.id.dataset_license_spinner);
             spinnerLicenses.setAdapter(spinnerArrayAdapterLicenses);
             Spinner spinnerProjects = layout.findViewById(R.id.dataset_project_spinner);
             spinnerProjects.setAdapter(spinnerArrayAdapterPojects);
             Button btnCreateDataset = layout.findViewById(R.id.createDatasetButton);
+
             datasetName = layout.findViewById(R.id.dataset_name_text);
             datasetDescription = layout.findViewById(R.id.dataset_description_text);
             datasetTags = layout.findViewById(R.id.dataset_tags_text);
             datasetSwitch = layout.findViewById(R.id.makePublic);
+
+
             btnCreateDataset.setOnClickListener(view -> {
-                Log.d("initiateNewDatasetWindow: ", "Check details entered");
                 if(checkDetailsEntered()){
-                    Log.d("initiateNewDatasetWindow: ", "Get edit text values");
                     datasetNameText = datasetName.getText().toString().trim();
                     datasetDescriptionText = datasetDescription.getText().toString().trim();
                     datasetTagText = datasetTags.getText().toString().trim();
-                    Log.d("initiateNewDatasetWindow: ", "Check public");
                     if(datasetSwitch.isChecked()){
-                        Log.d("initiateNewDatasetWindow: ", "set public");
                         datasetPublic = true;
                     }
-                    Log.d("initiateNewDatasetWindow: ", "Get project key");
                     int projectKey = dbManager.getProjectKey(spinnerProjects.getSelectedItem().toString());
-                    Log.d("initiateNewDatasetWindow: ", "Get license key");
                     int licenseKey = dbManager.getLicenseKey(spinnerLicenses.getSelectedItem().toString());
-                    Log.d("initiateNewDatasetWindow: ", "Dataset values");
-                    Log.d("initiateNewDatasetWindow: ", "NAME: " + datasetNameText);
-                    Log.d("initiateNewDatasetWindow: ", "DESCRIPTION: " + datasetDescriptionText);
-                    Log.d("initiateNewDatasetWindow: ", "PROJECT KEY: " + projectKey);
-                    Log.d("initiateNewDatasetWindow: ", "LICENSE KEY: " + licenseKey);
-                    Log.d("initiateNewDatasetWindow: ", "PUBLIC: " + datasetPublic);
-                    Log.d("initiateNewDatasetWindow: ", "TAGS: " + datasetTagText);
+
+                    //create
                     Thread t = new Thread(() -> {
                         try {
-                            Log.d("initiateNewDatasetWindow: ", "Create dataset");
-                            Utility.getClient().datasets().create(datasetNameText, datasetDescriptionText, projectKey, licenseKey, datasetPublic, datasetTagText);
-                            Log.d("initiateNewDatasetWindow: ", "Dataset created");
+                            action.create(datasetNameText, datasetDescriptionText, projectKey, licenseKey, datasetPublic, datasetTagText);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -236,7 +232,6 @@ public class GalleryFragment extends Fragment {
                 }
             });
         } catch (Exception e) {
-            Log.d("initiateNewDatasetWindow: ", "ERROR THROWN");
             e.printStackTrace();
         }
     }
@@ -286,4 +281,22 @@ public class GalleryFragment extends Fragment {
         }
         ft.detach(this).attach(this).commit();
     }
+
+    /**
+     * A method to darken the background when a popup window is displayed
+     * @param popupWindow The popup window being displayed
+     */
+    public static void darkenBackground(PopupWindow popupWindow) {
+        //get the popup view & context
+        View container = popupWindow.getContentView().getRootView();
+        Context context = popupWindow.getContentView().getContext();
+
+        //setup window manager layout parameters to dim the background & update the view
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager.LayoutParams layoutParams = (WindowManager.LayoutParams) container.getLayoutParams();
+        layoutParams.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+        layoutParams.dimAmount = 0.5f;
+        windowManager.updateViewLayout(container, layoutParams);
+    }
+
 }

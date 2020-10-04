@@ -176,50 +176,33 @@ public class Utility {
      * handle the storage and retrieval of the access and refresh tokens which will be used in API calls.
      */
     public static void connectToServer() {
-        Log.d("connectToServer: ", "Create String Variables");
-        String server, user, password;
-        Log.d("connectToServer: ", "Create and assign MOS Variable");
-        MemoryOnlyStorage mos = new MemoryOnlyStorage();
-        Log.d("connectToServer: ", "Assign String Variables");
-        server = loadServerURL();
-        user = loadUsername();
-        password = loadPassword();
-        Log.d("connectToServer: ", "MAKE CONNECTION");
-        client = new Client(server, user, password, mos);
-//        client = new Client(loadServerURL(), loadUsername(), loadPassword(), new MemoryOnlyStorage());
-//        client = new Client("http://127.0.0.1:8000", "admin", "admin", new MemoryOnlyStorage());
-//        Log.d("connectToServer: ", client.toString());
-        try {
-            DBManager dbManager = new DBManager(context);
-            Log.d("connectToServer: ", "INSERTING LICENSES");
-            Log.d("connectToServer: ", "GET LICENSES FROM API");
-            System.out.println("\nLicenses:");
-            for (Licenses.License license: client.licenses().list()) {
-                System.out.println(license);
-                Log.d("connectToServer: ", "INSERTING LICENSE INTO SQLITE");
-                dbManager.insertLicenses(license.getPK(), license.getName());
-            }
-            Log.d("connectToServer: ", "INSERTING PROJECTS");
-            Log.d("connectToServer: ", "GET PROJECTS FROM API");
-            System.out.println("\nProjects:");
-            for (Projects.Project project: client.projects().list()) {
-                System.out.println(project);
-                Log.d("connectToServer: ", "INSERTING PROJECT INTO SQLITE");
-                dbManager.insertProjects(project.getPK(), project.getName());
-            }
-//            for (Licenses.License license : client.licenses().list()) {
-//                Log.d("connectToServer: ", "GET LICENSE NAME");
-//                licName = license.getName();
-//                Log.d("connectToServer: ", "PRINT TO THE CONSOLE");
-//                System.out.println(licName);
-//                Log.d("connectToServer: ", "INSERTING LICENSE INTO SQLITE");
-//                dbManager.insertLicenses(licName);
-//            }
-        }catch (IllegalStateException e) {
-                Log.d("connectToServer: ","Please check your username, password and server URL details in settings");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+      client = new Client(loadServerURL(), loadUsername(), loadPassword(), new MemoryOnlyStorage());
+
+      Thread t = new Thread(()-> {
+          try {
+              DBManager dbManager = new DBManager(context);
+              System.out.println("\nLicenses:");
+              for (Licenses.License license: client.licenses().list()) {
+                  System.out.println(license);
+                  Log.d("connectToServer: ", "INSERTING LICENSE INTO SQLITE");
+                  dbManager.insertLicenses(license.getPK(), license.getName());
+              }
+
+              System.out.println("\nProjects:");
+              for (Projects.Project project: client.projects().list()) {
+                  System.out.println(project);
+                  Log.d("connectToServer: ", "INSERTING PROJECT INTO SQLITE");
+                  dbManager.insertProjects(project.getPK(), project.getName());
+              }
+
+          }catch (IllegalStateException e) {
+              Log.d("connectToServer: ","Please check your username, password and server URL details in settings");
+          } catch (Exception e) {
+
+          }
+      });
+
+      t.start();
     }
 
     /**
@@ -240,4 +223,15 @@ public class Utility {
     {
         return Patterns.WEB_URL.matcher(URL).matches();
     }
+
+    /**
+     * Method to check whether tokens are null or not
+     * @return
+     */
+    public static boolean authenticationFailed()
+    {
+        String[] data = client.toString().split(" ");
+        return data[data.length-1].equals("access=") | data[data.length-1].equals("tokens=null");
+    }
+
 }

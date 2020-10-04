@@ -1804,6 +1804,7 @@ id content
 id contentPanel
 id content_text
 id coordinator
+id createDatasetButton
 id custom
 id customPanel
 id custom_image
@@ -1811,11 +1812,14 @@ id custom_view_container
 id cut
 id dataseName
 id datasetTags
+id dataset_description_text
+id dataset_description_title
 id dataset_folder
 id dataset_license_spinner
 id dataset_license_title
 id dataset_name_text
 id dataset_name_title
+id dataset_project_spinner
 id dataset_project_text
 id dataset_project_title
 id dataset_tags
@@ -1892,6 +1896,7 @@ id listMode
 id list_item
 id list_view_datasets
 id loading
+id makePublic
 id mask_left
 id mask_right
 id masked
