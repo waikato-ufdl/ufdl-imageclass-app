@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
+import com.bumptech.glide.Glide;
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.ui.settings.Utility;
@@ -30,6 +31,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import okhttp3.internal.Util;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -251,7 +254,11 @@ public class HomeFragment extends Fragment {
 
         //create rotated bitmap using dimensions of original bitmap and the matrix
         Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-        capturedImage.setImageBitmap(rotatedBitmap);
+        //capturedImage.setImageBitmap(rotatedBitmap);
+        Glide.with(this)
+                .asBitmap()
+                .load(rotatedBitmap)
+                .into(capturedImage);
     }
 
     @Override

@@ -6,15 +6,19 @@ import android.util.Log;
 import android.util.Patterns;
 import android.widget.Toast;
 
+import com.example.myapplication.DBManager;
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.ui.images.ClassifiedImage;
 import com.github.waikatoufdl.ufdl4j.Client;
+import com.github.waikatoufdl.ufdl4j.action.Licenses;
+import com.github.waikatoufdl.ufdl4j.action.Projects;
 import com.github.waikatoufdl.ufdl4j.auth.MemoryOnlyStorage;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 
 /**
  * This is a class that will be used to store and retrieve user settings from shared storage
@@ -136,7 +140,6 @@ public class Utility {
         editor.commit();
     }
 
-
     /**
      * A method to retrieve a stored password from sharedPreferences
      * @return
@@ -158,7 +161,6 @@ public class Utility {
         editor.commit();
     }
 
-
     /**
      * A method to retrieve the server's URL from sharedPreference
      * @return
@@ -174,7 +176,36 @@ public class Utility {
      * handle the storage and retrieval of the access and refresh tokens which will be used in API calls.
      */
     public static void connectToServer() {
-        client = new Client(loadServerURL(), loadUsername(), loadPassword(), new MemoryOnlyStorage());
+
+        System.out.println((loadServerURL() + " " + loadPassword() + " " + loadPassword()));
+      client = new Client(loadServerURL(), loadUsername(), loadPassword(), new MemoryOnlyStorage());
+
+      Thread t = new Thread(()-> {
+          try {
+              DBManager dbManager = new DBManager(context);
+              System.out.println("\nLicenses:");
+              for (Licenses.License license: client.licenses().list()) {
+                  System.out.println(license);
+                  Log.d("connectToServer: ", "INSERTING LICENSE INTO SQLITE");
+                  dbManager.insertLicenses(license.getPK(), license.getName());
+              }
+
+              System.out.println("\nProjects:");
+              for (Projects.Project project: client.projects().list()) {
+                  System.out.println(project);
+                  Log.d("connectToServer: ", "INSERTING PROJECT INTO SQLITE");
+                  dbManager.insertProjects(project.getPK(), project.getName());
+              }
+
+          }catch (IllegalStateException e) {
+
+              Log.d("connectToServer: ","Please check your username, password and server URL details in settings");
+          } catch (Exception e) {
+
+          }
+      });
+
+      t.start();
     }
 
     /**
@@ -196,9 +227,14 @@ public class Utility {
         return Patterns.WEB_URL.matcher(URL).matches();
     }
 
+    /**
+     * Method to check whether tokens are null or not
+     * @return
+     */
     public static boolean authenticationFailed()
     {
         String[] data = client.toString().split(" ");
         return data[data.length-1].equals("access=") | data[data.length-1].equals("tokens=null");
     }
+
 }

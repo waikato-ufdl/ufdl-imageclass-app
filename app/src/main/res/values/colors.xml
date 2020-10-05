@@ -11,4 +11,5 @@
     <color name="grey">#818181</color>
     <color name="orange">#FF8C00</color>
     <color name="grey2">#202020</color>
+    <color name="imageExcessBackground">#202020</color>
 </resources>

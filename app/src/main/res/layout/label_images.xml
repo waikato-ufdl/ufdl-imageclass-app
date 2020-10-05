@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageSwitcher
+        android:id="@+id/imageSwitcher"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:background="@color/grey2" />
+
+    <Button
+        android:id="@+id/buttonPrev"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:text="Previous"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/imageSwitcher"
+        android:background="@drawable/button_design"/>
+
+    <Button
+        android:id="@+id/buttonNext"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:text="Next"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/imageSwitcher"
+        android:background="@drawable/button_design"/>
+
+    <TextView
+        android:id="@+id/labelCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Image Label: "
+        android:textSize="18dp"
+        android:textColor="@color/colorAccent"
+        android:layout_below="@id/buttonNext"
+        android:layout_marginBottom="2dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="25dp"/>
+
+
+    <EditText
+        android:id="@+id/editTextCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edit_text_design"
+        android:layout_below="@id/labelCategory"
+        android:padding="10dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginBottom="10dp"/>
+
+    <CheckBox
+        android:id="@+id/labelCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Label all images with this category"
+        android:layout_below="@id/editTextCategory"
+        android:layout_marginLeft="25dp"
+        android:layout_marginBottom="40dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_design"
+        android:text="Save Images"
+        android:layout_below="@id/labelCheckBox"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"/>
+
+</RelativeLayout>

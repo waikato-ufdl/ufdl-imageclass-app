@@ -29,9 +29,7 @@ import java.net.UnknownHostException;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private AppBarConfiguration mAppBarConfiguration;
-    private Button buttonSettings;
     private static final int VERIFY_PERMISSIONS_REQUEST = 1;
-    private DBManager dbManager;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
 
@@ -56,49 +54,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //ask user to grant permissions
             verifyPermissions(Utility.PERMISSIONS);
         }
-
-        dbManager = new DBManager(this);
-        dbManager.open();
     }
 
     /**
      * A method to establish a connection to the UFDL backend
      */
     public void connectToServer() {
+        Log.d("connectToServer: ", "RUNNING connectToServer()");
         Utility.connectToServer();
-        //ArrayList<byte[]> images = new ArrayList<>();
-
-
-        if(!Utility.authenticationFailed()) {
-            //an example to see whether we are able to retrieve the list of licenses from the backend
-            try {
-//            ImageClassificationDatasets action = client.action(ImageClassificationDatasets.class);
-//            //System.out.println("\nDatasets:");
-//            for (Datasets.Dataset dataset : client.datasets().list()) {
-//                //System.out.println(dataset.getName());
-//            }
-//
-//            Map<String, List<String>>  categories = action.getCategories(3);
-//
-//            for(Map.Entry<String, List<String>> entry: categories.entrySet()) {
-//                System.out.println(entry.getKey());
-//                images.add(client.datasets().getFile(3, entry.getKey()));
-//            }
-//
-//            System.out.println(images.size());
-                Log.d("connectToServer: ", "INSERTING LICENSES");
-                String licName = "";
-                for (Licenses.License license : Utility.getClient().licenses().list()) {
-                    licName = license.getName();
-                    System.out.println(licName);
-                    dbManager.insertLicenses(licName);
-                }
-            } catch (IllegalStateException e) {
-                showToast("Please check your username, password and server URL details in settings");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**
@@ -116,15 +79,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-//        FloatingActionButton fab = findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-
 
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView= findViewById(R.id.nav_view);

@@ -123,7 +123,6 @@ public class SettingsFragment extends Fragment {
                     if(detailsHaveChanged()) {
                         //save user details before exiting & also establish a connection to the API using the settings information
                         saveSettings();
-                        Utility.connectToServer();
                     }
 
                     Navigation.findNavController(view).popBackStack();
@@ -169,6 +168,7 @@ public class SettingsFragment extends Fragment {
         Utility.saveUsername(username.getText().toString().trim());
         Utility.savePassword(password.getText().toString().trim());
         Utility.saveServerURL(serverURL.getText().toString().trim());
+        Utility.connectToServer();
     }
 
     /**

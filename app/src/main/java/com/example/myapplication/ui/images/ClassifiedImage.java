@@ -70,4 +70,13 @@ public class ClassifiedImage {
     public String getImageFileName() {
         return imageFileName;
     }
+
+    /**
+     * Setter method for setting the classification label of an image
+     * @param label
+     */
+    public void setClassificationLabel(String label)
+    {
+        classification = label;
+    }
 }

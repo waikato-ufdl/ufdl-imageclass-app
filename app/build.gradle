@@ -39,6 +39,8 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
     implementation 'androidx.exifinterface:exifinterface:1.1.0'
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
@@ -50,4 +52,16 @@ dependencies {
     //glide library
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+
+    //matisse library for gallery
+    implementation 'com.zhihu.android:matisse:0.5.3-beta3'
+
+    //sweet alert library for well designed alert dialogs
+    implementation 'com.github.f0ris.sweetalert:library:1.6.2'
+
+    //this library will be used to setup the bounce back scroll animation
+    implementation 'me.everything:overscroll-decor-android:1.1.0'
+
+    //library which makes it possible to display view pager dots indicator
+    implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:4.1.2'
 }

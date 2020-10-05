@@ -1,202 +1,230 @@
 [
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/mipmap-mdpi_ic_launcher_round.png.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/mipmap-mdpi/ic_launcher_round.png"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_popup_background.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/popup_background.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_edit_icon.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/edit_icon.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/mipmap-xxhdpi/ic_launcher.png"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_image_display.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/image_display.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/layout_fragment_images.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/layout/fragment_images.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_dataset_display.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/dataset_display.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/layout_dataset_display.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/layout/dataset_display.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/menu_main.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/menu/main.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_thumb.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/thumb.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable-xhdpi_loading_image.png.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable-xhdpi/loading_image.png"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_add_circle.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/add_circle.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/layout_image_display.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/layout/image_display.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "/home/yug/374/app/src/main/res/mipmap-hdpi/ic_launcher_round.png"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi_ic_launcher_round.png.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_thumb.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/thumb.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/layout_spinner_item.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/layout/spinner_item.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_fragment_images.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/fragment_images.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/layout_nav_header_main.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/layout/nav_header_main.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "/home/yug/374/app/src/main/res/mipmap-xxhdpi/ic_launcher.png"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_side_nav_bar.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/side_nav_bar.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_fragment_settings.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/fragment_settings.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_ic_menu_camera.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/ic_menu_camera.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_add_image.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/add_image.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/color_nav_menu_item.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/color/nav_menu_item.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_fragment_home.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/fragment_home.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/layout_app_bar_main.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/layout/app_bar_main.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/navigation_mobile_navigation.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/navigation/mobile_navigation.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/layout_fragment_settings.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/layout/fragment_settings.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_menu_settings.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/ic_menu_settings.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_add_circle.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/add_circle.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_spinner_item.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/spinner_item.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_ic_uow_logo.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/ic_uow_logo.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_dataset_folder.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/dataset_folder.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_ic_launcher_background.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/ic_launcher_background.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/menu_context_menu.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/menu/context_menu.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/mipmap-hdpi_ic_launcher.png.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/mipmap-hdpi/ic_launcher.png"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_label_images.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/label_images.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/layout_content_main.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/layout/content_main.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_edit_text_design.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/edit_text_design.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/mipmap-hdpi_ic_launcher_round.png.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/mipmap-hdpi/ic_launcher_round.png"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_menu_gallery.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/ic_menu_gallery.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/menu_activity_main_drawer.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/menu/activity_main_drawer.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "/home/yug/374/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/layout_fragment_home.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/layout/fragment_home.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_new_dataset.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/new_dataset.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/mipmap-xhdpi_ic_launcher_round.png.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_button_design.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/button_design.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/navigation_mobile_navigation.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/navigation/mobile_navigation.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "/home/yug/374/app/src/main/res/mipmap-mdpi/ic_launcher_round.png"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_progress_animation.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/progress_animation.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_edit_text_design.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/edit_text_design.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_fragment_slideshow.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/fragment_slideshow.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_track.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/track.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_nav_header_main.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/nav_header_main.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_ic_baseline_delete_24.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/ic_baseline_delete_24.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_menu_camera.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/ic_menu_camera.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/layout_activity_main.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/layout/activity_main.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_baseline_search_24.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/ic_baseline_search_24.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/menu_main.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/menu/main.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "/home/yug/374/app/src/main/res/mipmap-xhdpi/ic_launcher.png"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_ic_menu_settings.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/ic_menu_settings.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_baseline_delete_24.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/ic_baseline_delete_24.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/layout_new_dataset.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/layout/new_dataset.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_menu_slideshow.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/ic_menu_slideshow.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable-v24_ic_launcher_foreground.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable-v24/ic_launcher_foreground.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_side_nav_bar.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/side_nav_bar.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_gallery_selection_label.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/gallery_selection_label.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_button_design.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/button_design.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_gallery_item.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/gallery_item.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_ic_menu_gallery.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/ic_menu_gallery.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_activity_main.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/activity_main.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/mipmap-mdpi_ic_launcher.png.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/mipmap-mdpi/ic_launcher.png"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_app_bar_main.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/app_bar_main.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/layout_fragment_gallery.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/layout/fragment_gallery.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/color_nav_menu_item.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/color/nav_menu_item.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable-xhdpi_loading_image.png.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable-xhdpi/loading_image.png"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "/home/yug/374/app/src/main/res/mipmap-hdpi/ic_launcher.png"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_ripple_oval.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/ripple_oval.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable-v24_ic_launcher_foreground.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable-v24/ic_launcher_foreground.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_ic_menu_slideshow.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/ic_menu_slideshow.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_track.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/track.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/layout_fragment_slideshow.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/layout/fragment_slideshow.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_content_main.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/content_main.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_floating_button_background.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/floating_button_background.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/xml_file_paths.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/xml/file_paths.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ripple_oval.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/ripple_oval.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/mipmap-xhdpi/ic_launcher.png"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_popup_background.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/popup_background.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/mipmap-xxhdpi_ic_launcher_round.png.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "/home/yug/374/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/menu_context_menu.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/menu/context_menu.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_progress_animation.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/progress_animation.xml"
     },
     {
-        "merged": "/home/jordan/StudioProjects/374/app/build/intermediates/res/merged/debug/drawable_dataset_folder.xml.flat",
-        "source": "/home/jordan/StudioProjects/374/app/src/main/res/drawable/dataset_folder.xml"
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_uow_logo.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/ic_uow_logo.xml"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/xml_file_paths.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/xml/file_paths.xml"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/menu_activity_main_drawer.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/menu/activity_main_drawer.xml"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_fragment_gallery.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/fragment_gallery.xml"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "/home/yug/374/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "/home/yug/374/app/src/main/res/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_launcher_background.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "/home/yug/374/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png"
     }
 ]

@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.text.HtmlCompat;
+
+import com.example.myapplication.DBManager;
 import com.example.myapplication.R;
 import com.github.waikatoufdl.ufdl4j.action.Datasets;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 public class datasetListAdapter extends ArrayAdapter<Datasets.Dataset> {
     private Context mContext;
     private int mResource;
+    private DBManager dbManager;
 
     /**
      * Default constructor for the datasetListAdapter
@@ -28,6 +31,7 @@ public class datasetListAdapter extends ArrayAdapter<Datasets.Dataset> {
         super(context, resource, objects);
         mContext = context;
         mResource = resource;
+        dbManager = new DBManager(context);
     }
 
     @NonNull
@@ -36,7 +40,7 @@ public class datasetListAdapter extends ArrayAdapter<Datasets.Dataset> {
 
         //get the dataset information
         String datasetName = getItem(position).getName();
-        String projectName = Integer.toString(getItem(position).getProject());
+        String projectName = dbManager.getProjectName(getItem(position).getProject());
         String datasetTags = getItem(position).getTags();
 
         ViewHolder holder;

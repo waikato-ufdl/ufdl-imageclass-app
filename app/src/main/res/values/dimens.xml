@@ -13,6 +13,7 @@
     <dimen name="editTextCornerRadius">1dp</dimen>
     <dimen name="inputTextSize">20sp</dimen>
     <dimen name="settingsLabelSizes">18dp</dimen>
+    <dimen name="grid_expected_size">120dp</dimen>
 
 
 </resources>

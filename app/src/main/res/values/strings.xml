@@ -17,21 +17,17 @@
     <string name="URL">URL</string>
     <string name="darkMode">DARK MODE</string>
     <string name="add_dataset">Add Dataset</string>
+    <string name="add_image">Add Image From Gallery</string>
 
     <string name="license_prompt">Choose a license</string>
 
     <string-array name="license_array">
-        <item>Malaysia</item>
-        <item>United States</item>
-        <item>Indonesia</item>
-        <item>France</item>
-        <item>Italy</item>
-        <item>Singapore</item>
-        <item>New Zealand</item>
-        <item>India</item>
     </string-array>
 
     <!-- Context Menu for Image Management -->
     <string name="Delete">Delete</string>
+    <string name="error_gif">x or y bound size should be at least %1$dpx and file size should be no more than %2$sM</string>
+    <string name="edit_label">Edit Label</string>
+    <string name="search">Search</string>
 
 </resources>
