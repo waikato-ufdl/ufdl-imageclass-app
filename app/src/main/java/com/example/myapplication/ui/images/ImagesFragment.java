@@ -414,6 +414,8 @@ public class ImagesFragment extends Fragment {
                         }
                         else
                             editText.getText().clear();
+
+                        editText.setSelection(editText.getText().length());
                     }
 
                     prevIndex = position;
@@ -441,6 +443,7 @@ public class ImagesFragment extends Fragment {
                         else
                             editText.getText().clear();
 
+                        editText.setSelection(editText.getText().length());
                     }
 
 
