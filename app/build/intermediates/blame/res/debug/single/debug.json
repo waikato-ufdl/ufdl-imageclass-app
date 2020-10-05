@@ -76,6 +76,10 @@
         "source": "/home/yug/374/app/src/main/res/menu/context_menu.xml"
     },
     {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_label_images.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/label_images.xml"
+    },
+    {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_edit_text_design.xml.flat",
         "source": "/home/yug/374/app/src/main/res/drawable/edit_text_design.xml"
     },
@@ -134,6 +138,14 @@
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_side_nav_bar.xml.flat",
         "source": "/home/yug/374/app/src/main/res/drawable/side_nav_bar.xml"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_gallery_selection_label.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/gallery_selection_label.xml"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_gallery_item.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/layout/gallery_item.xml"
     },
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_activity_main.xml.flat",

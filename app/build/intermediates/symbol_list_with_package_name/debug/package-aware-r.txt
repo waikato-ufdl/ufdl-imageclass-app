@@ -289,6 +289,7 @@ attr counterTextColor
 attr customNavigationLayout
 attr customPivotX
 attr customPivotY
+attr dampingRatio
 attr data
 attr dataPattern
 attr dayInvalidStyle
@@ -306,6 +307,13 @@ attr divider
 attr dividerHorizontal
 attr dividerPadding
 attr dividerVertical
+attr dotsColor
+attr dotsCornerRadius
+attr dotsSize
+attr dotsSpacing
+attr dotsStrokeColor
+attr dotsStrokeWidth
+attr dotsWidthFactor
 attr drawableBottomCompat
 attr drawableEndCompat
 attr drawableLeftCompat
@@ -623,6 +631,7 @@ attr preview_bottomToolbar_apply_textColor
 attr preview_bottomToolbar_back_textColor
 attr progressBarPadding
 attr progressBarStyle
+attr progressMode
 attr queryBackground
 attr queryHint
 attr radioButtonStyle
@@ -643,6 +652,7 @@ attr searchViewStyle
 attr seekBarStyle
 attr selectableItemBackground
 attr selectableItemBackgroundBorderless
+attr selectedDotColor
 attr selectionRequired
 attr shapeAppearance
 attr shapeAppearanceLargeComponent
@@ -684,6 +694,7 @@ attr state_lifted
 attr statusBarBackground
 attr statusBarForeground
 attr statusBarScrim
+attr stiffness
 attr strokeColor
 attr strokeWidth
 attr subMenuArrow
@@ -966,6 +977,7 @@ color grey
 color grey2
 color highlighted_text_material_dark
 color highlighted_text_material_light
+color imageExcessBackground
 color lightGrey
 color main_blue_color
 color main_blue_stroke_color
@@ -1611,6 +1623,7 @@ drawable design_password_eye
 drawable design_snackbar_background
 drawable dialog_background
 drawable dialog_background_dark
+drawable dot_background
 drawable edit_icon
 drawable edit_text_design
 drawable error_center_x
@@ -1675,6 +1688,8 @@ drawable progress_animation
 drawable red_button_background
 drawable ripple_oval
 drawable side_nav_bar
+drawable spring_dot_background
+drawable spring_dot_stroke_background
 drawable success_bow
 drawable success_circle
 drawable test_custom_background
@@ -1684,6 +1699,8 @@ drawable tooltip_frame_light
 drawable track
 drawable warning_circle
 drawable warning_sigh
+drawable worm_dot_background
+drawable worm_dot_stroke_background
 id ALT
 id BOTTOM_END
 id BOTTOM_START
@@ -1772,7 +1789,9 @@ id beginning
 id blocking
 id bottom
 id bottom_toolbar
+id buttonNext
 id buttonPanel
+id buttonPrev
 id button_apply
 id button_back
 id button_preview
@@ -1836,8 +1855,10 @@ id dialog_button
 id dimensions
 id direct
 id disableHome
+id dot
 id drawer_layout
 id dropdown_menu
+id editTextCategory
 id edit_query
 id empty_view
 id empty_view_content
@@ -1861,6 +1882,7 @@ id fitToContents
 id fixed
 id floating
 id forever
+id galleryImage
 id ghost_view
 id ghost_view_holder
 id gif
@@ -1880,6 +1902,7 @@ id ifRoom
 id image
 id imageCheckBox
 id imageRecyclerView
+id imageSwitcher
 id imageView
 id image_view
 id imagesFragment
@@ -1887,6 +1910,9 @@ id info
 id invisible
 id italic
 id item_touch_helper_previous_elevation
+id labelCategory
+id labelCheckBox
+id labelViewPager
 id labeled
 id largeLabel
 id left
@@ -2016,6 +2042,8 @@ id spacer
 id split_action_bar
 id spread
 id spread_inside
+id spring_dot
+id spring_dots_indicator
 id src_atop
 id src_in
 id src_over
@@ -2083,6 +2111,7 @@ id visible
 id warning_frame
 id withText
 id withinBounds
+id worm_dot
 id wrap
 id wrap_content
 id x
@@ -2174,6 +2203,7 @@ layout design_navigation_menu
 layout design_navigation_menu_item
 layout design_text_input_end_icon
 layout design_text_input_start_icon
+layout dot_layout
 layout fragment_gallery
 layout fragment_home
 layout fragment_images
@@ -2181,7 +2211,10 @@ layout fragment_media_selection
 layout fragment_preview_item
 layout fragment_settings
 layout fragment_slideshow
+layout gallery_item
+layout gallery_selection_label
 layout image_display
+layout label_images
 layout media_grid_content
 layout media_grid_item
 layout mtrl_alert_dialog
@@ -2234,6 +2267,7 @@ layout select_dialog_item_material
 layout select_dialog_multichoice_material
 layout select_dialog_singlechoice_material
 layout spinner_item
+layout spring_dot_layout
 layout support_simple_spinner_dropdown_item
 layout test_action_chip
 layout test_chip_zero_corner_radius
@@ -2249,6 +2283,7 @@ layout text_view_with_line_height_from_layout
 layout text_view_with_line_height_from_style
 layout text_view_with_theme_line_height
 layout text_view_without_line_height
+layout worm_dot_layout
 menu activity_main_drawer
 menu context_menu
 menu main
@@ -3139,6 +3174,7 @@ styleable ConstraintSet android_orientation android_id android_visibility androi
 styleable CoordinatorLayout keylines statusBarBackground
 styleable CoordinatorLayout_Layout android_layout_gravity layout_anchor layout_anchorGravity layout_behavior layout_dodgeInsetEdges layout_insetEdge layout_keyline
 styleable DialogFragmentNavigator android_name
+styleable DotsIndicator dotsColor dotsCornerRadius dotsSize dotsSpacing dotsWidthFactor progressMode selectedDotColor
 styleable DrawerArrowToggle arrowHeadLength arrowShaftLength barLength color drawableSize gapBetweenBars spinBars thickness
 styleable ExtendedFloatingActionButton elevation extendMotionSpec hideMotionSpec showMotionSpec shrinkMotionSpec
 styleable ExtendedFloatingActionButton_Behavior_Layout behavior_autoHide behavior_autoShrink
@@ -3197,6 +3233,7 @@ styleable Slider android_value android_stepSize android_valueFrom android_valueT
 styleable Snackbar snackbarButtonStyle snackbarStyle snackbarTextViewStyle
 styleable SnackbarLayout android_maxWidth actionTextColorAlpha animationMode backgroundOverlayColorAlpha backgroundTint backgroundTintMode elevation maxActionInlineWidth
 styleable Spinner android_entries android_popupBackground android_prompt android_dropDownWidth popupTheme
+styleable SpringDotsIndicator dampingRatio dotsColor dotsCornerRadius dotsSize dotsSpacing dotsStrokeColor dotsStrokeWidth stiffness
 styleable StateListDrawable android_dither android_visible android_variablePadding android_constantSize android_enterFadeDuration android_exitFadeDuration
 styleable StateListDrawableItem android_drawable
 styleable SwitchCompat android_textOn android_textOff android_thumb showText splitTrack switchMinWidth switchPadding switchTextAppearance thumbTextPadding thumbTint thumbTintMode track trackTint trackTintMode
@@ -3213,6 +3250,7 @@ styleable View android_theme android_focusable paddingEnd paddingStart theme
 styleable ViewBackgroundHelper android_background backgroundTint backgroundTintMode
 styleable ViewPager2 android_orientation
 styleable ViewStubCompat android_id android_layout android_inflatedId
+styleable WormDotsIndicator dotsColor dotsCornerRadius dotsSize dotsSpacing dotsStrokeColor dotsStrokeWidth
 styleable ds backgroundColor buttonColor editTextBackgroundColour editTextOutlineColour navMenuBackgroundColour navMenuIconColours textColor tintColor toolBarColour
 xml file_paths
 xml standalone_badge

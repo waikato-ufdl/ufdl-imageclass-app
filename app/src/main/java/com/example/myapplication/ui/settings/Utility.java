@@ -176,6 +176,8 @@ public class Utility {
      * handle the storage and retrieval of the access and refresh tokens which will be used in API calls.
      */
     public static void connectToServer() {
+
+        System.out.println((loadServerURL() + " " + loadPassword() + " " + loadPassword()));
       client = new Client(loadServerURL(), loadUsername(), loadPassword(), new MemoryOnlyStorage());
 
       Thread t = new Thread(()-> {
@@ -196,6 +198,7 @@ public class Utility {
               }
 
           }catch (IllegalStateException e) {
+
               Log.d("connectToServer: ","Please check your username, password and server URL details in settings");
           } catch (Exception e) {
 

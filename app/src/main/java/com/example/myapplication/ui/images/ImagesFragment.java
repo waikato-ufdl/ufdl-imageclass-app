@@ -1,5 +1,7 @@
 package com.example.myapplication.ui.images;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -18,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.util.Log;
 import android.view.ActionMode;
@@ -28,21 +31,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toolbar;
+import android.widget.ViewSwitcher;
 
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.ui.settings.Utility;
 import com.github.waikatoufdl.ufdl4j.action.Generic;
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
+import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
@@ -87,6 +95,16 @@ public class ImagesFragment extends Fragment {
     //specify the number of images to load upon scroll
     public final int PAGE_LIMIT = 8;
 
+    //variables related to the popup menu which asks users to label images
+    private ImageSwitcher imageSwitcher;
+    private Button previousButton, nextButton;
+    private List<Uri> galleryImages;
+    private String[] labels;
+
+    //the index position of the selected image (from gallery)
+    private int indexPosition;
+    private int prevIndex;
+
     public ImagesFragment() {
         // Required empty public constructor
     }
@@ -122,7 +140,6 @@ public class ImagesFragment extends Fragment {
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 adapter.searchCategory(images);
-                System.out.println("EHLLLLOOOOOOOOOOOOOOOOO");
                 return true;
             }
         });
@@ -146,13 +163,19 @@ public class ImagesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_images, container, false);
 
+        //initialising views & initialising variables
         images = Utility.getImageList(datasetKey);
         recyclerView = (RecyclerView) v.findViewById(R.id.imageRecyclerView);
         progressBar = (ProgressBar) v.findViewById(R.id.progressBar);
         addImages = (ImageButton) v.findViewById(R.id.fab_add_images);
+
+        //set on click listener which will start up the gallery
         addImages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -301,13 +324,138 @@ public class ImagesFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        List<Uri> mSelected;
-
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-            mSelected = Matisse.obtainResult(data);
-            Log.d("Matisse", "mSelected: " + mSelected);
+            galleryImages = Matisse.obtainResult(data);
+            Log.d("Matisse", "mSelected: " + galleryImages);
+
+            final Dialog dialog = new Dialog(getContext(), ViewGroup.LayoutParams.MATCH_PARENT);
+            //dialog.setContentView(R.layout.label_images);
+
+            /*
+            imageSwitcher = (ImageSwitcher) dialog.findViewById(R.id.imageSwitcher);
+            imageSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
+                @Override
+                public View makeView() {
+                    return new ImageView(getContext());
+                }
+            });
+
+
+            previousButton = (Button) dialog.findViewById(R.id.buttonPrev);
+            nextButton = (Button) dialog.findViewById(R.id.buttonNext);
+            indexPosition = 0;
+
+            //display the previous image & the category associated with the image if entered
+            previousButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(indexPosition > 0) {
+                        indexPosition--;
+                        imageSwitcher.setImageURI(galleryImages.get(indexPosition));
+                    }
+                }
+            });
+
+            //display the next image & the category associated with the image if entered
+            nextButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(indexPosition < galleryImages.size()-1) {
+                        indexPosition++;
+                        imageSwitcher.setImageURI(galleryImages.get(indexPosition));
+                    }
+                }
+            });
+
+            //set the first image to the image switcher
+            //imageSwitcher.setImageURI(galleryImages.get(0));
+
+            dialog.show();
+            imageSwitcher.setImageURI(galleryImages.get(0));
+
+             */
+
+            //initialise index position;
+            indexPosition = 0;
+            prevIndex = 0;
+            labels = new String[9];
+
+            dialog.setContentView(R.layout.gallery_selection_label);
+
+            //initialise view pager & adapter
+            ViewPager2 viewPager = dialog.findViewById(R.id.labelViewPager);
+            GallerySelectionAdapter galleryAdapter = new GallerySelectionAdapter(getContext(), galleryImages);
+            SpringDotsIndicator indicator = (SpringDotsIndicator) dialog.findViewById(R.id.spring_dots_indicator);
+            EditText editText = (EditText)  dialog.findViewById(R.id.editTextCategory);
+
+            //set adapter & default start position
+            viewPager.getChildAt(indexPosition).setOverScrollMode(View.OVER_SCROLL_NEVER);
+            viewPager.setAdapter(galleryAdapter);
+            indicator.setViewPager2(viewPager);
+
+
+            viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+
+                    //the user is scrolling from the right to the left
+                    if(prevIndex > position)
+                    {
+                        labels[prevIndex] = editText.getText().toString().trim();
+                        Log.e("HOOOOO", prevIndex + " " + position);
+                    }
+                    else if (position > prevIndex)
+                    {
+                        Log.e("SOOOOOOOOOOOOOOOOOO000000000000", position + " ");
+
+                        if(labels[position] != null) {
+                            editText.setText(labels[position]);
+                        }
+                        else
+                            editText.getText().clear();
+                    }
+
+                    prevIndex = position;
+
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+                    super.onPageSelected(position);
+
+                    //scrolling from left to right
+                    if(prevIndex != position)
+                    {
+                        labels[prevIndex] = editText.getText().toString().trim();
+                        //labels.set(prevIndex, editText.getText().toString().trim());
+                        Log.e("SOOOOO", prevIndex + " " + position);
+                    }
+                    else
+                    {
+                        Log.e("SOOOOOOOOOOOOOOOOOO", position + " ");
+
+                        if(labels[position] != null) {
+                            editText.setText(labels[position]);
+                        }
+                        else
+                            editText.getText().clear();
+
+                    }
+
+
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+                    super.onPageScrollStateChanged(state);
+                }
+            });
+
+            dialog.show();
         }
     }
+
 
 
     /**
