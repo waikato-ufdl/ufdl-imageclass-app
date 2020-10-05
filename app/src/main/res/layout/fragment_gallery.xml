@@ -10,7 +10,8 @@
     <ListView
         android:id="@+id/list_view_datasets"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:choiceMode="singleChoice"/>
 
     <ImageButton
         android:id="@+id/fab_add_dataset"

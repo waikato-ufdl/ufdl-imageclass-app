@@ -5,8 +5,12 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -36,12 +40,16 @@ import androidx.navigation.Navigation;
 import com.example.myapplication.DBManager;
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
+import com.example.myapplication.ui.images.ClassifiedImage;
+import com.example.myapplication.ui.images.ImagesFragment;
 import com.example.myapplication.ui.settings.Utility;
 import com.github.waikatoufdl.ufdl4j.action.Datasets;
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 import static androidx.core.content.ContextCompat.getSystemService;
@@ -56,6 +64,7 @@ public class GalleryFragment extends Fragment {
     private boolean datasetPublic = false;
     private String datasetNameText, datasetDescriptionText, datasetTagText;
     private ImageClassificationDatasets action;
+    private boolean isActionMode;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,6 +86,7 @@ public class GalleryFragment extends Fragment {
         });
 
         dbManager = new DBManager(getContext());
+        isActionMode = false;
         return root;
     }
 
@@ -139,6 +149,72 @@ public class GalleryFragment extends Fragment {
                                 Navigation.findNavController(view).navigate(R.id.action_nav_gallery_to_imagesFragment, bundle);
                             }
                         });
+
+                        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                            @Override
+                            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                                int dKey = dataset.get(position).getPK();
+                                String dName = dataset.get(position).getName();
+                                //initialise Action mode
+                                ActionMode.Callback callback = new ActionMode.Callback() {
+                                    @Override
+                                    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                                        //Initialise menu inflater & inflate menu
+                                        MenuInflater menuInflater = mode.getMenuInflater();
+                                        menuInflater.inflate(R.menu.context_menu_datasets, menu);
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                                        //When action mode is preparing
+                                        isActionMode = true;
+                                        mode.setTitle(String.format("%s Selected", dName));
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                                        //handles the click of an action mode item
+
+                                        //get menu id
+                                        int id = item.getItemId();
+
+                                        //check which menu item was clicked
+                                        switch (id)
+                                        {
+                                            case R.id.action_relabel_dataset:
+                                                //when the user presses edit
+//                                                confirmEditCategories(mode);
+                                                break;
+
+                                            case R.id.action_copy_dataset:
+                                                //when the user presses edit
+                                                confirmCopyDataset(mode, dName, dKey);
+                                                break;
+
+                                            case R.id.action_delete_dataset:
+                                                //when user presses delete
+                                                deleteConfirmation(mode, dKey);
+                                                break;
+                                        }
+
+                                        return false;
+                                    }
+
+                                    @Override
+                                    public void onDestroyActionMode(ActionMode mode) {
+                                        //when action mode is destroyed
+                                        isActionMode = false;
+                                        mode.finish();
+                                    }
+                                };
+                                //Start action mode
+                                ((MainActivity) view.getContext()).startActionMode(callback);
+                                return true;
+                            }
+                        });
+
                     });
                 }
                 catch (IllegalStateException e) {
@@ -297,6 +373,147 @@ public class GalleryFragment extends Fragment {
         layoutParams.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
         layoutParams.dimAmount = 0.5f;
         windowManager.updateViewLayout(container, layoutParams);
+    }
+
+    /**
+     * A method to confirm the deletion process via a popup before deleting a dataset
+     * @param mode the action mode
+     */
+    public void deleteConfirmation(ActionMode mode, int datasetKey)
+    {
+        new SweetAlertDialog(getContext(), SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Are you sure?")
+                .setContentText("You won't be able to recover the dataset after deletion")
+                .setConfirmText("Delete")
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        //if a user accepts the deletion, delete all the selected images
+                        deleteDataset(datasetKey);
+
+                        //show a successful deletion popup
+                        sDialog
+                                .setTitleText("Deleted!")
+                                .setContentText("The selected dataset has been deleted!")
+                                .setConfirmText("OK")
+                                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                    @Override
+                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                        //when the user clicks ok, dismiss the popup
+                                        sDialog.dismissWithAnimation();
+                                        //finish action mode once a user has confirmed the deletion of images, else keep users in selection mode
+                                        mode.finish();
+                                    }
+                                })
+                                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                    }
+                })
+                .setCancelButton("Cancel", new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        //if the user cancels deletion close the popup but leave them on the selection mode
+                        sDialog.dismissWithAnimation();
+                    }
+                })
+                .show();
+    }
+
+    /**
+     * Method to delete the selected dataset from list view & backend
+     */
+    public void deleteDataset(int datasetKey)
+    {
+            //make an API request to delete an image
+            Thread t = new Thread(() -> {
+                try {
+                    ImageClassificationDatasets action = Utility.getClient().action(ImageClassificationDatasets.class);
+
+                    //delete image file
+                    action.delete(datasetKey, true);
+                    return;
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            });
+            t.start();
+
+            reload();
+    }
+
+    public void confirmCopyDataset(ActionMode mode, String datasetName, int datasetKey) {
+        final EditText editText = new EditText(getContext());
+        new SweetAlertDialog(getContext(), SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Copy dataset " + datasetName + " as: ")
+                .setConfirmText("Copy")
+                .setCustomView(editText)
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        String newDatasetName = editText.getText().toString().trim();
+
+                        //if a value has been entered
+                        if(newDatasetName.length() > 0) {
+                            if(!newDatasetName.equals(datasetName)){
+                                //copy dataset
+                                copyDataset(datasetKey, newDatasetName);
+
+                                //show a success popup
+                                sweetAlertDialog
+                                        .setTitleText("Success!")
+                                        .setContentText("The dataset " + datasetName + " has been copied as: " + newDatasetName)
+                                        .setConfirmText("OK")
+                                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                            @Override
+                                            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                                //when the user clicks ok, dismiss the popup
+                                                sweetAlertDialog.dismissWithAnimation();
+                                                //finish action mode once a user has confirmed the reclassification
+                                                mode.finish();
+                                            }
+                                        })
+                                        .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                            }else{
+                                editText.setError("Dataset name must be different");
+                            }
+                        }
+                        else
+                            editText.setError("Please enter a classification label");
+                    }
+                })
+                .setCancelButton("Cancel", new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        //if the user clicks cancel close the popup but leave them on the selection mode
+                        sDialog.dismissWithAnimation();
+                    }
+                })
+                .show();
+    }
+
+    /**
+     * Method to delete the selected dataset from list view & backend
+     */
+    public void copyDataset(int datasetKey, String newDatasetName)
+    {
+        //make an API request to delete an image
+        Thread t = new Thread(() -> {
+            try {
+                ImageClassificationDatasets action = Utility.getClient().action(ImageClassificationDatasets.class);
+
+                //delete image file
+                action.copy(datasetKey, newDatasetName);
+                return;
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+        t.start();
+
+        reload();
     }
 
 }
