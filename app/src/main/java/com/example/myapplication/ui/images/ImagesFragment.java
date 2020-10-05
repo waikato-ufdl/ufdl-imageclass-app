@@ -68,6 +68,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 
 import static android.app.Activity.RESULT_OK;
@@ -394,6 +395,7 @@ public class ImagesFragment extends Fragment {
             SpringDotsIndicator indicator = (SpringDotsIndicator) dialog.findViewById(R.id.spring_dots_indicator);
             EditText editText = (EditText)  dialog.findViewById(R.id.editTextCategory);
             CheckBox checkBox = (CheckBox) dialog.findViewById(R.id.labelCheckBox);
+            Button saveImages = (Button) dialog.findViewById(R.id.saveImages);
 
             //set adapter & default start position
             viewPager.getChildAt(indexPosition).setOverScrollMode(View.OVER_SCROLL_NEVER);
@@ -410,7 +412,6 @@ public class ImagesFragment extends Fragment {
                     if(prevIndex > position)
                     {
                         labels[prevIndex] = editText.getText().toString().trim();
-                        Log.e("HOOOOO", prevIndex + " " + position);
                     }
                     //user has scrolled from left to right
                     else if (position > prevIndex)
@@ -448,6 +449,7 @@ public class ImagesFragment extends Fragment {
                 }
             });
 
+            //set listener to listen for check box state changes
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -472,8 +474,75 @@ public class ImagesFragment extends Fragment {
                 }
             });
 
+            saveImages.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String informativeMessage;
+
+                    if(allLabelsFilled())
+                    {
+                        informativeMessage = "Save classified images?";
+                    }
+                    else
+                    {
+                        informativeMessage = "All labels have not been filled out. Any empty labels will be labeled as 'unlabelled'. Are you sure you wish to save these images?";
+                    }
+
+                    new SweetAlertDialog(getContext(), SweetAlertDialog.WARNING_TYPE)
+                            .setTitleText("Are you sure?")
+                            .setContentText(informativeMessage)
+                            .setConfirmText("Yes")
+                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                @Override
+                                public void onClick(SweetAlertDialog sDialog) {
+                                    //if a user accepts, save all images
+
+
+                                    //show a successful deletion popup
+                                    sDialog
+                                            .setTitleText("Successful!")
+                                            .setContentText("Successfully saved images!")
+                                            .setConfirmText("OK")
+                                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                                @Override
+                                                public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                                    //when the user clicks ok, dismiss the popup
+                                                    sDialog.dismissWithAnimation();
+                                                }
+                                            })
+                                            .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                                }
+                            })
+                            .setCancelButton("No", new SweetAlertDialog.OnSweetClickListener() {
+                                @Override
+                                public void onClick(SweetAlertDialog sDialog) {
+                                    //if the user cancels deletion close the popup but leave them on the selection mode
+                                    sDialog.dismissWithAnimation();
+                                }
+                            })
+                            .show();
+                }
+            });
+
             dialog.show();
         }
+    }
+
+    /**
+     * Method to check if user has labelled each image
+     * @return
+     */
+    public boolean allLabelsFilled()
+    {
+        for(String label: labels)
+        {
+            if(label == null || label.length() < 1)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
