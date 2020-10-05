@@ -103,7 +103,7 @@ public class GalleryFragment extends Fragment {
         else
         {
             //only continue if the client is connected to the API
-            if(!Utility.authenticationFailed());
+            if(!Utility.authenticationFailed())
             {
                 displayDatasets(view);
             }

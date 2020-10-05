@@ -35,6 +35,8 @@ import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -58,6 +60,7 @@ import com.zhihu.matisse.filter.Filter;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -380,20 +383,24 @@ public class ImagesFragment extends Fragment {
             prevIndex = 0;
             labels = new String[9];
 
+            //create a backup of the current labels
+            String[] backup = new String[9];
+
             dialog.setContentView(R.layout.gallery_selection_label);
 
-            //initialise view pager & adapter
+            //initialise views
             ViewPager2 viewPager = dialog.findViewById(R.id.labelViewPager);
             GallerySelectionAdapter galleryAdapter = new GallerySelectionAdapter(getContext(), galleryImages);
             SpringDotsIndicator indicator = (SpringDotsIndicator) dialog.findViewById(R.id.spring_dots_indicator);
             EditText editText = (EditText)  dialog.findViewById(R.id.editTextCategory);
+            CheckBox checkBox = (CheckBox) dialog.findViewById(R.id.labelCheckBox);
 
             //set adapter & default start position
             viewPager.getChildAt(indexPosition).setOverScrollMode(View.OVER_SCROLL_NEVER);
             viewPager.setAdapter(galleryAdapter);
             indicator.setViewPager2(viewPager);
 
-
+            //set a listener to listen for page changes caused by user swipes
             viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -405,21 +412,14 @@ public class ImagesFragment extends Fragment {
                         labels[prevIndex] = editText.getText().toString().trim();
                         Log.e("HOOOOO", prevIndex + " " + position);
                     }
+                    //user has scrolled from left to right
                     else if (position > prevIndex)
                     {
-                        Log.e("SOOOOOOOOOOOOOOOOOO000000000000", position + " ");
-
-                        if(labels[position] != null) {
-                            editText.setText(labels[position]);
-                        }
-                        else
-                            editText.getText().clear();
-
-                        editText.setSelection(editText.getText().length());
+                        //display the label associated with the particular image if one has previously been entered
+                        displayImageLabel(editText, position);
                     }
 
                     prevIndex = position;
-
                 }
 
                 @Override
@@ -429,24 +429,17 @@ public class ImagesFragment extends Fragment {
                     //scrolling from left to right
                     if(prevIndex != position)
                     {
+                        //set the label to the image if a user has entered one in
                         labels[prevIndex] = editText.getText().toString().trim();
-                        //labels.set(prevIndex, editText.getText().toString().trim());
-                        Log.e("SOOOOO", prevIndex + " " + position);
                     }
+                    //user has swiped right to left
                     else
                     {
-                        Log.e("SOOOOOOOOOOOOOOOOOO", position + " ");
-
-                        if(labels[position] != null) {
-                            editText.setText(labels[position]);
-                        }
-                        else
-                            editText.getText().clear();
-
-                        editText.setSelection(editText.getText().length());
+                        //display the label associated with the particular image if one has previously been entered
+                        displayImageLabel(editText, position);
                     }
 
-
+                    indexPosition = position;
                 }
 
                 @Override
@@ -455,10 +448,52 @@ public class ImagesFragment extends Fragment {
                 }
             });
 
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    String classification = editText.getText().toString().trim();
+
+                    //if the user has checked the checkbox
+                    if(isChecked)
+                    {
+                        labels[indexPosition] = classification;
+                        //create a backup of the current labels
+                        System.arraycopy(labels, 0, backup, 0, labels.length);
+
+                        //fill the labels array with the current classification
+                        Arrays.fill(labels, classification);
+                    }
+                    else
+                    {
+                        //set labels to the backup labels
+                        System.arraycopy(backup, 0, labels, 0, backup.length);
+                        editText.setText(labels[indexPosition]);
+                    }
+                }
+            });
+
             dialog.show();
         }
     }
 
+    /**
+     * //display the label associated with a particular image if one has previously been entered
+     * @param editText the editText to display a label if any
+     * @param position the position indicating the image the user is current looking at
+     */
+    public void displayImageLabel(EditText editText, int position)
+    {
+        //if a user has entered a label for the image being observed, then show the label in the edit text
+        if(labels[position] != null) {
+            editText.setText(labels[position]);
+        }
+        //else show an empty text box
+        else
+            editText.getText().clear();
+
+        //position to the cursor to the end of the text in the text box
+        editText.setSelection(editText.getText().length());
+    }
 
 
     /**
