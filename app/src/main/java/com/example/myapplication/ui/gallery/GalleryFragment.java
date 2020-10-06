@@ -45,6 +45,7 @@ import com.example.myapplication.ui.images.ImagesFragment;
 import com.example.myapplication.ui.settings.Utility;
 import com.github.waikatoufdl.ufdl4j.action.Datasets;
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
+import com.github.waikatoufdl.ufdl4j.action.Projects;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -185,7 +186,7 @@ public class GalleryFragment extends Fragment {
                                         {
                                             case R.id.action_relabel_dataset:
                                                 //when the user presses edit
-//                                                confirmEditCategories(mode);
+                                                initiateUpdateDatasetWindow(root, dKey);
                                                 break;
 
                                             case R.id.action_copy_dataset:
@@ -516,4 +517,104 @@ public class GalleryFragment extends Fragment {
         reload();
     }
 
+    public void initiateUpdateDatasetWindow(View v, int datasetKey) {
+        try {
+            Log.d("initiateUpdateDatasetWindow: ", "Update Dataset Popup");
+            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            //Inflate the view from a predefined XML layout
+            View layout = inflater.inflate(R.layout.new_dataset,
+                    null);
+
+            //            Projects.Project project = Projects.Project.load(dataset.getProject());
+
+            // create a 300px width and 470px height PopupWindow
+            final PopupWindow popupWindow = new PopupWindow(layout,
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT, true);
+
+            // display the popup in the center
+            popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
+
+            //darken the background behind the popup window
+            darkenBackground(popupWindow);
+
+            dbManager = new DBManager(getContext());
+
+            //get licenses & projects using database manager
+            final List<String> spinnerArrayLicenses = dbManager.getLicenses();
+            final List<String> spinnerArrayProjects = dbManager.getProjects();
+
+            ArrayAdapter<String> spinnerArrayAdapterLicenses = new ArrayAdapter<String>
+                    (getContext(), spinner_item,
+                            spinnerArrayLicenses); //selected item will look like a spinner set from XML
+            spinnerArrayAdapterLicenses.setDropDownViewResource(android.R.layout
+                    .simple_spinner_dropdown_item);
+
+            ArrayAdapter<String> spinnerArrayAdapterPojects = new ArrayAdapter<String>
+                    (getContext(), spinner_item,
+                            spinnerArrayProjects); //selected item will look like a spinner set from XML
+            spinnerArrayAdapterPojects.setDropDownViewResource(android.R.layout
+                    .simple_spinner_dropdown_item);
+
+            //initialise views
+            Spinner spinnerLicenses = layout.findViewById(R.id.dataset_license_spinner);
+            spinnerLicenses.setAdapter(spinnerArrayAdapterLicenses);
+            Spinner spinnerProjects = layout.findViewById(R.id.dataset_project_spinner);
+            spinnerProjects.setAdapter(spinnerArrayAdapterPojects);
+            Button btnCreateDataset = layout.findViewById(R.id.createDatasetButton);
+
+            datasetName = layout.findViewById(R.id.dataset_name_text);
+            datasetDescription = layout.findViewById(R.id.dataset_description_text);
+            datasetTags = layout.findViewById(R.id.dataset_tags_text);
+            datasetSwitch = layout.findViewById(R.id.makePublic);
+
+            Thread thread = new Thread(() -> {
+                try {
+                    Datasets.Dataset dataset = action.load(datasetKey);
+                    datasetName.setText(dataset.getName());
+                    datasetDescription.setText(dataset.getDescription());
+                    datasetTags.setText(dataset.getTags());
+                    datasetSwitch.setChecked(dataset.isPublic());
+                    btnCreateDataset.setText("Update Dataset");
+                    int projName = spinnerArrayAdapterPojects.getPosition(dbManager.getProjectName(dataset.getProject()));
+                    int licName = spinnerArrayAdapterLicenses.getPosition(dbManager.getLicenseName(dataset.getLicense()));
+                    Log.d("initiateUpdateDatasetWindow: ", "Project " + projName + " License " + licName);
+// Spinners not assigning due to thread issue
+                    spinnerProjects.setSelection(projName);
+                    spinnerLicenses.setSelection(licName);
+                    Log.d("initiateUpdateDatasetWindow: ", "Spinner selections made");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            thread.start();
+
+            btnCreateDataset.setOnClickListener(view -> {
+                if(checkDetailsEntered()){
+                    datasetNameText = datasetName.getText().toString().trim();
+                    datasetDescriptionText = datasetDescription.getText().toString().trim();
+                    datasetTagText = datasetTags.getText().toString().trim();
+                    if(datasetSwitch.isChecked()){
+                        datasetPublic = true;
+                    }
+                    int projectKey = dbManager.getProjectKey(spinnerProjects.getSelectedItem().toString());
+                    int licenseKey = dbManager.getLicenseKey(spinnerLicenses.getSelectedItem().toString());
+
+                    //create
+                    Thread t = new Thread(() -> {
+                        try {
+                            action.update(datasetKey, datasetNameText, datasetDescriptionText, projectKey, licenseKey, datasetPublic, datasetTagText);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    t.start();
+                    popupWindow.dismiss();
+                    reload();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
