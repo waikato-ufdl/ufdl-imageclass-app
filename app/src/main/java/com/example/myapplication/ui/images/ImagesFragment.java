@@ -1,9 +1,12 @@
 package com.example.myapplication.ui.images;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -22,6 +25,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -49,6 +57,7 @@ import android.widget.ViewSwitcher;
 
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
+import com.example.myapplication.ui.UriUtils;
 import com.example.myapplication.ui.settings.Utility;
 import com.github.waikatoufdl.ufdl4j.action.Generic;
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
@@ -59,6 +68,7 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 import com.zhihu.matisse.filter.Filter;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -485,7 +495,7 @@ public class ImagesFragment extends Fragment {
                     }
                     else
                     {
-                        informativeMessage = "All labels have not been filled out. Any empty labels will be labeled as 'unlabelled'. Are you sure you wish to save these images?";
+                        informativeMessage = "All labels have not been filled out. Any images with empty labels will be labeled as 'unlabelled'. Are you sure you wish to save these images?";
                     }
 
                     new SweetAlertDialog(getContext(), SweetAlertDialog.WARNING_TYPE)
@@ -496,7 +506,7 @@ public class ImagesFragment extends Fragment {
                                 @Override
                                 public void onClick(SweetAlertDialog sDialog) {
                                     //if a user accepts, save all images
-
+                                    saveImageFiles();
 
                                     //show a successful deletion popup
                                     sDialog
@@ -527,6 +537,52 @@ public class ImagesFragment extends Fragment {
             dialog.show();
         }
     }
+
+    public void saveImageFiles()
+    {
+        //iterate through the selected images
+        for (int i = 0; i < galleryImages.size(); i++)
+        {
+            //use the image URI path to create image file
+            Uri selectedImageUri = galleryImages.get(i);
+            File imageFile = new File(UriUtils.getPathFromUri(getContext(), selectedImageUri));
+            String label = (labels[i] != null) ? labels[i]: "unlabelled";
+
+            Thread t = new Thread(() -> {
+                try {
+                    //add image file to backend via API & also add the image's category label
+                    action.addFile(datasetKey, imageFile, imageFile.getName());
+                    action.addCategories(datasetKey, Arrays.asList(imageFile.getName()), Arrays.asList(label));
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            });
+            t.start();
+        }
+    }
+
+    /**
+     * Get the real address of the file according to Uri
+     */
+    public static String getRealFilePath(Context context, Uri uri) {
+        // can post image
+        String [] proj={MediaStore.Images.Media.DATA};
+        Cursor cursor = context.getContentResolver().query(uri,
+                proj, // Which columns to return
+                null,       // WHERE clause; which rows to return (all rows)
+                null,       // WHERE clause selection arguments (none)
+                null); // Order-by clause (ascending by name)
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+
+        Log.e("TAGG", cursor.getString(column_index));
+
+        return cursor.getString(column_index);
+    }
+
+
 
     /**
      * Method to check if user has labelled each image
