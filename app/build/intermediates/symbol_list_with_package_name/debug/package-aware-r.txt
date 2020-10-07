@@ -1615,6 +1615,7 @@ drawable btn_radio_on_mtrl
 drawable btn_radio_on_to_off_mtrl_animation
 drawable button_design
 drawable dataset_folder
+drawable dataset_selector
 drawable design_bottom_navigation_item_background
 drawable design_fab_background
 drawable design_ic_visibility
@@ -1633,6 +1634,7 @@ drawable gray_button_background
 drawable green_button_background
 drawable ic_arrow_drop_down_white_24dp
 drawable ic_baseline_delete_24
+drawable ic_baseline_file_copy_24
 drawable ic_baseline_search_24
 drawable ic_check_white_18dp
 drawable ic_empty_dracula
@@ -1759,7 +1761,9 @@ id action_bar_subtitle
 id action_bar_title
 id action_container
 id action_context_bar
+id action_copy_dataset
 id action_delete
+id action_delete_dataset
 id action_divider
 id action_image
 id action_menu_divider
@@ -1771,6 +1775,7 @@ id action_nav_gallery_to_imagesFragment
 id action_nav_gallery_to_settingsFragment
 id action_nav_home_to_settingsFragment
 id action_relabel
+id action_relabel_dataset
 id action_search
 id action_text
 id actions
@@ -2287,11 +2292,13 @@ layout text_view_without_line_height
 layout worm_dot_layout
 menu activity_main_drawer
 menu context_menu
+menu context_menu_datasets
 menu main
 mipmap ic_launcher
 mipmap ic_launcher_round
 navigation mobile_navigation
 plurals mtrl_badge_content_description
+string Copy
 string Delete
 string LOADING
 string URL

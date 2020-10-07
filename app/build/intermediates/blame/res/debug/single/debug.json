@@ -104,6 +104,10 @@
         "source": "/home/yug/374/app/src/main/res/mipmap-mdpi/ic_launcher_round.png"
     },
     {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_baseline_file_copy_24.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/ic_baseline_file_copy_24.xml"
+    },
+    {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-anydpi-v26_ic_launcher.xml.flat",
         "source": "/home/yug/374/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
     },
@@ -140,6 +144,10 @@
         "source": "/home/yug/374/app/src/main/res/drawable/side_nav_bar.xml"
     },
     {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/menu_context_menu_datasets.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/menu/context_menu_datasets.xml"
+    },
+    {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_gallery_selection_label.xml.flat",
         "source": "/home/yug/374/app/src/main/res/layout/gallery_selection_label.xml"
     },
@@ -150,6 +158,10 @@
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_activity_main.xml.flat",
         "source": "/home/yug/374/app/src/main/res/layout/activity_main.xml"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_dataset_selector.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/dataset_selector.xml"
     },
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/layout_app_bar_main.xml.flat",

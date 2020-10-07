@@ -92,6 +92,23 @@ public class DBManager {
 //        close();
     }
 
+    public String getLicenseName(int licenseKey) {
+        open();
+        String result;
+        Cursor cursor = database.rawQuery("SELECT * FROM "+dbHelper.TABLE_LICENSE+" WHERE "+dbHelper.LICENSE_COL_1+" = "+licenseKey+"", null);
+        Log.d("getLicenseName: ", "CHECK FOR RESULT");
+        if (cursor.moveToFirst()) {
+            Log.d("getLicenseName: ", "CURSOR FOUND RESULT");
+            result = cursor.getString(cursor.getColumnIndex(dbHelper.LICENSE_COL_2));
+        } else {
+            Log.d("getLicenseName: ", "CURSOR DIDNT FIND RESULT");
+            result = "License Key Incorrect";
+        }
+        Log.d("getLicenseName: ", "RESULT IS " + result);
+        cursor.close();
+        return result;
+    }
+
     public List<String> getProjects() {
 //        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
 //        Cursor result = sqLiteDatabase.rawQuery("select * from " + TABLE_LICENSE, null);
