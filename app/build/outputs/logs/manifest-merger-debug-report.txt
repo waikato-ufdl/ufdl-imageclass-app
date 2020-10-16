@@ -18,6 +18,7 @@ MERGED from [androidx.exifinterface:exifinterface:1.1.0] /home/yug/.gradle/cache
 MERGED from [androidx.viewpager2:viewpager2:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/65b26ec11e574f5d68d3fe93c8217bcb/jetified-viewpager2-1.0.0/AndroidManifest.xml:17:1-24:12
 MERGED from [com.github.f0ris.sweetalert:library:1.6.2] /home/yug/.gradle/caches/transforms-2/files-2.1/da69e5b27cfc7ce21312b93b5902dbe4/jetified-library-1.6.2/AndroidManifest.xml:2:1-13:12
 MERGED from [me.everything:overscroll-decor-android:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/ce0c3e02ff6574f74926720e57e29137/jetified-overscroll-decor-android-1.1.0/AndroidManifest.xml:2:1-11:12
+MERGED from [id.zelory:compressor:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/172859b48433f9ca6e311a800c4b1b57/jetified-compressor-2.1.0/AndroidManifest.xml:2:1-12:12
 MERGED from [androidx.fragment:fragment:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/12c076570219bdc2a11e9d0df335391a/fragment-1.1.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.appcompat:appcompat-resources:1.2.0] /home/yug/.gradle/caches/transforms-2/files-2.1/ee9b51f71825564f346013ea1d4d0318/jetified-appcompat-resources-1.2.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] /home/yug/.gradle/caches/transforms-2/files-2.1/f5ec57ec49d0a3e9add695de66a9078c/legacy-support-core-ui-1.0.0/AndroidManifest.xml:17:1-22:12
@@ -213,6 +214,8 @@ MERGED from [com.github.f0ris.sweetalert:library:1.6.2] /home/yug/.gradle/caches
 MERGED from [com.github.f0ris.sweetalert:library:1.6.2] /home/yug/.gradle/caches/transforms-2/files-2.1/da69e5b27cfc7ce21312b93b5902dbe4/jetified-library-1.6.2/AndroidManifest.xml:7:5-9:41
 MERGED from [me.everything:overscroll-decor-android:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/ce0c3e02ff6574f74926720e57e29137/jetified-overscroll-decor-android-1.1.0/AndroidManifest.xml:7:5-9:41
 MERGED from [me.everything:overscroll-decor-android:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/ce0c3e02ff6574f74926720e57e29137/jetified-overscroll-decor-android-1.1.0/AndroidManifest.xml:7:5-9:41
+MERGED from [id.zelory:compressor:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/172859b48433f9ca6e311a800c4b1b57/jetified-compressor-2.1.0/AndroidManifest.xml:8:5-10:41
+MERGED from [id.zelory:compressor:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/172859b48433f9ca6e311a800c4b1b57/jetified-compressor-2.1.0/AndroidManifest.xml:8:5-10:41
 MERGED from [androidx.fragment:fragment:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/12c076570219bdc2a11e9d0df335391a/fragment-1.1.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.fragment:fragment:1.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/12c076570219bdc2a11e9d0df335391a/fragment-1.1.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.appcompat:appcompat-resources:1.2.0] /home/yug/.gradle/caches/transforms-2/files-2.1/ee9b51f71825564f346013ea1d4d0318/jetified-appcompat-resources-1.2.0/AndroidManifest.xml:20:5-22:41

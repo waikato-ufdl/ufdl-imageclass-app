@@ -350,6 +350,9 @@ public class GalleryFragment extends Fragment {
         return editText.getText().toString().trim().length() <= minLength;
     }
 
+    /**
+     * A method to reload the fragment
+     */
     public void reload(){
         // Reload current fragment
         FragmentTransaction ft = getFragmentManager().beginTransaction();

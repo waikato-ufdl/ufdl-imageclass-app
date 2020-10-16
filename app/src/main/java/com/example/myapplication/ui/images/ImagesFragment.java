@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.Image;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -20,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -71,18 +73,23 @@ import com.zhihu.matisse.internal.entity.CaptureStrategy;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import id.zelory.compressor.Compressor;
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 
 import static android.app.Activity.RESULT_OK;
-
 
 public class ImagesFragment extends Fragment {
     private ArrayList<ClassifiedImage> images;
@@ -96,28 +103,23 @@ public class ImagesFragment extends Fragment {
     private SearchView searchView;
 
     //Lazy loading variables
-    ImageClassificationDatasets action;
-    Map<String, List<String>> categories;
-    private boolean retrievedAll = false;
-    Boolean isScrolling = false;
-    int currentItems, totalItems, scrolledItems;
-    private boolean isLoading = false;
-    int totalImages;
+    private ImageClassificationDatasets action;
+    private String[] imageFileNames;
+    private boolean retrievedAll = false, isScrolling = false,  isLoading = false, datasetModified = false;
+    private int currentItems, totalItems, scrolledItems;
+    private int totalImages;
     private int REQUEST_CODE = 1;
-    private boolean datasetModified = false;
 
     //specify the number of images to load upon scroll
     public final int PAGE_LIMIT = 8;
 
     //variables related to the popup menu which asks users to label images
-    private ImageSwitcher imageSwitcher;
-    private Button previousButton, nextButton;
     private List<Uri> galleryImages;
     private String[] labels;
 
     //the index position of the selected image (from gallery)
-    private int indexPosition;
-    private int prevIndex;
+    private int indexPosition, prevIndex;
+
 
     public ImagesFragment() {
         // Required empty public constructor
@@ -304,36 +306,6 @@ public class ImagesFragment extends Fragment {
     }
 
 
-    /**
-     * This method will discard any images already process in the case that the user has went back to datasets and come back in
-     * @param loadedImages The number of images which have already been stored
-     */
-    public void processCategoryList(int loadedImages)
-    {
-        int index = 0;
-
-        //if no images have been processed, return
-        if(loadedImages == 0) {
-            return;
-        }
-
-        //iterate through the category entry set
-        for (Iterator<Map.Entry<String, List<String>>> entryIterator = categories.entrySet().iterator();
-             entryIterator.hasNext(); ) {
-
-            Map.Entry<String, List<String>> entry = entryIterator.next();
-
-            //discard all entries that have been processed
-            if(index < loadedImages) {
-                entryIterator.remove();
-                index++;
-            }
-            else {
-                return;
-            }
-        }
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -343,51 +315,6 @@ public class ImagesFragment extends Fragment {
             Log.d("Matisse", "mSelected: " + galleryImages);
 
             final Dialog dialog = new Dialog(getContext(), ViewGroup.LayoutParams.MATCH_PARENT);
-            //dialog.setContentView(R.layout.label_images);
-
-            /*
-            imageSwitcher = (ImageSwitcher) dialog.findViewById(R.id.imageSwitcher);
-            imageSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
-                @Override
-                public View makeView() {
-                    return new ImageView(getContext());
-                }
-            });
-
-
-            previousButton = (Button) dialog.findViewById(R.id.buttonPrev);
-            nextButton = (Button) dialog.findViewById(R.id.buttonNext);
-            indexPosition = 0;
-
-            //display the previous image & the category associated with the image if entered
-            previousButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(indexPosition > 0) {
-                        indexPosition--;
-                        imageSwitcher.setImageURI(galleryImages.get(indexPosition));
-                    }
-                }
-            });
-
-            //display the next image & the category associated with the image if entered
-            nextButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(indexPosition < galleryImages.size()-1) {
-                        indexPosition++;
-                        imageSwitcher.setImageURI(galleryImages.get(indexPosition));
-                    }
-                }
-            });
-
-            //set the first image to the image switcher
-            //imageSwitcher.setImageURI(galleryImages.get(0));
-
-            dialog.show();
-            imageSwitcher.setImageURI(galleryImages.get(0));
-
-             */
 
             //initialise index position;
             indexPosition = 0;
@@ -506,9 +433,13 @@ public class ImagesFragment extends Fragment {
                                 @Override
                                 public void onClick(SweetAlertDialog sDialog) {
                                     //if a user accepts, save all images
-                                    saveImageFiles();
+                                    try {
+                                        saveImageFiles();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
 
-                                    //show a successful deletion popup
+                                    //show a successful popup
                                     sDialog
                                             .setTitleText("Successful!")
                                             .setContentText("Successfully saved images!")
@@ -516,6 +447,15 @@ public class ImagesFragment extends Fragment {
                                             .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                                 @Override
                                                 public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                                    //if the recycler view has less images than the page_limit, load in the same amount of images that have been deleted
+                                                    if(images.size() < PAGE_LIMIT)
+                                                    {
+                                                        reload();
+                                                    }
+
+                                                    retrievedAll = false;
+                                                    datasetModified = true;
+
                                                     //when the user clicks ok, dismiss the popup
                                                     sDialog.dismissWithAnimation();
                                                 }
@@ -538,51 +478,55 @@ public class ImagesFragment extends Fragment {
         }
     }
 
-    public void saveImageFiles()
-    {
+    /**
+     * A method to reload the current fragment
+     */
+    public void reload(){
+        // Reload current fragment
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        if (Build.VERSION.SDK_INT >= 26) {
+            ft.setReorderingAllowed(false);
+        }
+        ft.detach(this).attach(this).commit();
+    }
+
+
+    /**
+     * A method to store classified images into the backend via API requests.
+     * @throws Exception
+     */
+    public void saveImageFiles() throws Exception {
         //iterate through the selected images
-        for (int i = 0; i < galleryImages.size(); i++)
-        {
+        for (int i = 0; i < galleryImages.size(); i++) {
             //use the image URI path to create image file
             Uri selectedImageUri = galleryImages.get(i);
             File imageFile = new File(UriUtils.getPathFromUri(getContext(), selectedImageUri));
-            String label = (labels[i] != null) ? labels[i]: "unlabelled";
+            imageFile = new Compressor(getContext()).compressToFile(imageFile);
 
-            Thread t = new Thread(() -> {
-                try {
-                    //add image file to backend via API & also add the image's category label
-                    action.addFile(datasetKey, imageFile, imageFile.getName());
-                    action.addCategories(datasetKey, Arrays.asList(imageFile.getName()), Arrays.asList(label));
+            String label = (labels[i] != null && labels[i].length() > 0) ? labels[i] : "unlabelled";
+
+
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+
+            File finalImageFile = imageFile;
+
+            executor.execute(() -> {;
+
+                try{
+                    //add image file + label to the backend
+                    action.addFile(datasetKey, finalImageFile, finalImageFile.getName());
+                    action.addCategories(datasetKey, Arrays.asList(finalImageFile.getName()), Arrays.asList(label));
+                    datasetModified = true;
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
                 }
             });
-            t.start();
+
+            executor.shutdown();
         }
     }
-
-    /**
-     * Get the real address of the file according to Uri
-     */
-    public static String getRealFilePath(Context context, Uri uri) {
-        // can post image
-        String [] proj={MediaStore.Images.Media.DATA};
-        Cursor cursor = context.getContentResolver().query(uri,
-                proj, // Which columns to return
-                null,       // WHERE clause; which rows to return (all rows)
-                null,       // WHERE clause selection arguments (none)
-                null); // Order-by clause (ascending by name)
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-
-        Log.e("TAGG", cursor.getString(column_index));
-
-        return cursor.getString(column_index);
-    }
-
-
 
     /**
      * Method to check if user has labelled each image
@@ -622,83 +566,6 @@ public class ImagesFragment extends Fragment {
 
 
     /**
-     * A method to load in and process a certain number of images at a time so that not all images are processed and displayed at once.
-     * @throws Exception
-     */
-    public void LazyLoadImages() throws Exception {
-        //get the stored image list from utility if there is one for this dataset
-        isLoading = true;
-        int startIndex = images.size();
-        int loadedItems = 0;
-        byte[] img;
-        String imageFileName;
-
-        //if the start index is 0, then we have never loaded this dataset before
-        if (startIndex == 0 || categories == null || datasetModified) {
-            datasetModified = false;
-            //retrieve categories as this contains the image names + classifications that we need
-            action = Utility.getClient().action(ImageClassificationDatasets.class);
-            categories = action.getCategories(datasetKey);
-            totalImages = categories.size();
-            processCategoryList(startIndex);
-        }
-
-        //if we haven't retrieved all images from the dataset yet
-        if (!(startIndex >= totalImages)) {
-
-            //iterate through the category entry set
-            for (Iterator<Map.Entry<String, List<String>>> entryIterator = categories.entrySet().iterator();
-                 entryIterator.hasNext(); ) {
-
-                Map.Entry<String, List<String>> entry = entryIterator.next();
-
-                //if we have haven't yet retrieved all or reached the limit of images to load
-                if ((startIndex + loadedItems) <= totalImages && loadedItems < PAGE_LIMIT) {
-                    //get the name of the image file
-                    imageFileName = entry.getKey();
-
-                    System.out.println(imageFileName + " " + totalImages);
-
-                    try {
-                        //retrieve the byte array of images from the API using the dataset's primary key + image name
-                        img =action.getFile(datasetKey, imageFileName);
-                    }
-                    catch (Exception e) {
-                        continue;
-                    }
-
-                    //create a classifiedImage object using image name and classification label and add it to the images arrayList
-                    images.add(new ClassifiedImage(img, entry.getValue().get(0), imageFileName));
-                    loadedItems++;
-
-                    //update the recycler view
-                    getActivity().runOnUiThread(() -> {
-                        adapter.notifyItemChanged(images.size() - 1);
-                    });
-
-                    //remove entry from the map as it has been dealt with
-                    entryIterator.remove();
-                }
-                //all images have been retrieved from backend
-                else if (startIndex + loadedItems > totalImages) {
-                    retrievedAll = true;
-                    saveChanges();
-                    return;
-                }
-            }
-            //save changes to the list stored in memory
-            saveChanges();
-        }
-
-        if(startIndex >= totalImages)
-        {
-            retrievedAll = true;
-            saveChanges();
-            return;
-        }
-    }
-
-    /**
      * A method to set the boolean value indicating whether a dataset change to the API has taken place
      * @param bool true if a dataset has been modified
      */
@@ -727,5 +594,77 @@ public class ImagesFragment extends Fragment {
 
         //display the filtered list
         adapter.searchCategory(filteredSearchList);
+    }
+
+
+    /**
+     * A method to load in and process a certain number of images at a time so that not all images are processed and displayed at once.
+     * @throws Exception
+     */
+
+    public void LazyLoadImages() throws Exception {
+        //get the stored image list from utility if there is one for this dataset
+        isLoading = true;
+        int startIndex = images.size();
+        int loadedItems = 0;
+        byte[] img;
+        String imageFileName;
+        String classificationLabel;
+
+        //if the start index is 0, then we have never loaded this dataset before
+        if (startIndex == 0 || datasetModified) {
+            datasetModified = false;
+            //retrieve categories as this contains the image names + classifications that we need
+            action = Utility.getClient().action(ImageClassificationDatasets.class);
+            imageFileNames = Utility.getClient().datasets().load(datasetKey).getFiles();
+            totalImages = imageFileNames.length;
+        }
+
+
+        //if we haven't retrieved all images from the dataset yet
+        if (!(startIndex >= totalImages)) {
+
+            //iterate through the image list
+            for (int i = startIndex; i < totalImages; i++) {
+
+                //if we have haven't yet retrieved all or reached the limit of images to load
+                if ((startIndex + loadedItems) <= totalImages && loadedItems < PAGE_LIMIT) {
+                    //get the name of the image file
+                    imageFileName = imageFileNames[i];
+
+                    try {
+                        //retrieve the byte array of images from the API using the dataset's primary key + image name
+                        img = action.getFile(datasetKey, imageFileName);
+                        classificationLabel = action.getCategories(datasetKey, imageFileName).get(0);
+                    } catch (Exception e) {
+                        continue;
+                    }
+
+                    //create a classifiedImage object using image name and classification label and add it to the images arrayList
+                    images.add(new ClassifiedImage(img, classificationLabel, imageFileName));
+                    loadedItems++;
+
+                    //update the recycler view
+                    getActivity().runOnUiThread(() -> {
+                        adapter.notifyItemChanged(images.size() - 1);
+                    });
+                }
+                //all images have been retrieved from backend
+                else if (startIndex + loadedItems > totalImages) {
+                    retrievedAll = true;
+                    saveChanges();
+                    return;
+                }
+            }
+            //save changes to the list stored in memory
+            saveChanges();
+        }
+
+        if(startIndex >= totalImages)
+        {
+            retrievedAll = true;
+            saveChanges();
+            return;
+        }
     }
 }

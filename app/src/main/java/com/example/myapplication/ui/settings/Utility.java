@@ -19,6 +19,8 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This is a class that will be used to store and retrieve user settings from shared storage
@@ -32,6 +34,9 @@ public class Utility {
 
     private static HashMap<Integer, ArrayList<ClassifiedImage>> imagesCollection = new HashMap<>();
     private static Client client;
+    private static final int NUMBER_OF_THREADS = 15;
+    public static final ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+    public static final ExecutorService clientConnection = Executors.newFixedThreadPool(1);
 
 
     public static SharedPreferences getPrefs(Context context) {
@@ -180,7 +185,7 @@ public class Utility {
         System.out.println((loadServerURL() + " " + loadPassword() + " " + loadPassword()));
       client = new Client(loadServerURL(), loadUsername(), loadPassword(), new MemoryOnlyStorage());
 
-      Thread t = new Thread(()-> {
+      clientConnection.execute(() -> {
           try {
               DBManager dbManager = new DBManager(context);
               System.out.println("\nLicenses:");
@@ -204,8 +209,6 @@ public class Utility {
 
           }
       });
-
-      t.start();
     }
 
     /**

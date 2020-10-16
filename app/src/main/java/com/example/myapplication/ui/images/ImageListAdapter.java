@@ -53,7 +53,6 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
     private ArrayList<ClassifiedImage> selectedImages;
     private boolean isActionMode;
     ImagesFragmentViewModel imagesViewModel;
-    private ArrayList<ClassifiedImage> backup;
 
 
     public ImageListAdapter(Fragment frag, Context context, ArrayList<ClassifiedImage> imageList)
@@ -252,16 +251,6 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
             t.start();
         }
         notifyDataSetChanged();
-
-        //set the data set modified flag to true in the image fragment
-        ((ImagesFragment) fragment).setDatasetModified(true);
-
-        //if the recycler view has less images than the page_limit, load in the same amount of images that have been deleted
-        if(images.size() < ((ImagesFragment) fragment).PAGE_LIMIT)
-        {
-            Thread t = new Thread(() -> {((ImagesFragment) fragment).processImages(); });
-            t.start();
-        }
     }
 
     /**
@@ -338,6 +327,17 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
                                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                     @Override
                                     public void onClick(SweetAlertDialog sweetAlertDialog) {
+
+                                        //set the data set modified flag to true in the image fragment
+                                        ((ImagesFragment) fragment).setDatasetModified(true);
+
+                                        //if the recycler view has less images than the page_limit, load in the same amount of images that have been deleted
+                                        if(images.size() > 0 && images.size() < ((ImagesFragment) fragment).PAGE_LIMIT)
+                                        {
+                                            Thread t = new Thread(() -> {((ImagesFragment) fragment).processImages(); });
+                                            t.start();
+                                        }
+
                                         //when the user clicks ok, dismiss the popup
                                         sDialog.dismissWithAnimation();
                                         //finish action mode once a user has confirmed the deletion of images, else keep users in selection mode
@@ -362,7 +362,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
         final EditText editText = new EditText(mContext);
                 new SweetAlertDialog(mContext, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText("Reclassify all selected images as: ")
-                .setConfirmText("Reclassify!")
+                .setConfirmText("Reclassify")
                 .setCustomView(editText)
                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override

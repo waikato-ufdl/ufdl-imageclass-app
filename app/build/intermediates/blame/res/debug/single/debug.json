@@ -20,12 +20,12 @@
         "source": "/home/yug/374/app/src/main/res/menu/main.xml"
     },
     {
-        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable-xhdpi_loading_image.png.flat",
-        "source": "/home/yug/374/app/src/main/res/drawable-xhdpi/loading_image.png"
-    },
-    {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_add_circle.xml.flat",
         "source": "/home/yug/374/app/src/main/res/drawable/add_circle.xml"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable-xhdpi_loading_image.png.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable-xhdpi/loading_image.png"
     },
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/mipmap-hdpi_ic_launcher_round.png.flat",
@@ -70,6 +70,10 @@
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_dataset_folder.xml.flat",
         "source": "/home/yug/374/app/src/main/res/drawable/dataset_folder.xml"
+    },
+    {
+        "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/drawable_ic_baseline_image_24.xml.flat",
+        "source": "/home/yug/374/app/src/main/res/drawable/ic_baseline_image_24.xml"
     },
     {
         "merged": "/home/yug/374/app/build/intermediates/res/merged/debug/menu_context_menu.xml.flat",
