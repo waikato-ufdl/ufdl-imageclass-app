@@ -1645,6 +1645,7 @@ drawable ic_launcher_background
 drawable ic_launcher_foreground
 drawable ic_menu_camera
 drawable ic_menu_gallery
+drawable ic_menu_info
 drawable ic_menu_settings
 drawable ic_menu_slideshow
 drawable ic_mtrl_checked_circle
@@ -2116,6 +2117,7 @@ id video_play_button
 id view_offset_helper
 id visible
 id warning_frame
+id website
 id withText
 id withinBounds
 id worm_dot
@@ -2296,6 +2298,7 @@ menu context_menu
 menu context_menu_datasets
 menu main
 mipmap ic_launcher
+mipmap ic_launcher_foreground
 mipmap ic_launcher_round
 navigation mobile_navigation
 plurals mtrl_badge_content_description

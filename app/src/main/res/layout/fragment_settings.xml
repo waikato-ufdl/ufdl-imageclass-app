@@ -8,7 +8,7 @@
     android:padding="10dp"
     android:layout_marginLeft="25dp"
     android:layout_marginRight="25dp"
-    tools:context=".ui.settings.SettingsFragment">
+    tools:context="io.github.waikato_ufdl.ui.settings.SettingsFragment">
 
 
 <!--    <TextView-->

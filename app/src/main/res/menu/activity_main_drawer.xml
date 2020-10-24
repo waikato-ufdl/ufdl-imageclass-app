@@ -17,5 +17,10 @@
             android:id="@+id/settingsFragment"
             android:icon="@drawable/ic_menu_settings"
             android:title="SETTINGS" />
+
+        <item
+            android:id="@+id/website"
+            android:icon="@drawable/ic_menu_info"
+            android:title="WEBSITE" />
     </group>
 </menu>
