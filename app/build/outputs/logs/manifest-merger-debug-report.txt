@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-43:12
-INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-43:12
-INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-43:12
-INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-43:12
+ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-44:12
+INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-44:12
+INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-44:12
+INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-44:12
 MERGED from [androidx.navigation:navigation-ui:2.1.0] /home/jordan/.gradle/caches/transforms-2/files-2.1/675130c9fe4503bbd1dc9fadda39e65b/navigation-ui-2.1.0/AndroidManifest.xml:17:1-24:12
 MERGED from [com.google.android.material:material:1.2.0] /home/jordan/.gradle/caches/transforms-2/files-2.1/d6752e9dca7ab5d55460279240467b37/material-1.2.0/AndroidManifest.xml:17:1-24:12
 MERGED from [com.zhihu.android:matisse:0.5.3-beta3] /home/jordan/.gradle/caches/transforms-2/files-2.1/a8971d14119c22e566d96804ad590e26/jetified-matisse-0.5.3-beta3/AndroidManifest.xml:17:1-33:12
@@ -61,20 +61,20 @@ MERGED from [androidx.annotation:annotation-experimental:1.0.0] /home/jordan/.gr
 MERGED from [it.sephiroth.android.library.imagezoom:library:1.0.4] /home/jordan/.gradle/caches/transforms-2/files-2.1/7af14e65d005de0d5659c4f126bbb736/jetified-library-1.0.4/AndroidManifest.xml:1:106-7:12
 MERGED from [com.pnikosis:materialish-progress:1.7] /home/jordan/.gradle/caches/transforms-2/files-2.1/0f84c5ff58d23cc269172d4354208700/jetified-materialish-progress-1.7/AndroidManifest.xml:2:1-13:12
 MERGED from [it.sephiroth.android.library.easing:library:1.0.2] /home/jordan/.gradle/caches/transforms-2/files-2.1/f2b94b7fb448db684684d3527d1460cb/jetified-library-1.0.2/AndroidManifest.xml:1:116-8:12
-INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-43:12
-INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-43:12
-INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-43:12
+INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-44:12
+INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-44:12
+INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-44:12
 	package
 		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:3:5-37
 		INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml
 		INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml
 	android:versionName
 		INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml
-		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-43:12
+		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-44:12
 		INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml
 	android:versionCode
 		INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml
-		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-43:12
+		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:1-44:12
 		INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml
 	xmlns:android
 		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:2:11-69
@@ -103,7 +103,7 @@ ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:10:5
 	android:name
 		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:10:22-64
 application
-ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:12:5-41:19
+ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:12:5-42:19
 MERGED from [com.google.android.material:material:1.2.0] /home/jordan/.gradle/caches/transforms-2/files-2.1/d6752e9dca7ab5d55460279240467b37/material-1.2.0/AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.2.0] /home/jordan/.gradle/caches/transforms-2/files-2.1/d6752e9dca7ab5d55460279240467b37/material-1.2.0/AndroidManifest.xml:22:5-20
 MERGED from [com.zhihu.android:matisse:0.5.3-beta3] /home/jordan/.gradle/caches/transforms-2/files-2.1/a8971d14119c22e566d96804ad590e26/jetified-matisse-0.5.3-beta3/AndroidManifest.xml:27:5-31:19
@@ -149,7 +149,9 @@ MERGED from [it.sephiroth.android.library.easing:library:1.0.2] /home/jordan/.gr
 	android:usesCleartextTraffic
 		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:16:9-44
 activity#io.github.waikato_ufdl.MainActivity
-ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:20:9-29:20
+ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:20:9-30:20
+	android:screenOrientation
+		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:24:13-49
 	android:label
 		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:22:13-45
 	android:theme
@@ -157,31 +159,31 @@ ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:20:9
 	android:name
 		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:21:13-63
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:24:13-28:29
+ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:25:13-29:29
 action#android.intent.action.MAIN
-ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:25:17-69
+ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:26:17-69
 	android:name
-		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:25:25-66
+		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:26:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:27:17-77
+ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:28:17-77
 	android:name
-		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:27:27-74
+		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:28:27-74
 provider#androidx.core.content.FileProvider
-ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:31:9-39:20
+ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:32:9-40:20
 	android:grantUriPermissions
-		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:35:13-47
+		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:36:13-47
 	android:authorities
-		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:33:13-78
+		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:34:13-70
 	android:exported
-		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:34:13-37
+		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:35:13-37
 	android:name
-		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:32:13-62
+		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:33:13-62
 meta-data#android.support.FILE_PROVIDER_PATHS
-ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:36:13-38:64
+ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:37:13-39:64
 	android:resource
-		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:38:17-51
+		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:39:17-51
 	android:name
-		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:37:17-67
+		ADDED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml:38:17-67
 uses-sdk
 INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /home/jordan/StudioProjects/374/app/src/main/AndroidManifest.xml

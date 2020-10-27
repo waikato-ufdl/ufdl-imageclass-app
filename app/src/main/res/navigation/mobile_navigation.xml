@@ -38,4 +38,9 @@
         android:name="io.github.waikato_ufdl.ui.images.ImagesFragment"
         android:label="@string/fragment_images"
         tools:layout="@layout/fragment_images" />
+
+    <activity
+        android:id="@+id/website"
+        app:action="android.intent.action.VIEW"
+        app:data="@string/application_url"/>
 </navigation>

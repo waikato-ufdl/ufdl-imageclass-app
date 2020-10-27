@@ -30,5 +30,6 @@
     <string name="edit_label">Edit Label</string>
     <string name="search">Search</string>
     <string name="Copy">Copy</string>
+    <string name="application_url">https://waikato-ufdl.github.io/</string>
 
 </resources>

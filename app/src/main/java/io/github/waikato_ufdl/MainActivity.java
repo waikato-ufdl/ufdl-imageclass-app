@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.settingsFragment, R.id.imagesFragment)
+                R.id.nav_home, R.id.nav_gallery, R.id.settingsFragment, R.id.imagesFragment, R.id.website)
                 .setDrawerLayout(drawerLayout)
                 .build();
 
@@ -127,9 +127,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.website: {
 //                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
 //                startActivity(browserIntent);
-
                 Log.d("WEB_INTENT", "Open website");
-                startActivity( new Intent( Intent.ACTION_VIEW, Uri.parse("https://waikato-ufdl.github.io/")));
+                startActivity(new Intent(
+                        Intent.ACTION_VIEW, Uri.parse(String.valueOf(R.string.application_url))
+                ));
+
+
+//                startActivity( new Intent( Intent.ACTION_VIEW, Uri.parse("https://waikato-ufdl.github.io/")));
 //                Log.d("WEB_INTENT", "Go home");
 //                Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.nav_home);
 

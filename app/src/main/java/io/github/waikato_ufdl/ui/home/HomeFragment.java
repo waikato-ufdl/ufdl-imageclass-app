@@ -170,7 +170,7 @@ public class HomeFragment extends Fragment {
 
                 //create a photo URI and pass it to the camera intent
                 Uri photoURI = FileProvider.getUriForFile(getContext(),
-                        "com.example.android.fileprovider",
+                        "io.github.waikato_ufdl.fileprovider",
                         pictureFile);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
 

@@ -2339,6 +2339,7 @@ string add_image
 string album_name_all
 string app_name
 string appbar_scrolling_view_behavior
+string application_url
 string bottom_sheet_behavior
 string button_apply
 string button_apply_default

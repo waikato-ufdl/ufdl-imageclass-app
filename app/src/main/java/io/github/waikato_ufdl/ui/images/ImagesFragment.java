@@ -170,7 +170,7 @@ public class ImagesFragment extends Fragment {
                         .choose(MimeType.ofImage()) //show only images
                         .countable(true)    //show count on selected images
                         .capture(true)  //show preview of images
-                        .captureStrategy(new CaptureStrategy(true, "com.example.android.fileprovider")) //where to store images
+                        .captureStrategy(new CaptureStrategy(true, "io.github.waikato_ufdl.fileprovider")) //where to store images
                         .maxSelectable(9)   //maximum amount of images which can be selected
                         .addFilter(new GifSizeFilter(320, 320, 5 * Filter.K * Filter.K)) //define the preview size
                         .gridExpectedSize(getResources().getDimensionPixelSize(R.dimen.grid_expected_size)) //show images in grid format
