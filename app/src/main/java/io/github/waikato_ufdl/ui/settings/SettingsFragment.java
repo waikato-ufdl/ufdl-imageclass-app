@@ -15,7 +15,9 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 
-import com.example.myapplication.R;
+import io.github.waikato_ufdl.R;
+
+import io.github.waikato_ufdl.R;
 
 
 public class SettingsFragment extends Fragment {

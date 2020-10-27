@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.core.text.HtmlCompat;
 
 import io.github.waikato_ufdl.DBManager;
-import com.example.myapplication.R;
+import io.github.waikato_ufdl.R;
 import com.github.waikatoufdl.ufdl4j.action.Datasets;
 import java.util.ArrayList;
 

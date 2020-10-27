@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.example.myapplication.R;
+import io.github.waikato_ufdl.R;
 
 public class SlideshowFragment extends Fragment {
 

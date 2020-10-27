@@ -24,8 +24,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import io.github.waikato_ufdl.MainActivity;
-import com.example.myapplication.R;
+import io.github.waikato_ufdl.R;
 
+import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.ui.settings.Utility;
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
 

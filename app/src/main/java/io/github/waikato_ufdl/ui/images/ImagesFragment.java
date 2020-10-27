@@ -32,7 +32,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
-import com.example.myapplication.R;
+import io.github.waikato_ufdl.R;
+
+import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.ui.UriUtils;
 import io.github.waikato_ufdl.ui.settings.Utility;
 

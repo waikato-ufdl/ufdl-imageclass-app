@@ -11,7 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
-import com.example.myapplication.R;
+import io.github.waikato_ufdl.R;
 
 import io.github.waikato_ufdl.ui.settings.Utility;
 
@@ -125,8 +125,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
 
             case R.id.website: {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
-                startActivity(browserIntent);
+//                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
+//                startActivity(browserIntent);
+
+                Log.d("WEB_INTENT", "Open website");
+                startActivity( new Intent( Intent.ACTION_VIEW, Uri.parse("https://waikato-ufdl.github.io/")));
+//                Log.d("WEB_INTENT", "Go home");
+//                Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.nav_home);
+
                 break;
             }
         }

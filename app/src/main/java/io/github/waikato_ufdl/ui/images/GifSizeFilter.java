@@ -4,7 +4,7 @@ package io.github.waikato_ufdl.ui.images;
 import android.content.Context;
 import android.graphics.Point;
 
-import com.example.myapplication.R;
+import io.github.waikato_ufdl.R;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.filter.Filter;
 import com.zhihu.matisse.internal.entity.IncapableCause;

@@ -7,7 +7,9 @@ import android.util.Patterns;
 
 import io.github.waikato_ufdl.DBManager;
 
-import com.example.myapplication.R;
+import io.github.waikato_ufdl.R;
+
+import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.ui.images.ClassifiedImage;
 import com.github.waikatoufdl.ufdl4j.Client;
 import com.github.waikatoufdl.ufdl4j.action.Licenses;

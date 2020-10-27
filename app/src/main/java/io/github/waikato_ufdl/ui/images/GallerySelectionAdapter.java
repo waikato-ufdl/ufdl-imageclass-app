@@ -9,9 +9,11 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
-import com.example.myapplication.R;
+import io.github.waikato_ufdl.R;
 import java.util.List;
 import android.net.Uri;
+
+import io.github.waikato_ufdl.R;
 
 public class GallerySelectionAdapter  extends RecyclerView.Adapter<GallerySelectionAdapter.ViewHolder> {
     //initialise variables

@@ -23,7 +23,9 @@ import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 import io.github.waikato_ufdl.MainActivity;
-import com.example.myapplication.R;
+import io.github.waikato_ufdl.R;
+
+import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.ui.settings.Utility;
 
 import java.io.File;

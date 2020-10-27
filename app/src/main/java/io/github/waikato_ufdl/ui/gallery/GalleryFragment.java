@@ -32,8 +32,9 @@ import androidx.navigation.Navigation;
 
 import io.github.waikato_ufdl.DBManager;
 import io.github.waikato_ufdl.MainActivity;
-import com.example.myapplication.R;
+import io.github.waikato_ufdl.R;
 
+import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.ui.settings.Utility;
 import com.github.waikatoufdl.ufdl4j.action.Datasets;
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
@@ -43,7 +44,7 @@ import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-import static com.example.myapplication.R.layout.spinner_item;
+import static io.github.waikato_ufdl.R.layout.spinner_item;
 
 public class GalleryFragment extends Fragment {
     private ImageButton btnNewDataset;
@@ -248,13 +249,13 @@ public class GalleryFragment extends Fragment {
             final List<String> spinnerArrayProjects = dbManager.getProjects();
 
             ArrayAdapter<String> spinnerArrayAdapterLicenses = new ArrayAdapter<String>
-                    (getContext(), spinner_item,
+                    (getContext(), R.layout.spinner_item,
                             spinnerArrayLicenses); //selected item will look like a spinner set from XML
             spinnerArrayAdapterLicenses.setDropDownViewResource(android.R.layout
                     .simple_spinner_dropdown_item);
 
             ArrayAdapter<String> spinnerArrayAdapterPojects = new ArrayAdapter<String>
-                    (getContext(), spinner_item,
+                    (getContext(), R.layout.spinner_item,
                             spinnerArrayProjects); //selected item will look like a spinner set from XML
             spinnerArrayAdapterPojects.setDropDownViewResource(android.R.layout
                     .simple_spinner_dropdown_item);
@@ -536,13 +537,13 @@ public class GalleryFragment extends Fragment {
             final List<String> spinnerArrayProjects = dbManager.getProjects();
 
             ArrayAdapter<String> spinnerArrayAdapterLicenses = new ArrayAdapter<String>
-                    (getContext(), spinner_item,
+                    (getContext(), R.layout.spinner_item,
                             spinnerArrayLicenses); //selected item will look like a spinner set from XML
             spinnerArrayAdapterLicenses.setDropDownViewResource(android.R.layout
                     .simple_spinner_dropdown_item);
 
             ArrayAdapter<String> spinnerArrayAdapterPojects = new ArrayAdapter<String>
-                    (getContext(), spinner_item,
+                    (getContext(), R.layout.spinner_item,
                             spinnerArrayProjects); //selected item will look like a spinner set from XML
             spinnerArrayAdapterPojects.setDropDownViewResource(android.R.layout
                     .simple_spinner_dropdown_item);
