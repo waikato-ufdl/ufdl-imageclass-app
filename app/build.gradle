@@ -5,7 +5,7 @@ android {
     buildToolsVersion "30.0.1"
 
     defaultConfig {
-        applicationId "com.example.myapplication"
+        applicationId "io.github.waikato_ufdl"
         minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
@@ -64,4 +64,7 @@ dependencies {
 
     //library which makes it possible to display view pager dots indicator
     implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:4.1.2'
+
+    //library for image compression which will reduce image sizes with negligible loss in quality
+    implementation 'id.zelory:compressor:2.1.0'
 }

@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.gallery.GalleryFragment"
+    tools:context="io.github.waikato_ufdl.ui.gallery.GalleryFragment"
     android:orientation="vertical">
 
     <ListView
         android:id="@+id/list_view_datasets"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:choiceMode="singleChoice"/>
 
     <ImageButton
         android:id="@+id/fab_add_dataset"

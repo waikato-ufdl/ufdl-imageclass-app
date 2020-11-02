@@ -1,4 +1,4 @@
-com.example.myapplication
+io.github.waikato_ufdl
 anim abc_fade_in
 anim abc_fade_out
 anim abc_grow_fade_in_from_bottom
@@ -1615,6 +1615,7 @@ drawable btn_radio_on_mtrl
 drawable btn_radio_on_to_off_mtrl_animation
 drawable button_design
 drawable dataset_folder
+drawable dataset_selector
 drawable design_bottom_navigation_item_background
 drawable design_fab_background
 drawable design_ic_visibility
@@ -1633,6 +1634,8 @@ drawable gray_button_background
 drawable green_button_background
 drawable ic_arrow_drop_down_white_24dp
 drawable ic_baseline_delete_24
+drawable ic_baseline_file_copy_24
+drawable ic_baseline_image_24
 drawable ic_baseline_search_24
 drawable ic_check_white_18dp
 drawable ic_empty_dracula
@@ -1642,6 +1645,7 @@ drawable ic_launcher_background
 drawable ic_launcher_foreground
 drawable ic_menu_camera
 drawable ic_menu_gallery
+drawable ic_menu_info
 drawable ic_menu_settings
 drawable ic_menu_slideshow
 drawable ic_mtrl_checked_circle
@@ -1759,7 +1763,9 @@ id action_bar_subtitle
 id action_bar_title
 id action_container
 id action_context_bar
+id action_copy_dataset
 id action_delete
+id action_delete_dataset
 id action_divider
 id action_image
 id action_menu_divider
@@ -1771,6 +1777,7 @@ id action_nav_gallery_to_imagesFragment
 id action_nav_gallery_to_settingsFragment
 id action_nav_home_to_settingsFragment
 id action_relabel
+id action_relabel_dataset
 id action_search
 id action_text
 id actions
@@ -2003,6 +2010,7 @@ id right_side
 id root
 id rounded
 id row_index_key
+id saveImages
 id save_non_transition_alpha
 id save_overlay_view
 id scale
@@ -2109,6 +2117,7 @@ id video_play_button
 id view_offset_helper
 id visible
 id warning_frame
+id website
 id withText
 id withinBounds
 id worm_dot
@@ -2286,11 +2295,14 @@ layout text_view_without_line_height
 layout worm_dot_layout
 menu activity_main_drawer
 menu context_menu
+menu context_menu_datasets
 menu main
 mipmap ic_launcher
+mipmap ic_launcher_foreground
 mipmap ic_launcher_round
 navigation mobile_navigation
 plurals mtrl_badge_content_description
+string Copy
 string Delete
 string LOADING
 string URL
@@ -2327,6 +2339,7 @@ string add_image
 string album_name_all
 string app_name
 string appbar_scrolling_view_behavior
+string application_url
 string bottom_sheet_behavior
 string button_apply
 string button_apply_default

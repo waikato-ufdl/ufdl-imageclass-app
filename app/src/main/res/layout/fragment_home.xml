@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.HomeFragment">
+    tools:context="io.github.waikato_ufdl.ui.home.HomeFragment">
 
     <ImageView
         android:id="@+id/cameraImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
+        android:src="@drawable/ic_baseline_image_24"
         android:layout_above="@id/captureImageButton" />
 
     <Button

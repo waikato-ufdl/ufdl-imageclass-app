@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_relabel_dataset"
+        android:title="@string/edit_label"
+        android:icon="@drawable/edit_icon"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_copy_dataset"
+        android:title="@string/Copy"
+        android:icon="@drawable/ic_baseline_file_copy_24"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_delete_dataset"
+        android:title="@string/Delete"
+        android:icon="@drawable/ic_baseline_delete_24"
+        app:showAsAction="always" />
+
+</menu>

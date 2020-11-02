@@ -1,113 +1,115 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-3    package="com.example.myapplication"
+3    package="io.github.waikato_ufdl"
 4    android:versionCode="1"
 5    android:versionName="1.0" >
 6
 7    <uses-sdk
 8        android:minSdkVersion="26"
-8-->/home/yug/374/app/src/main/AndroidManifest.xml
+8-->/home/yug/374t/app/src/main/AndroidManifest.xml
 9        android:targetSdkVersion="30" />
-9-->/home/yug/374/app/src/main/AndroidManifest.xml
+9-->/home/yug/374t/app/src/main/AndroidManifest.xml
 10
 11    <!-- Permissions -->
 12    <uses-permission android:name="android.permission.CAMERA" />
-12-->/home/yug/374/app/src/main/AndroidManifest.xml:6:5-64
-12-->/home/yug/374/app/src/main/AndroidManifest.xml:6:22-62
+12-->/home/yug/374t/app/src/main/AndroidManifest.xml:6:5-64
+12-->/home/yug/374t/app/src/main/AndroidManifest.xml:6:22-62
 13    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-13-->/home/yug/374/app/src/main/AndroidManifest.xml:7:5-80
-13-->/home/yug/374/app/src/main/AndroidManifest.xml:7:22-78
+13-->/home/yug/374t/app/src/main/AndroidManifest.xml:7:5-80
+13-->/home/yug/374t/app/src/main/AndroidManifest.xml:7:22-78
 14    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-14-->/home/yug/374/app/src/main/AndroidManifest.xml:8:5-79
-14-->/home/yug/374/app/src/main/AndroidManifest.xml:8:22-77
+14-->/home/yug/374t/app/src/main/AndroidManifest.xml:8:5-79
+14-->/home/yug/374t/app/src/main/AndroidManifest.xml:8:22-77
 15
 16    <uses-feature android:name="android.hardware.camera" />
-16-->/home/yug/374/app/src/main/AndroidManifest.xml:9:5-60
-16-->/home/yug/374/app/src/main/AndroidManifest.xml:9:19-57
+16-->/home/yug/374t/app/src/main/AndroidManifest.xml:9:5-60
+16-->/home/yug/374t/app/src/main/AndroidManifest.xml:9:19-57
 17
 18    <uses-permission android:name="android.permission.INTERNET" />
-18-->/home/yug/374/app/src/main/AndroidManifest.xml:10:5-66
-18-->/home/yug/374/app/src/main/AndroidManifest.xml:10:22-64
+18-->/home/yug/374t/app/src/main/AndroidManifest.xml:10:5-66
+18-->/home/yug/374t/app/src/main/AndroidManifest.xml:10:22-64
 19
 20    <application
-20-->/home/yug/374/app/src/main/AndroidManifest.xml:12:5-41:19
+20-->/home/yug/374t/app/src/main/AndroidManifest.xml:12:5-42:19
 21        android:allowBackup="true"
-21-->/home/yug/374/app/src/main/AndroidManifest.xml:13:9-35
+21-->/home/yug/374t/app/src/main/AndroidManifest.xml:13:9-35
 22        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-22-->[androidx.core:core:1.3.0] /home/yug/.gradle/caches/transforms-2/files-2.1/429fb715fcc7711d4ab133e350b6f531/core-1.3.0/AndroidManifest.xml:24:18-86
+22-->[androidx.core:core:1.3.0] /home/yug/.gradle/caches/transforms-2/files-2.1/8dcd1701ae68e2a64de609ba4b65471f/core-1.3.0/AndroidManifest.xml:24:18-86
 23        android:debuggable="true"
 24        android:extractNativeLibs="false"
 25        android:icon="@mipmap/ic_launcher"
-25-->/home/yug/374/app/src/main/AndroidManifest.xml:14:9-43
+25-->/home/yug/374t/app/src/main/AndroidManifest.xml:14:9-43
 26        android:label="@string/app_name"
-26-->/home/yug/374/app/src/main/AndroidManifest.xml:15:9-41
+26-->/home/yug/374t/app/src/main/AndroidManifest.xml:15:9-41
 27        android:roundIcon="@mipmap/ic_launcher_round"
-27-->/home/yug/374/app/src/main/AndroidManifest.xml:17:9-54
+27-->/home/yug/374t/app/src/main/AndroidManifest.xml:17:9-54
 28        android:supportsRtl="true"
-28-->/home/yug/374/app/src/main/AndroidManifest.xml:18:9-35
+28-->/home/yug/374t/app/src/main/AndroidManifest.xml:18:9-35
 29        android:testOnly="true"
 30        android:theme="@style/AppTheme"
-30-->/home/yug/374/app/src/main/AndroidManifest.xml:19:9-40
+30-->/home/yug/374t/app/src/main/AndroidManifest.xml:19:9-40
 31        android:usesCleartextTraffic="true" >
-31-->/home/yug/374/app/src/main/AndroidManifest.xml:16:9-44
+31-->/home/yug/374t/app/src/main/AndroidManifest.xml:16:9-44
 32        <activity
-32-->/home/yug/374/app/src/main/AndroidManifest.xml:20:9-29:20
-33            android:name="com.example.myapplication.MainActivity"
-33-->/home/yug/374/app/src/main/AndroidManifest.xml:21:13-41
+32-->/home/yug/374t/app/src/main/AndroidManifest.xml:20:9-30:20
+33            android:name="io.github.waikato_ufdl.MainActivity"
+33-->/home/yug/374t/app/src/main/AndroidManifest.xml:21:13-63
 34            android:label="@string/app_name"
-34-->/home/yug/374/app/src/main/AndroidManifest.xml:22:13-45
-35            android:theme="@style/AppTheme.NoActionBar" >
-35-->/home/yug/374/app/src/main/AndroidManifest.xml:23:13-56
-36            <intent-filter>
-36-->/home/yug/374/app/src/main/AndroidManifest.xml:24:13-28:29
-37                <action android:name="android.intent.action.MAIN" />
-37-->/home/yug/374/app/src/main/AndroidManifest.xml:25:17-69
-37-->/home/yug/374/app/src/main/AndroidManifest.xml:25:25-66
-38
-39                <category android:name="android.intent.category.LAUNCHER" />
-39-->/home/yug/374/app/src/main/AndroidManifest.xml:27:17-77
-39-->/home/yug/374/app/src/main/AndroidManifest.xml:27:27-74
-40            </intent-filter>
-41        </activity>
-42
-43        <provider
-43-->/home/yug/374/app/src/main/AndroidManifest.xml:31:9-39:20
-44            android:name="androidx.core.content.FileProvider"
-44-->/home/yug/374/app/src/main/AndroidManifest.xml:32:13-62
-45            android:authorities="com.example.android.fileprovider"
-45-->/home/yug/374/app/src/main/AndroidManifest.xml:33:13-67
-46            android:exported="false"
-46-->/home/yug/374/app/src/main/AndroidManifest.xml:34:13-37
-47            android:grantUriPermissions="true" >
-47-->/home/yug/374/app/src/main/AndroidManifest.xml:35:13-47
-48            <meta-data
-48-->/home/yug/374/app/src/main/AndroidManifest.xml:36:13-38:64
-49                android:name="android.support.FILE_PROVIDER_PATHS"
-49-->/home/yug/374/app/src/main/AndroidManifest.xml:37:17-67
-50                android:resource="@xml/file_paths" />
-50-->/home/yug/374/app/src/main/AndroidManifest.xml:38:17-51
-51        </provider>
-52
-53        <activity android:name="com.zhihu.matisse.ui.MatisseActivity" />
-53-->[com.zhihu.android:matisse:0.5.3-beta3] /home/yug/.gradle/caches/transforms-2/files-2.1/6fce6eebb96f7ae0cf42d3fdebb7657d/jetified-matisse-0.5.3-beta3/AndroidManifest.xml:28:9-73
-53-->[com.zhihu.android:matisse:0.5.3-beta3] /home/yug/.gradle/caches/transforms-2/files-2.1/6fce6eebb96f7ae0cf42d3fdebb7657d/jetified-matisse-0.5.3-beta3/AndroidManifest.xml:28:19-70
-54        <activity android:name="com.zhihu.matisse.internal.ui.AlbumPreviewActivity" />
-54-->[com.zhihu.android:matisse:0.5.3-beta3] /home/yug/.gradle/caches/transforms-2/files-2.1/6fce6eebb96f7ae0cf42d3fdebb7657d/jetified-matisse-0.5.3-beta3/AndroidManifest.xml:29:9-87
-54-->[com.zhihu.android:matisse:0.5.3-beta3] /home/yug/.gradle/caches/transforms-2/files-2.1/6fce6eebb96f7ae0cf42d3fdebb7657d/jetified-matisse-0.5.3-beta3/AndroidManifest.xml:29:19-84
-55        <activity android:name="com.zhihu.matisse.internal.ui.SelectedPreviewActivity" />
-55-->[com.zhihu.android:matisse:0.5.3-beta3] /home/yug/.gradle/caches/transforms-2/files-2.1/6fce6eebb96f7ae0cf42d3fdebb7657d/jetified-matisse-0.5.3-beta3/AndroidManifest.xml:30:9-90
-55-->[com.zhihu.android:matisse:0.5.3-beta3] /home/yug/.gradle/caches/transforms-2/files-2.1/6fce6eebb96f7ae0cf42d3fdebb7657d/jetified-matisse-0.5.3-beta3/AndroidManifest.xml:30:19-87
-56
-57        <provider
-57-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:23:9-27:43
-58            android:name="androidx.lifecycle.ProcessLifecycleOwnerInitializer"
-58-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:24:13-79
-59            android:authorities="com.example.myapplication.lifecycle-process"
-59-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:25:13-69
-60            android:exported="false"
-60-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:26:13-37
-61            android:multiprocess="true" />
-61-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/894873d045a0a220e7c24d43283db9eb/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:27:13-40
-62    </application>
-63
-64</manifest>
+34-->/home/yug/374t/app/src/main/AndroidManifest.xml:22:13-45
+35            android:screenOrientation="portrait"
+35-->/home/yug/374t/app/src/main/AndroidManifest.xml:24:13-49
+36            android:theme="@style/AppTheme.NoActionBar" >
+36-->/home/yug/374t/app/src/main/AndroidManifest.xml:23:13-56
+37            <intent-filter>
+37-->/home/yug/374t/app/src/main/AndroidManifest.xml:25:13-29:29
+38                <action android:name="android.intent.action.MAIN" />
+38-->/home/yug/374t/app/src/main/AndroidManifest.xml:26:17-69
+38-->/home/yug/374t/app/src/main/AndroidManifest.xml:26:25-66
+39
+40                <category android:name="android.intent.category.LAUNCHER" />
+40-->/home/yug/374t/app/src/main/AndroidManifest.xml:28:17-77
+40-->/home/yug/374t/app/src/main/AndroidManifest.xml:28:27-74
+41            </intent-filter>
+42        </activity>
+43
+44        <provider
+44-->/home/yug/374t/app/src/main/AndroidManifest.xml:32:9-40:20
+45            android:name="androidx.core.content.FileProvider"
+45-->/home/yug/374t/app/src/main/AndroidManifest.xml:33:13-62
+46            android:authorities="io.github.waikato_ufdl.fileprovider"
+46-->/home/yug/374t/app/src/main/AndroidManifest.xml:34:13-70
+47            android:exported="false"
+47-->/home/yug/374t/app/src/main/AndroidManifest.xml:35:13-37
+48            android:grantUriPermissions="true" >
+48-->/home/yug/374t/app/src/main/AndroidManifest.xml:36:13-47
+49            <meta-data
+49-->/home/yug/374t/app/src/main/AndroidManifest.xml:37:13-39:64
+50                android:name="android.support.FILE_PROVIDER_PATHS"
+50-->/home/yug/374t/app/src/main/AndroidManifest.xml:38:17-67
+51                android:resource="@xml/file_paths" />
+51-->/home/yug/374t/app/src/main/AndroidManifest.xml:39:17-51
+52        </provider>
+53
+54        <activity android:name="com.zhihu.matisse.ui.MatisseActivity" />
+54-->[com.zhihu.android:matisse:0.5.3-beta3] /home/yug/.gradle/caches/transforms-2/files-2.1/a8971d14119c22e566d96804ad590e26/jetified-matisse-0.5.3-beta3/AndroidManifest.xml:28:9-73
+54-->[com.zhihu.android:matisse:0.5.3-beta3] /home/yug/.gradle/caches/transforms-2/files-2.1/a8971d14119c22e566d96804ad590e26/jetified-matisse-0.5.3-beta3/AndroidManifest.xml:28:19-70
+55        <activity android:name="com.zhihu.matisse.internal.ui.AlbumPreviewActivity" />
+55-->[com.zhihu.android:matisse:0.5.3-beta3] /home/yug/.gradle/caches/transforms-2/files-2.1/a8971d14119c22e566d96804ad590e26/jetified-matisse-0.5.3-beta3/AndroidManifest.xml:29:9-87
+55-->[com.zhihu.android:matisse:0.5.3-beta3] /home/yug/.gradle/caches/transforms-2/files-2.1/a8971d14119c22e566d96804ad590e26/jetified-matisse-0.5.3-beta3/AndroidManifest.xml:29:19-84
+56        <activity android:name="com.zhihu.matisse.internal.ui.SelectedPreviewActivity" />
+56-->[com.zhihu.android:matisse:0.5.3-beta3] /home/yug/.gradle/caches/transforms-2/files-2.1/a8971d14119c22e566d96804ad590e26/jetified-matisse-0.5.3-beta3/AndroidManifest.xml:30:9-90
+56-->[com.zhihu.android:matisse:0.5.3-beta3] /home/yug/.gradle/caches/transforms-2/files-2.1/a8971d14119c22e566d96804ad590e26/jetified-matisse-0.5.3-beta3/AndroidManifest.xml:30:19-87
+57
+58        <provider
+58-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/67f50bf9e8ec0e817db6486d97ff49c5/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:23:9-27:43
+59            android:name="androidx.lifecycle.ProcessLifecycleOwnerInitializer"
+59-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/67f50bf9e8ec0e817db6486d97ff49c5/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:24:13-79
+60            android:authorities="io.github.waikato_ufdl.lifecycle-process"
+60-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/67f50bf9e8ec0e817db6486d97ff49c5/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:25:13-69
+61            android:exported="false"
+61-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/67f50bf9e8ec0e817db6486d97ff49c5/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:26:13-37
+62            android:multiprocess="true" />
+62-->[androidx.lifecycle:lifecycle-process:2.1.0] /home/yug/.gradle/caches/transforms-2/files-2.1/67f50bf9e8ec0e817db6486d97ff49c5/jetified-lifecycle-process-2.1.0/AndroidManifest.xml:27:13-40
+63    </application>
+64
+65</manifest>

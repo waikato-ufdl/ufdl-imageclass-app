@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">UFDL Image Classification</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">USER-FRIENDLY DEEP LEARNING</string>
@@ -29,5 +29,7 @@
     <string name="error_gif">x or y bound size should be at least %1$dpx and file size should be no more than %2$sM</string>
     <string name="edit_label">Edit Label</string>
     <string name="search">Search</string>
+    <string name="Copy">Copy</string>
+    <string name="application_url">https://waikato-ufdl.github.io/</string>
 
 </resources>

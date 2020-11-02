@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.example.myapplication.ui.home.HomeFragment"
+        android:name="io.github.waikato_ufdl.ui.home.HomeFragment"
         android:label="@string/menu_capture"
         tools:layout="@layout/fragment_home" >
         <action
@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/nav_gallery"
-        android:name="com.example.myapplication.ui.gallery.GalleryFragment"
+        android:name="io.github.waikato_ufdl.ui.gallery.GalleryFragment"
         android:label="@string/menu_manage"
         tools:layout="@layout/fragment_gallery" >
         <action
@@ -30,12 +30,17 @@
 
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.myapplication.ui.settings.SettingsFragment"
+        android:name="io.github.waikato_ufdl.ui.settings.SettingsFragment"
         android:label="@string/menu_settings"
         tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/imagesFragment"
-        android:name="com.example.myapplication.ui.images.ImagesFragment"
+        android:name="io.github.waikato_ufdl.ui.images.ImagesFragment"
         android:label="@string/fragment_images"
         tools:layout="@layout/fragment_images" />
+
+    <activity
+        android:id="@+id/website"
+        app:action="android.intent.action.VIEW"
+        app:data="@string/application_url"/>
 </navigation>
