@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -307,6 +309,24 @@ public class ImagesFragment extends Fragment {
             viewPager.setAdapter(galleryAdapter);
             indicator.setViewPager2(viewPager);
 
+            editText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    System.out.println("POS: " + viewPager.getCurrentItem());
+                    labels[viewPager.getCurrentItem()] =  editText.getText().toString().trim();
+                }
+            });
+
             //set a listener to listen for page changes caused by user swipes
             viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
                 @Override
@@ -316,13 +336,13 @@ public class ImagesFragment extends Fragment {
                     //the user is scrolling from the right to the left
                     if(prevIndex > position)
                     {
-                        labels[prevIndex] = editText.getText().toString().trim();
+                        //labels[prevIndex] = editText.getText().toString().trim();
                     }
                     //user has scrolled from left to right
                     else if (position > prevIndex)
                     {
                         //display the label associated with the particular image if one has previously been entered
-                        displayImageLabel(editText, position);
+                        displayImageLabel(editText, viewPager.getCurrentItem());
                     }
 
                     prevIndex = position;
@@ -336,13 +356,13 @@ public class ImagesFragment extends Fragment {
                     if(prevIndex != position)
                     {
                         //set the label to the image if a user has entered one in
-                        labels[prevIndex] = editText.getText().toString().trim();
+                        //labels[prevIndex] = editText.getText().toString().trim();
                     }
                     //user has swiped right to left
                     else
                     {
                         //display the label associated with the particular image if one has previously been entered
-                        displayImageLabel(editText, position);
+                        displayImageLabel(editText, viewPager.getCurrentItem());
                     }
 
                     indexPosition = position;
@@ -383,8 +403,9 @@ public class ImagesFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     String informativeMessage;
+                    System.out.println("PORQUESH" + viewPager.getAdapter().getItemCount());
 
-                    if(allLabelsFilled())
+                    if(allLabelsFilled(viewPager.getAdapter().getItemCount()))
                     {
                         informativeMessage = "Save classified images?";
                     }
@@ -426,6 +447,8 @@ public class ImagesFragment extends Fragment {
 
                                                     //when the user clicks ok, dismiss the popup
                                                     sDialog.dismissWithAnimation();
+
+                                                    dialog.dismiss();
                                                 }
                                             })
                                             .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
@@ -439,12 +462,14 @@ public class ImagesFragment extends Fragment {
                                 }
                             })
                             .show();
+
                 }
             });
 
             dialog.show();
         }
     }
+
 
     /**
      * A method to reload the current fragment
@@ -497,14 +522,16 @@ public class ImagesFragment extends Fragment {
     }
 
     /**
-     * Method to check if user has labelled each image
-     * @return
+     * A method to check if all images have been labelled
+     * @param numImages The number of images to check
+     * @return True if all images has been assigned a label
      */
-    public boolean allLabelsFilled()
+    public boolean allLabelsFilled(int numImages)
     {
-        for(String label: labels)
+        for(int i=0; i < numImages; i++)
         {
-            if(label == null || label.length() < 1)
+            String label = labels[i];
+            if(label  == null || label.length() < 1)
             {
                 return false;
             }
@@ -603,7 +630,7 @@ public class ImagesFragment extends Fragment {
                     try {
                         //retrieve the byte array of images from the API using the dataset's primary key + image name
                         img = action.getFile(datasetKey, imageFileName);
-                        classificationLabel = action.getCategories(datasetKey, imageFileName).get(0);
+                        classificationLabel = (action.getCategories(datasetKey, imageFileName).size() > 0)? action.getCategories(datasetKey, imageFileName).get(0): "Unlabelled";
                     } catch (Exception e) {
                         continue;
                     }

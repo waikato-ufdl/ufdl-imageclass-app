@@ -238,5 +238,4 @@ public class Utility {
         String[] data = client.toString().split(" ");
         return data[data.length-1].equals("access=") | data[data.length-1].equals("tokens=null");
     }
-
 }

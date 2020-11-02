@@ -1,5 +1,6 @@
 package io.github.waikato_ufdl.ui.home;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,18 +23,24 @@ import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
+import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator;
+
 import io.github.waikato_ufdl.MainActivity;
 import io.github.waikato_ufdl.R;
 
 import io.github.waikato_ufdl.R;
+import io.github.waikato_ufdl.ui.images.GallerySelectionAdapter;
 import io.github.waikato_ufdl.ui.settings.Utility;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -123,6 +132,7 @@ public class HomeFragment extends Fragment {
                 displayScaledImage();
         }
     }
+
 
     /**
      * A method to create and return an image file
