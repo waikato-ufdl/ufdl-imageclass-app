@@ -34,7 +34,6 @@ import io.github.waikato_ufdl.DBManager;
 import io.github.waikato_ufdl.MainActivity;
 import io.github.waikato_ufdl.R;
 
-import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.ui.settings.Utility;
 import com.github.waikatoufdl.ufdl4j.action.Datasets;
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
@@ -52,9 +51,11 @@ public class GalleryFragment extends Fragment {
     private EditText datasetName, datasetDescription, datasetTags;
     private Switch datasetSwitch;
     private boolean datasetPublic = false;
-    private String datasetNameText, datasetDescriptionText, datasetTagText;
+    private String datasetNameText, datasetDescriptionText, datasetTagText, dName;
     private ImageClassificationDatasets action;
     private boolean isActionMode;
+    private int dKey;
+    private ActionMode actionMode = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -121,7 +122,7 @@ public class GalleryFragment extends Fragment {
             Thread t = new Thread(() -> {
                 try {
                     action = Utility.getClient().action(ImageClassificationDatasets.class);
-                    final ArrayList<Datasets.Dataset> dataset = (ArrayList) (Utility.getClient().datasets().list());
+                    final ArrayList<Datasets.Dataset> dataset = (ArrayList) action.list();
 
                     //must populate the listview on the main thread
                     getActivity().runOnUiThread(() -> {
@@ -132,26 +133,38 @@ public class GalleryFragment extends Fragment {
                         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                Bundle bundle = new Bundle();
-                                bundle.putInt("datasetPK", dataset.get(position).getPK());
 
-                                //move to the images fragment to display this dataset's images
-                                Navigation.findNavController(view).navigate(R.id.action_nav_gallery_to_imagesFragment, bundle);
+                                if (!isActionMode) {
+                                    Bundle bundle = new Bundle();
+                                    bundle.putInt("datasetPK", dataset.get(position).getPK());
+
+                                    //move to the images fragment to display this dataset's images
+                                    Navigation.findNavController(view).navigate(R.id.action_nav_gallery_to_imagesFragment, bundle);
+                                }
+                                else
+                                {
+                                    dKey = dataset.get(position).getPK();
+                                    dName = dataset.get(position).getName();
+                                    actionMode.setTitle(String.format("%s Selected", dName));
+                                }
                             }
                         });
 
                         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
                             @Override
                             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                                int dKey = dataset.get(position).getPK();
-                                String dName = dataset.get(position).getName();
+                                dKey = dataset.get(position).getPK();
+                                dName = dataset.get(position).getName();
                                 //initialise Action mode
+
                                 ActionMode.Callback callback = new ActionMode.Callback() {
                                     @Override
                                     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                                         //Initialise menu inflater & inflate menu
                                         MenuInflater menuInflater = mode.getMenuInflater();
                                         menuInflater.inflate(R.menu.context_menu_datasets, menu);
+                                        actionMode = mode;
                                         return true;
                                     }
 
@@ -196,9 +209,11 @@ public class GalleryFragment extends Fragment {
                                     public void onDestroyActionMode(ActionMode mode) {
                                         //when action mode is destroyed
                                         isActionMode = false;
+                                        actionMode = null;
                                         mode.finish();
                                     }
                                 };
+
                                 //Start action mode
                                 ((MainActivity) view.getContext()).startActionMode(callback);
                                 return true;
@@ -220,6 +235,7 @@ public class GalleryFragment extends Fragment {
             e.printStackTrace();
         }
     }
+
 
 
     public void initiateNewDatasetWindow(View v) {
@@ -308,25 +324,13 @@ public class GalleryFragment extends Fragment {
      */
     public boolean checkDetailsEntered()
     {
-        boolean valid = true;
-
         //check if any of the inputs are empty and if so, set an error message
         if(isEmpty(datasetName, 0)) {
             datasetName.setError("Required");
-            valid = false;
+            return false;
         }
-//        if(isEmpty(password, 0))
-//        {
-//            password.setError("Required");
-//            valid = false;
-//        }
-//        if(isEmpty(serverURL, 7))
-//        {
-//            serverURL.setError("Required");
-//            valid = false;
-//        }
 
-        return valid;
+        return true;
     }
 
     /**
@@ -419,8 +423,6 @@ public class GalleryFragment extends Fragment {
             //make an API request to delete an image
             Thread t = new Thread(() -> {
                 try {
-                    ImageClassificationDatasets action = Utility.getClient().action(ImageClassificationDatasets.class);
-
                     //delete image file
                     action.delete(datasetKey, true);
                     return;
@@ -490,13 +492,12 @@ public class GalleryFragment extends Fragment {
      */
     public void copyDataset(int datasetKey, String newDatasetName)
     {
-        //make an API request to delete an image
+        //make an API request to copy a dataset
         Thread t = new Thread(() -> {
             try {
-                ImageClassificationDatasets action = Utility.getClient().action(ImageClassificationDatasets.class);
-
-                //delete image file
+                //create a copy of the dataset
                 action.copy(datasetKey, newDatasetName);
+
                 return;
             }
             catch (Exception e)
@@ -571,7 +572,7 @@ public class GalleryFragment extends Fragment {
                     int projName = spinnerArrayAdapterPojects.getPosition(dbManager.getProjectName(dataset.getProject()));
                     int licName = spinnerArrayAdapterLicenses.getPosition(dbManager.getLicenseName(dataset.getLicense()));
                     Log.d("initiateUpdateDatasetWindow: ", "Project " + projName + " License " + licName);
-// Spinners not assigning due to thread issue
+
                     spinnerProjects.setSelection(projName);
                     spinnerLicenses.setSelection(licName);
                     Log.d("initiateUpdateDatasetWindow: ", "Spinner selections made");
