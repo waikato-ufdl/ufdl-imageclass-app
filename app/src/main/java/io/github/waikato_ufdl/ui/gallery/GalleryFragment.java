@@ -3,7 +3,6 @@ package io.github.waikato_ufdl.ui.gallery;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -23,39 +22,35 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.Switch;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.Navigation;
-
 import io.github.waikato_ufdl.DBManager;
 import io.github.waikato_ufdl.MainActivity;
 import io.github.waikato_ufdl.R;
-
 import io.github.waikato_ufdl.ui.settings.Utility;
 import com.github.waikatoufdl.ufdl4j.action.Datasets;
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import cn.pedant.SweetAlert.SweetAlertDialog;
-
-import static io.github.waikato_ufdl.R.layout.spinner_item;
 
 public class GalleryFragment extends Fragment {
     private ImageButton btnNewDataset;
     private DBManager dbManager;
     private EditText datasetName, datasetDescription, datasetTags;
+    private Button buttonCreateDataset;
+    private Spinner spinnerLicenses, spinnerProjects;
+    private ArrayAdapter<String> spinnerArrayAdapterLicenses, spinnerArrayAdapterPojects;
     private Switch datasetSwitch;
     private boolean datasetPublic = false;
     private String datasetNameText, datasetDescriptionText, datasetTagText, dName;
     private ImageClassificationDatasets action;
     private boolean isActionMode;
     private int dKey;
-    private ActionMode actionMode = null;
+    private ActionMode actionMode;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,8 +68,12 @@ public class GalleryFragment extends Fragment {
 
         btnNewDataset = root.findViewById(R.id.fab_add_dataset);
         btnNewDataset.setOnClickListener(view -> {
-            initiateNewDatasetWindow(view);
-        });
+            //if actionMode is on, turn it off
+            if(actionMode != null) {
+                actionMode.finish();
+            }
+            //then proceed display dataset creation window
+            initiateDatasetWindow(view, -1); });
 
         dbManager = new DBManager(getContext());
         isActionMode = false;
@@ -91,21 +90,17 @@ public class GalleryFragment extends Fragment {
 
     /**
      * Method to check whether the required settings have been set, if not, move to settings fragment
+     *
      * @param view
      */
-    public void checkSettings(View view)
-    {
+    public void checkSettings(View view) {
         //if these main user settings are empty, this must be the user's first time using this app
-        if(Utility.loadUsername() == null | Utility.loadPassword() == null | Utility.loadServerURL() == null)
-        {
+        if (Utility.loadUsername() == null | Utility.loadPassword() == null | Utility.loadServerURL() == null) {
             //navigate to settings and make them enter these details
             Navigation.findNavController(view).navigate(R.id.action_nav_gallery_to_settingsFragment);
-        }
-        else
-        {
+        } else {
             //only continue if the client is connected to the API
-            if(!Utility.authenticationFailed())
-            {
+            if (!Utility.authenticationFailed()) {
                 displayDatasets(view);
             }
         }
@@ -113,10 +108,10 @@ public class GalleryFragment extends Fragment {
 
     /**
      * Method to populate the listview with the dataset information
+     *
      * @param root
      */
-    public void displayDatasets(View root)
-    {
+    public void displayDatasets(View root) {
         try {
             //must start a thread to retrieve the dataset information as networking operations cannot be done on the main thread
             Thread t = new Thread(() -> {
@@ -140,9 +135,7 @@ public class GalleryFragment extends Fragment {
 
                                     //move to the images fragment to display this dataset's images
                                     Navigation.findNavController(view).navigate(R.id.action_nav_gallery_to_imagesFragment, bundle);
-                                }
-                                else
-                                {
+                                } else {
                                     dKey = dataset.get(position).getPK();
                                     dName = dataset.get(position).getName();
                                     actionMode.setTitle(String.format("%s Selected", dName));
@@ -184,11 +177,10 @@ public class GalleryFragment extends Fragment {
                                         int id = item.getItemId();
 
                                         //check which menu item was clicked
-                                        switch (id)
-                                        {
+                                        switch (id) {
                                             case R.id.action_relabel_dataset:
                                                 //when the user presses edit
-                                                initiateUpdateDatasetWindow(root, dKey);
+                                                initiateDatasetWindow(root, dKey);
                                                 break;
 
                                             case R.id.action_copy_dataset:
@@ -221,11 +213,9 @@ public class GalleryFragment extends Fragment {
                         });
 
                     });
-                }
-                catch (IllegalStateException e) {
+                } catch (IllegalStateException e) {
                     ((MainActivity) getActivity()).showToast("Please check your username, password and server URL details in settings");
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             });
@@ -236,18 +226,50 @@ public class GalleryFragment extends Fragment {
         }
     }
 
+    /**
+     * Method to initialise all the views for the dataset creation/edit window
+     * @param layout the layout view
+     */
+    public void initialiseDatasetCreationViews(View layout)
+    {
+        //get licenses & projects using database manager
+        final List<String> spinnerArrayLicenses = dbManager.getLicenses();
+        final List<String> spinnerArrayProjects = dbManager.getProjects();
+
+        spinnerArrayAdapterLicenses = new ArrayAdapter<String>(getContext(), R.layout.spinner_item, spinnerArrayLicenses);
+        spinnerArrayAdapterLicenses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinnerArrayAdapterPojects = new ArrayAdapter<String>(getContext(), R.layout.spinner_item, spinnerArrayProjects);
+        spinnerArrayAdapterPojects.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        //initialise views
+        spinnerLicenses = layout.findViewById(R.id.dataset_license_spinner);
+        spinnerLicenses.setAdapter(spinnerArrayAdapterLicenses);
+        spinnerProjects = layout.findViewById(R.id.dataset_project_spinner);
+        spinnerProjects.setAdapter(spinnerArrayAdapterPojects);
+        buttonCreateDataset = layout.findViewById(R.id.createDatasetButton);
+
+        datasetName = layout.findViewById(R.id.dataset_name_text);
+        datasetDescription = layout.findViewById(R.id.dataset_description_text);
+        datasetTags = layout.findViewById(R.id.dataset_tags_text);
+        datasetSwitch = layout.findViewById(R.id.makePublic);
+    }
 
 
-    public void initiateNewDatasetWindow(View v) {
+    /**
+     * Method to display a popup window which will be used for both dataset creation and dataset editing
+     * @param v the view
+     * @param datasetKey the primary key of the dataset. This will also be used to determine which function to perform (create/update)
+     *                   If datasetKey = -1 : creating dataset
+     *                   else : editing a particular dataset's details
+     */
+    public void initiateDatasetWindow(View v, int datasetKey) {
         try {
-            Log.d("initiateNewDatasetWindow: ", "New Dataset Popup");
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             //Inflate the view from a predefined XML layout
-            View layout = inflater.inflate(R.layout.new_dataset,
-                    null);
+            View layout = inflater.inflate(R.layout.new_dataset, null);
 
-
-            // create a 300px width and 470px height PopupWindow
+            // create a PopupWindow
             final PopupWindow popupWindow = new PopupWindow(layout,
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.MATCH_PARENT, true);
@@ -257,59 +279,44 @@ public class GalleryFragment extends Fragment {
 
             //darken the background behind the popup window
             darkenBackground(popupWindow);
+            initialiseDatasetCreationViews(layout);
 
-            dbManager = new DBManager(getContext());
+            //we are editing a dataset so first display the current details of the data
+            if (datasetKey != -1) {
+                setEditDatasetFields(datasetKey);
+                v.invalidate();
+            }
 
-            //get licenses & projects using database manager
-            final List<String> spinnerArrayLicenses = dbManager.getLicenses();
-            final List<String> spinnerArrayProjects = dbManager.getProjects();
+            buttonCreateDataset.setOnClickListener(view -> {
 
-            ArrayAdapter<String> spinnerArrayAdapterLicenses = new ArrayAdapter<String>
-                    (getContext(), R.layout.spinner_item,
-                            spinnerArrayLicenses); //selected item will look like a spinner set from XML
-            spinnerArrayAdapterLicenses.setDropDownViewResource(android.R.layout
-                    .simple_spinner_dropdown_item);
-
-            ArrayAdapter<String> spinnerArrayAdapterPojects = new ArrayAdapter<String>
-                    (getContext(), R.layout.spinner_item,
-                            spinnerArrayProjects); //selected item will look like a spinner set from XML
-            spinnerArrayAdapterPojects.setDropDownViewResource(android.R.layout
-                    .simple_spinner_dropdown_item);
-
-            //initialise views
-            Spinner spinnerLicenses = layout.findViewById(R.id.dataset_license_spinner);
-            spinnerLicenses.setAdapter(spinnerArrayAdapterLicenses);
-            Spinner spinnerProjects = layout.findViewById(R.id.dataset_project_spinner);
-            spinnerProjects.setAdapter(spinnerArrayAdapterPojects);
-            Button btnCreateDataset = layout.findViewById(R.id.createDatasetButton);
-
-            datasetName = layout.findViewById(R.id.dataset_name_text);
-            datasetDescription = layout.findViewById(R.id.dataset_description_text);
-            datasetTags = layout.findViewById(R.id.dataset_tags_text);
-            datasetSwitch = layout.findViewById(R.id.makePublic);
-
-
-            btnCreateDataset.setOnClickListener(view -> {
-                if(checkDetailsEntered()){
+                //check that all required fields have been filled
+                if (checkDetailsEntered()) {
                     datasetNameText = datasetName.getText().toString().trim();
                     datasetDescriptionText = datasetDescription.getText().toString().trim();
                     datasetTagText = datasetTags.getText().toString().trim();
-                    if(datasetSwitch.isChecked()){
+                    if (datasetSwitch.isChecked()) {
                         datasetPublic = true;
                     }
                     int projectKey = dbManager.getProjectKey(spinnerProjects.getSelectedItem().toString());
                     int licenseKey = dbManager.getLicenseKey(spinnerLicenses.getSelectedItem().toString());
 
-                    //create
                     Thread t = new Thread(() -> {
                         try {
-                            action.create(datasetNameText, datasetDescriptionText, projectKey, licenseKey, datasetPublic, datasetTagText);
+                            if(datasetKey == -1) {
+                                //create a new dataset
+                                action.create(datasetNameText, datasetDescriptionText, projectKey, licenseKey, datasetPublic, datasetTagText);
+                            }
+                            else {
+                                //update an existing dataset's details
+                                action.update(datasetKey, datasetNameText, datasetDescriptionText, projectKey, licenseKey, datasetPublic, datasetTagText);
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     });
                     t.start();
                     popupWindow.dismiss();
+                    if(actionMode != null) {actionMode.finish();};
                     reload();
                 }
             });
@@ -320,12 +327,12 @@ public class GalleryFragment extends Fragment {
 
     /**
      * Method to check if any of the required user setting fields are empty
+     *
      * @return boolean
      */
-    public boolean checkDetailsEntered()
-    {
+    public boolean checkDetailsEntered() {
         //check if any of the inputs are empty and if so, set an error message
-        if(isEmpty(datasetName, 0)) {
+        if (isEmpty(datasetName, 0)) {
             datasetName.setError("Required");
             return false;
         }
@@ -335,18 +342,18 @@ public class GalleryFragment extends Fragment {
 
     /**
      * Method to check if an EditText is empty
+     *
      * @param editText The EditText to check
      * @return
      */
-    public boolean isEmpty(EditText editText, int minLength)
-    {
+    public boolean isEmpty(EditText editText, int minLength) {
         return editText.getText().toString().trim().length() <= minLength;
     }
 
     /**
      * A method to reload the fragment
      */
-    public void reload(){
+    public void reload() {
         // Reload current fragment
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         if (Build.VERSION.SDK_INT >= 26) {
@@ -357,6 +364,7 @@ public class GalleryFragment extends Fragment {
 
     /**
      * A method to darken the background when a popup window is displayed
+     *
      * @param popupWindow The popup window being displayed
      */
     public static void darkenBackground(PopupWindow popupWindow) {
@@ -374,10 +382,10 @@ public class GalleryFragment extends Fragment {
 
     /**
      * A method to confirm the deletion process via a popup before deleting a dataset
+     *
      * @param mode the action mode
      */
-    public void deleteConfirmation(ActionMode mode, int datasetKey)
-    {
+    public void deleteConfirmation(ActionMode mode, int datasetKey) {
         new SweetAlertDialog(getContext(), SweetAlertDialog.WARNING_TYPE)
                 .setTitleText("Are you sure?")
                 .setContentText("You won't be able to recover the dataset after deletion")
@@ -418,23 +426,20 @@ public class GalleryFragment extends Fragment {
     /**
      * Method to delete the selected dataset from list view & backend
      */
-    public void deleteDataset(int datasetKey)
-    {
-            //make an API request to delete an image
-            Thread t = new Thread(() -> {
-                try {
-                    //delete image file
-                    action.delete(datasetKey, true);
-                    return;
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            });
-            t.start();
+    public void deleteDataset(int datasetKey) {
+        //make an API request to delete an image
+        Thread t = new Thread(() -> {
+            try {
+                //delete image file
+                action.delete(datasetKey, true);
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        t.start();
 
-            reload();
+        reload();
     }
 
     public void confirmCopyDataset(ActionMode mode, String datasetName, int datasetKey) {
@@ -449,8 +454,8 @@ public class GalleryFragment extends Fragment {
                         String newDatasetName = editText.getText().toString().trim();
 
                         //if a value has been entered
-                        if(newDatasetName.length() > 0) {
-                            if(!newDatasetName.equals(datasetName)){
+                        if (newDatasetName.length() > 0) {
+                            if (!newDatasetName.equals(datasetName)) {
                                 //copy dataset
                                 copyDataset(datasetKey, newDatasetName);
 
@@ -469,11 +474,10 @@ public class GalleryFragment extends Fragment {
                                             }
                                         })
                                         .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
-                            }else{
+                            } else {
                                 editText.setError("Dataset name must be different");
                             }
-                        }
-                        else
+                        } else
                             editText.setError("Please enter a classification label");
                     }
                 })
@@ -490,8 +494,7 @@ public class GalleryFragment extends Fragment {
     /**
      * Method to delete the selected dataset from list view & backend
      */
-    public void copyDataset(int datasetKey, String newDatasetName)
-    {
+    public void copyDataset(int datasetKey, String newDatasetName) {
         //make an API request to copy a dataset
         Thread t = new Thread(() -> {
             try {
@@ -499,115 +502,44 @@ public class GalleryFragment extends Fragment {
                 action.copy(datasetKey, newDatasetName);
 
                 return;
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
         t.start();
-
         reload();
     }
 
-    public void initiateUpdateDatasetWindow(View v, int datasetKey) {
-        try {
-            Log.d("initiateUpdateDatasetWindow: ", "Update Dataset Popup");
-            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            //Inflate the view from a predefined XML layout
-            View layout = inflater.inflate(R.layout.new_dataset,
-                    null);
+    /**
+     * Method to display an existing dataset's details on the edit dataset window
+     * @param datasetKey the primary key of the dataset
+     */
+    public void setEditDatasetFields(int datasetKey) {
+        Thread thread = new Thread(() -> {
+            try {
+                //load the dataset which is currently being edited
+                Datasets.Dataset dataset = action.load(datasetKey);
 
-            //            Projects.Project project = Projects.Project.load(dataset.getProject());
-
-            // create a 300px width and 470px height PopupWindow
-            final PopupWindow popupWindow = new PopupWindow(layout,
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT, true);
-
-            // display the popup in the center
-            popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
-
-            //darken the background behind the popup window
-            darkenBackground(popupWindow);
-
-            dbManager = new DBManager(getContext());
-
-            //get licenses & projects using database manager
-            final List<String> spinnerArrayLicenses = dbManager.getLicenses();
-            final List<String> spinnerArrayProjects = dbManager.getProjects();
-
-            ArrayAdapter<String> spinnerArrayAdapterLicenses = new ArrayAdapter<String>
-                    (getContext(), R.layout.spinner_item,
-                            spinnerArrayLicenses); //selected item will look like a spinner set from XML
-            spinnerArrayAdapterLicenses.setDropDownViewResource(android.R.layout
-                    .simple_spinner_dropdown_item);
-
-            ArrayAdapter<String> spinnerArrayAdapterPojects = new ArrayAdapter<String>
-                    (getContext(), R.layout.spinner_item,
-                            spinnerArrayProjects); //selected item will look like a spinner set from XML
-            spinnerArrayAdapterPojects.setDropDownViewResource(android.R.layout
-                    .simple_spinner_dropdown_item);
-
-            //initialise views
-            Spinner spinnerLicenses = layout.findViewById(R.id.dataset_license_spinner);
-            spinnerLicenses.setAdapter(spinnerArrayAdapterLicenses);
-            Spinner spinnerProjects = layout.findViewById(R.id.dataset_project_spinner);
-            spinnerProjects.setAdapter(spinnerArrayAdapterPojects);
-            Button btnCreateDataset = layout.findViewById(R.id.createDatasetButton);
-
-            datasetName = layout.findViewById(R.id.dataset_name_text);
-            datasetDescription = layout.findViewById(R.id.dataset_description_text);
-            datasetTags = layout.findViewById(R.id.dataset_tags_text);
-            datasetSwitch = layout.findViewById(R.id.makePublic);
-
-            Thread thread = new Thread(() -> {
-                try {
-                    Datasets.Dataset dataset = action.load(datasetKey);
+                getActivity().runOnUiThread(() -> {
+                    //set the fields to display the current dataset details
                     datasetName.setText(dataset.getName());
                     datasetDescription.setText(dataset.getDescription());
                     datasetTags.setText(dataset.getTags());
                     datasetSwitch.setChecked(dataset.isPublic());
-                    btnCreateDataset.setText("Update Dataset");
+                    buttonCreateDataset.setText("Update Dataset");
+
+                    //check the current project and license associated to this dataset
                     int projName = spinnerArrayAdapterPojects.getPosition(dbManager.getProjectName(dataset.getProject()));
                     int licName = spinnerArrayAdapterLicenses.getPosition(dbManager.getLicenseName(dataset.getLicense()));
-                    Log.d("initiateUpdateDatasetWindow: ", "Project " + projName + " License " + licName);
 
+                    //set the spinners to reflect the current project and license details
                     spinnerProjects.setSelection(projName);
                     spinnerLicenses.setSelection(licName);
-                    Log.d("initiateUpdateDatasetWindow: ", "Spinner selections made");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            thread.start();
-
-            btnCreateDataset.setOnClickListener(view -> {
-                if(checkDetailsEntered()){
-                    datasetNameText = datasetName.getText().toString().trim();
-                    datasetDescriptionText = datasetDescription.getText().toString().trim();
-                    datasetTagText = datasetTags.getText().toString().trim();
-                    if(datasetSwitch.isChecked()){
-                        datasetPublic = true;
-                    }
-                    int projectKey = dbManager.getProjectKey(spinnerProjects.getSelectedItem().toString());
-                    int licenseKey = dbManager.getLicenseKey(spinnerLicenses.getSelectedItem().toString());
-
-                    //create
-                    Thread t = new Thread(() -> {
-                        try {
-                            action.update(datasetKey, datasetNameText, datasetDescriptionText, projectKey, licenseKey, datasetPublic, datasetTagText);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    });
-                    t.start();
-                    popupWindow.dismiss();
-                    reload();
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        thread.start();
     }
 }
