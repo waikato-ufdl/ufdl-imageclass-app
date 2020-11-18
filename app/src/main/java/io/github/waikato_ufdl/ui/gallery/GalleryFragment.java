@@ -27,6 +27,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import io.github.waikato_ufdl.DBManager;
 import io.github.waikato_ufdl.MainActivity;
 import io.github.waikato_ufdl.R;
@@ -51,6 +55,9 @@ public class GalleryFragment extends Fragment {
     private boolean isActionMode;
     private int dKey;
     private ActionMode actionMode;
+    datasetRecyclerAdapter.RecyclerViewClickListener listener;
+    RecyclerView mRecyclerView;
+    datasetRecyclerAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,6 +93,12 @@ public class GalleryFragment extends Fragment {
 
         //check that the user settings are not empty
         checkSettings(view);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.datasets_recyclerView);
+        adapter = new datasetRecyclerAdapter(getContext(), new ArrayList<>());
+        RecyclerView.LayoutManager lm = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(lm);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(adapter);
     }
 
     /**
@@ -108,111 +121,19 @@ public class GalleryFragment extends Fragment {
 
     /**
      * Method to populate the listview with the dataset information
-     *
-     * @param root
      */
-    public void displayDatasets(View root) {
+    public void displayDatasets(View v) {
         try {
             //must start a thread to retrieve the dataset information as networking operations cannot be done on the main thread
             Thread t = new Thread(() -> {
                 try {
                     action = Utility.getClient().action(ImageClassificationDatasets.class);
-                    final ArrayList<Datasets.Dataset> dataset = (ArrayList) action.list();
+                    final ArrayList<Datasets.Dataset> datasetList = (ArrayList) action.list();
+                    //set the adapter data, listener and notify change to see datasets
+                    adapter.setData(datasetList);
+                    getActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+                    setRecyclerViewListener(datasetList, v);
 
-                    //must populate the listview on the main thread
-                    getActivity().runOnUiThread(() -> {
-                        ListView mListView = (ListView) root.findViewById(R.id.list_view_datasets);
-                        datasetListAdapter adapter = new datasetListAdapter(getContext(), R.layout.dataset_display, dataset);
-                        mListView.setAdapter(adapter);
-
-                        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                                if (!isActionMode) {
-                                    Bundle bundle = new Bundle();
-                                    bundle.putInt("datasetPK", dataset.get(position).getPK());
-
-                                    //move to the images fragment to display this dataset's images
-                                    Navigation.findNavController(view).navigate(R.id.action_nav_gallery_to_imagesFragment, bundle);
-                                } else {
-                                    dKey = dataset.get(position).getPK();
-                                    dName = dataset.get(position).getName();
-                                    actionMode.setTitle(String.format("%s Selected", dName));
-                                }
-                            }
-                        });
-
-                        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-                            @Override
-                            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                                dKey = dataset.get(position).getPK();
-                                dName = dataset.get(position).getName();
-                                //initialise Action mode
-
-                                ActionMode.Callback callback = new ActionMode.Callback() {
-                                    @Override
-                                    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                                        //Initialise menu inflater & inflate menu
-                                        MenuInflater menuInflater = mode.getMenuInflater();
-                                        menuInflater.inflate(R.menu.context_menu_datasets, menu);
-                                        actionMode = mode;
-                                        return true;
-                                    }
-
-                                    @Override
-                                    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                                        //When action mode is preparing
-                                        isActionMode = true;
-                                        mode.setTitle(String.format("%s Selected", dName));
-                                        return true;
-                                    }
-
-                                    @Override
-                                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                                        //handles the click of an action mode item
-
-                                        //get menu id
-                                        int id = item.getItemId();
-
-                                        //check which menu item was clicked
-                                        switch (id) {
-                                            case R.id.action_relabel_dataset:
-                                                //when the user presses edit
-                                                initiateDatasetWindow(root, dKey);
-                                                break;
-
-                                            case R.id.action_copy_dataset:
-                                                //when the user presses edit
-                                                confirmCopyDataset(mode, dName, dKey);
-                                                break;
-
-                                            case R.id.action_delete_dataset:
-                                                //when user presses delete
-                                                deleteConfirmation(mode, dKey);
-                                                break;
-                                        }
-
-                                        return false;
-                                    }
-
-                                    @Override
-                                    public void onDestroyActionMode(ActionMode mode) {
-                                        //when action mode is destroyed
-                                        isActionMode = false;
-                                        actionMode = null;
-                                        mode.finish();
-                                    }
-                                };
-
-                                //Start action mode
-                                ((MainActivity) view.getContext()).startActionMode(callback);
-                                return true;
-                            }
-                        });
-
-                    });
                 } catch (IllegalStateException e) {
                     ((MainActivity) getActivity()).showToast("Please check your username, password and server URL details in settings");
                 } catch (Exception e) {
@@ -224,6 +145,98 @@ public class GalleryFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Initialises the recyclerView listener to deal with onClick and onLongClick of dataset itemviews
+     * @param datasetList
+     * @param root
+     */
+    private void setRecyclerViewListener(ArrayList<Datasets.Dataset> datasetList, View root) {
+        listener = new datasetRecyclerAdapter.RecyclerViewClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                if (!isActionMode) {
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("datasetPK", datasetList.get(position).getPK());
+
+                    //move to the images fragment to display this dataset's images
+                    Navigation.findNavController(v).navigate(R.id.action_nav_gallery_to_imagesFragment, bundle);
+                } else {
+                    dKey = datasetList.get(position).getPK();
+                    dName = datasetList.get(position).getName();
+                    actionMode.setTitle(String.format("%s Selected", dName));
+                }
+            }
+
+            @Override
+            public void onLongClick(View v, int position) {
+
+                dKey = datasetList.get(position).getPK();
+                dName = datasetList.get(position).getName();
+                //initialise Action mode
+
+                ActionMode.Callback callback = new ActionMode.Callback() {
+                    @Override
+                    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                        //Initialise menu inflater & inflate menu
+                        MenuInflater menuInflater = mode.getMenuInflater();
+                        menuInflater.inflate(R.menu.context_menu_datasets, menu);
+                        actionMode = mode;
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                        //When action mode is preparing
+                        isActionMode = true;
+                        mode.setTitle(String.format("%s Selected", dName));
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                        //handles the click of an action mode item
+
+                        //get menu id
+                        int id = item.getItemId();
+
+                        //check which menu item was clicked
+                        switch (id) {
+                            case R.id.action_relabel_dataset:
+                                //when the user presses edit
+                                initiateDatasetWindow(root, dKey);
+                                break;
+
+                            case R.id.action_copy_dataset:
+                                //when the user presses edit
+                                confirmCopyDataset(mode, dName, dKey);
+                                break;
+
+                            case R.id.action_delete_dataset:
+                                //when user presses delete
+                                deleteConfirmation(mode, dKey);
+                                break;
+                        }
+
+                        return false;
+                    }
+
+                    @Override
+                    public void onDestroyActionMode(ActionMode mode) {
+                        //when action mode is destroyed
+                        isActionMode = false;
+                        actionMode = null;
+                        mode.finish();
+                    }
+                };
+
+                //Start action mode
+                ((MainActivity) v.getContext()).startActionMode(callback);
+            }
+        };
+
+        adapter.setListener(listener);
     }
 
     /**
