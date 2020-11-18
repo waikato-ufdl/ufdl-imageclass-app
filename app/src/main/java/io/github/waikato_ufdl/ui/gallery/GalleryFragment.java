@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -131,8 +133,12 @@ public class GalleryFragment extends Fragment {
                     final ArrayList<Datasets.Dataset> datasetList = (ArrayList) action.list();
                     //set the adapter data, listener and notify change to see datasets
                     adapter.setData(datasetList);
-                    getActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+                    getActivity().runOnUiThread(() -> {
+                        //adapter.notifyDataSetChanged();
+                        layoutAnimation();
+                    });
                     setRecyclerViewListener(datasetList, v);
+
 
                 } catch (IllegalStateException e) {
                     ((MainActivity) getActivity()).showToast("Please check your username, password and server URL details in settings");
@@ -554,5 +560,13 @@ public class GalleryFragment extends Fragment {
             }
         });
         thread.start();
+    }
+
+    private void layoutAnimation()
+    {
+        LayoutAnimationController layoutAnimationController = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.layout_animation_fall_down);
+        mRecyclerView.setLayoutAnimation(layoutAnimationController);
+        mRecyclerView.getAdapter().notifyDataSetChanged();
+        mRecyclerView.scheduleLayoutAnimation();
     }
 }

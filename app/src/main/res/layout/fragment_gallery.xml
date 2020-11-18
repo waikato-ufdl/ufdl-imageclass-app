@@ -7,18 +7,11 @@
     tools:context="io.github.waikato_ufdl.ui.gallery.GalleryFragment"
     android:orientation="vertical">
 
-    <!--
-    <ListView
-        android:id="@+id/list_view_datasets"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:choiceMode="singleChoice"/>
-        -->
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/datasets_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layoutAnimation="@anim/layout_animation_fall_down"
         android:choiceMode="singleChoice"/>
 
 
