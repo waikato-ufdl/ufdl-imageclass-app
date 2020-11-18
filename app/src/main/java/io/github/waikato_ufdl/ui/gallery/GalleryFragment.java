@@ -134,7 +134,6 @@ public class GalleryFragment extends Fragment {
                     //set the adapter data, listener and notify change to see datasets
                     adapter.setData(datasetList);
                     getActivity().runOnUiThread(() -> {
-                        //adapter.notifyDataSetChanged();
                         layoutAnimation();
                     });
                     setRecyclerViewListener(datasetList, v);
@@ -165,23 +164,24 @@ public class GalleryFragment extends Fragment {
                 if (!isActionMode) {
                     Bundle bundle = new Bundle();
                     bundle.putInt("datasetPK", datasetList.get(position).getPK());
-
+                    highlightBackground(position);
                     //move to the images fragment to display this dataset's images
                     Navigation.findNavController(v).navigate(R.id.action_nav_gallery_to_imagesFragment, bundle);
                 } else {
                     dKey = datasetList.get(position).getPK();
                     dName = datasetList.get(position).getName();
                     actionMode.setTitle(String.format("%s Selected", dName));
+                    highlightBackground(position);
                 }
             }
 
             @Override
             public void onLongClick(View v, int position) {
-
                 dKey = datasetList.get(position).getPK();
                 dName = datasetList.get(position).getName();
-                //initialise Action mode
+                highlightBackground(position);
 
+                //initialise Action mode
                 ActionMode.Callback callback = new ActionMode.Callback() {
                     @Override
                     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -234,11 +234,20 @@ public class GalleryFragment extends Fragment {
                         isActionMode = false;
                         actionMode = null;
                         mode.finish();
+                        highlightBackground(-1);
                     }
                 };
 
-                //Start action mode
-                ((MainActivity) v.getContext()).startActionMode(callback);
+                //if action mode is off, then turn start it upon long press
+                if(actionMode == null) {
+                    //Start action mode
+                    ((MainActivity) v.getContext()).startActionMode(callback);
+                }
+                else
+                {
+                    //if we are already in action mode, then just change the name action bar title (as selection focus has changed to another dataset)
+                    actionMode.setTitle(String.format("%s Selected", dName));
+                }
             }
         };
 
@@ -568,5 +577,11 @@ public class GalleryFragment extends Fragment {
         mRecyclerView.setLayoutAnimation(layoutAnimationController);
         mRecyclerView.getAdapter().notifyDataSetChanged();
         mRecyclerView.scheduleLayoutAnimation();
+    }
+
+    private void highlightBackground(int position)
+    {
+        adapter.setSelectedIndex(position);
+        adapter.notifyDataSetChanged();
     }
 }

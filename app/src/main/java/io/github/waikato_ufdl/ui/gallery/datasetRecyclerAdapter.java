@@ -1,6 +1,7 @@
 package io.github.waikato_ufdl.ui.gallery;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +14,14 @@ import java.util.ArrayList;
 
 import io.github.waikato_ufdl.DBManager;
 import io.github.waikato_ufdl.R;
+import io.github.waikato_ufdl.ui.settings.Utility;
 
 public class datasetRecyclerAdapter extends RecyclerView.Adapter<datasetRecyclerAdapter.ViewHolder> {
     private ArrayList<Datasets.Dataset> datasetList;
     private RecyclerViewClickListener listener;
     private LayoutInflater mInflater;
     private DBManager dbManager;
+    private int selectedIndex = -1;
 
     public datasetRecyclerAdapter(Context context, ArrayList<Datasets.Dataset> dsList)
     {
@@ -47,11 +50,22 @@ public class datasetRecyclerAdapter extends RecyclerView.Adapter<datasetRecycler
         String projectNameLabel = getColoredSpanned("Project name: ");
         String tagLabel = getColoredSpanned("Tags: ");
 
-
         //set the view holder variable text
         holder.datasetName.setText(HtmlCompat.fromHtml(datasetNameLabel + datasetName, HtmlCompat.FROM_HTML_MODE_LEGACY));
         holder.projectName.setText(HtmlCompat.fromHtml(projectNameLabel + projectName, HtmlCompat.FROM_HTML_MODE_LEGACY));
         holder.datasetTags.setText(HtmlCompat.fromHtml(tagLabel + datasetTags, HtmlCompat.FROM_HTML_MODE_LEGACY));
+
+        //highlight the selected item
+        if(selectedIndex == position) {
+            //if darkmode is on, the background should be grey, else pastel yellow for light mode
+            String colHex = (Utility.loadDarkModeState()) ? "#3d3d3d":"#fde396";
+            holder.itemView.setBackgroundColor(Color.parseColor(colHex));
+        }
+        else
+        {
+            //if the item is not selected background colour should remain as it is
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+        }
     }
 
     @Override
@@ -97,6 +111,12 @@ public class datasetRecyclerAdapter extends RecyclerView.Adapter<datasetRecycler
     {
         listener = lis;
     }
+
+    public void setSelectedIndex(int index)
+    {
+        selectedIndex = index;
+    }
+
 
     /**
      * method to colour substrings of one text view
