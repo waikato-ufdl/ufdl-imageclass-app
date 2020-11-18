@@ -143,6 +143,12 @@ public class ImagesFragment extends Fragment {
         //get Bundle from the previous fragment
         datasetKey = getArguments().getInt("datasetPK");
 
+        try {
+            action = Utility.getClient().action(ImageClassificationDatasets.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         setHasOptionsMenu(true);
     }
 
@@ -214,7 +220,7 @@ public class ImagesFragment extends Fragment {
      */
     private void setupImageGrid() {
         //get the recycler view, set it's layout to a gridlayout with 2 columns & then set the adapter
-        adapter = new ImageListAdapter(this, getContext(), images);
+        adapter = new ImageListAdapter(this, getContext(), images, action, datasetKey);
         gridLayoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(gridLayoutManager);
         OverScrollDecoratorHelper.setUpOverScroll(recyclerView, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
@@ -403,7 +409,6 @@ public class ImagesFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     String informativeMessage;
-                    System.out.println("PORQUESH" + viewPager.getAdapter().getItemCount());
 
                     if(allLabelsFilled(viewPager.getAdapter().getItemCount()))
                     {
@@ -497,14 +502,11 @@ public class ImagesFragment extends Fragment {
             imageFile = new Compressor(getContext()).compressToFile(imageFile);
 
             String label = (labels[i] != null && labels[i].length() > 0) ? labels[i] : "unlabelled";
-
+            File finalImageFile = imageFile;
 
             ExecutorService executor = Executors.newSingleThreadExecutor();
 
-            File finalImageFile = imageFile;
-
             executor.execute(() -> {;
-
                 try{
                     //add image file + label to the backend
                     action.addFile(datasetKey, finalImageFile, finalImageFile.getName());
@@ -610,8 +612,7 @@ public class ImagesFragment extends Fragment {
         if (startIndex == 0 || datasetModified) {
             datasetModified = false;
             //retrieve categories as this contains the image names + classifications that we need
-            action = Utility.getClient().action(ImageClassificationDatasets.class);
-            imageFileNames = Utility.getClient().datasets().load(datasetKey).getFiles();
+            imageFileNames = action.load(datasetKey).getFiles();
             totalImages = imageFileNames.length;
         }
 

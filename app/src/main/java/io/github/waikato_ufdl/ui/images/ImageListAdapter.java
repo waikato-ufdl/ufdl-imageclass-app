@@ -29,9 +29,13 @@ import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.ui.settings.Utility;
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
+import com.github.waikatoufdl.ufdl4j.examples.ManagingImageClassificationDatasets;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -46,9 +50,19 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
     private ArrayList<ClassifiedImage> selectedImages;
     private boolean isActionMode;
     ImagesFragmentViewModel imagesViewModel;
+    ImageClassificationDatasets action;
+    int datasetPK;
 
 
-    public ImageListAdapter(Fragment frag, Context context, ArrayList<ClassifiedImage> imageList)
+    /**
+     * Constructor for image list adapater
+     * @param frag the images fragment
+     * @param context the context
+     * @param imageList the list of images within a particular data set
+     * @param act  the action which will be used to perform API requests specifically on Image Classification datasets
+     * @param dsPK the particular dataset's primary key
+     */
+    public ImageListAdapter(Fragment frag, Context context, ArrayList<ClassifiedImage> imageList, ImageClassificationDatasets act, int dsPK)
     {
         fragment = frag;
         mContext = context;
@@ -56,6 +70,8 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
         images = imageList;
         isActionMode = false;
         selectedImages =  new ArrayList<>();
+        action = act;
+        datasetPK = dsPK;
     }
 
     @NonNull
@@ -219,31 +235,30 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
      */
     public void deleteImages()
     {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+
         for(ClassifiedImage image : selectedImages)
         {
             //remove image from list
             images.remove(image);
 
+
             //make an API request to delete an image
-            Thread t = new Thread(() -> {
+            executor.execute(()-> {
                 try {
-
-                    int datasetPK = ((ImagesFragment) fragment).getDatasetKey();
-                    ImageClassificationDatasets action = Utility.getClient().action(ImageClassificationDatasets.class);
-
-                    //delete image file
+                    //delete image file pk images categories
                     action.deleteFile(datasetPK, image.getImageFileName());
                     Utility.saveImageList(datasetPK, images);
-                    return;
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
                 }
             });
-            t.start();
+
         }
         notifyDataSetChanged();
+        executor.shutdown();
     }
 
     /**
@@ -403,11 +418,9 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
      */
     private void editImageCategories(String label)
     {
-        int datasetPK = ((ImagesFragment) fragment).getDatasetKey();
-
         //first go through and remove the category label for each of the images & then relabel them
-        removeCurrentCategories(datasetPK, label);
-        addCategories(datasetPK, label);
+        removeCurrentCategories(label);
+        addCategories(label);
 
         //set the data set modified flag to true in the image fragment
         ((ImagesFragment) fragment).setDatasetModified(true);
@@ -415,22 +428,19 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
 
     /**
      * A method to remove the current labels for the selected images
-     * @param datasetPK the dataset primary key to indicate which dataset the images belong to
      * @param label the new classification label to set for the selected images
      */
-    private void removeCurrentCategories(int datasetPK, String label)
+    private void removeCurrentCategories(String label)
     {
         for(ClassifiedImage image : selectedImages)
         {
             Thread t = new Thread(() -> {
                 try {
-                    ImageClassificationDatasets action = Utility.getClient().action(ImageClassificationDatasets.class);
-
                     System.out.println(image.getClassification());
 
                     //make an API request to remove current the categories for each image
                     action.removeCategories(datasetPK, Arrays.asList(image.getImageFileName()), Arrays.asList(image.getClassification()));
-                    //action.addCategories(datasetPK, Arrays.asList(image.getImageFileName()), Arrays.asList(label));
+
                     //reclassify all the selected images locally with the user defined label
                     image.setClassificationLabel(label);
                     Utility.saveImageList(datasetPK, images);
@@ -449,16 +459,14 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
 
     /**
      * A method to add categories to each of the selected images
-     * @param datasetPK the primary key of the dataset where the images belong
      * @param label the new category to set for the images
      */
-    private void addCategories(int datasetPK, String label)
+    private void addCategories(String label)
     {
         Thread s = new Thread(() -> {
             try {
                 //retrieve the image file names and make an API request to assign the new label to each of the images
                 ArrayList<String> imageFileNames = (ArrayList<String>) selectedImages.stream().map(i ->  i.getImageFileName()).collect(Collectors.toList());
-                ImageClassificationDatasets action = Utility.getClient().action(ImageClassificationDatasets.class);
                 action.addCategories(datasetPK, imageFileNames, Arrays.asList(label));
                 return;
             }
