@@ -117,7 +117,7 @@
         android:layout_marginBottom="50dp"
         android:background="@drawable/button_design"
         android:padding="10dp"
-        android:text="Save &amp; Exit"
+        android:text="Login"
         android:textSize="@dimen/buttonTextSize"
         android:layout_below="@id/themeSwitch"/>
 

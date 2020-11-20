@@ -1,4 +1,4 @@
-package io.github.waikato_ufdl.ui.gallery;
+package io.github.waikato_ufdl.ui.manage;
 
 import android.content.Context;
 import android.graphics.Color;

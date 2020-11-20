@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This is a class that will be used to store and retrieve user settings from shared storage
@@ -33,9 +34,6 @@ public class Utility {
 
     private static HashMap<Integer, ArrayList<ClassifiedImage>> imagesCollection = new HashMap<>();
     private static Client client;
-    private static final int NUMBER_OF_THREADS = 15;
-    public static final ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-    public static final ExecutorService clientConnection = Executors.newFixedThreadPool(1);
 
 
     public static SharedPreferences getPrefs(Context context) {
@@ -180,34 +178,37 @@ public class Utility {
      * handle the storage and retrieval of the access and refresh tokens which will be used in API calls.
      */
     public static void connectToServer() {
-
         System.out.println((loadServerURL() + " " + loadPassword() + " " + loadPassword()));
-      client = new Client(loadServerURL(), loadUsername(), loadPassword(), new MemoryOnlyStorage());
+        client = new Client(loadServerURL(), loadUsername(), loadPassword(), new MemoryOnlyStorage());
 
-      clientConnection.execute(() -> {
-          try {
-              DBManager dbManager = new DBManager(context);
-              System.out.println("\nLicenses:");
-              for (Licenses.License license: client.licenses().list()) {
-                  System.out.println(license);
-                  Log.d("connectToServer: ", "INSERTING LICENSE INTO SQLITE");
-                  dbManager.insertLicenses(license.getPK(), license.getName());
-              }
+        ExecutorService clientConnection = Executors.newSingleThreadExecutor();
 
-              System.out.println("\nProjects:");
-              for (Projects.Project project: client.projects().list()) {
-                  System.out.println(project);
-                  Log.d("connectToServer: ", "INSERTING PROJECT INTO SQLITE");
-                  dbManager.insertProjects(project.getPK(), project.getName());
-              }
+        clientConnection.execute(() -> {
+            try {
+                DBManager dbManager = new DBManager(context);
+                System.out.println("\nLicenses:");
+                for (Licenses.License license : client.licenses().list()) {
+                    System.out.println(license);
+                    Log.d("connectToServer: ", "INSERTING LICENSE INTO SQLITE");
+                    dbManager.insertLicenses(license.getPK(), license.getName());
+                }
 
-          }catch (IllegalStateException e) {
+                System.out.println("\nProjects:");
+                for (Projects.Project project : client.projects().list()) {
+                    System.out.println(project);
+                    Log.d("connectToServer: ", "INSERTING PROJECT INTO SQLITE");
+                    dbManager.insertProjects(project.getPK(), project.getName());
+                }
 
-              Log.d("connectToServer: ","Please check your username, password and server URL details in settings");
-          } catch (Exception e) {
+            } catch (IllegalStateException e) {
 
-          }
-      });
+                Log.d("connectToServer: ", "Please check your username, password and server URL details in settings");
+            } catch (Exception e) {
+
+            }
+        });
+
+        clientConnection.shutdown();
     }
 
     /**
@@ -230,12 +231,32 @@ public class Utility {
     }
 
     /**
-     * Method to check whether tokens are null or not
+     * Method to check there is a connection established between the device and the server by trying to retrieve data via an API request
      * @return
      */
-    public static boolean authenticationFailed()
-    {
-        String[] data = client.toString().split(" ");
-        return data[data.length-1].equals("access=") | data[data.length-1].equals("tokens=null");
+    public static boolean isConnected(){
+        // create the shared boolean variable
+        final AtomicBoolean b = new AtomicBoolean();
+
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    boolean val = (client.licenses().list().size() > 0) ? true : false;
+                    b.set(val);
+                } catch (Exception ex) {
+                    b.set(false);
+                }
+            }
+        });
+        t.start();
+
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        //return the boolean value
+        return b.get();
     }
 }

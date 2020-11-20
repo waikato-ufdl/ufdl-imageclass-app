@@ -1,4 +1,4 @@
-package io.github.waikato_ufdl.ui.gallery;
+package io.github.waikato_ufdl.ui.manage;
 
 import android.content.Context;
 import android.os.Build;
@@ -14,13 +14,11 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -43,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class GalleryFragment extends Fragment {
+public class ManageFragment extends Fragment {
     private ImageButton btnNewDataset;
     private DBManager dbManager;
     private EditText datasetName, datasetDescription, datasetTags;
@@ -73,7 +71,7 @@ public class GalleryFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        View root = inflater.inflate(R.layout.fragment_gallery, container, false);
+        View root = inflater.inflate(R.layout.fragment_manage, container, false);
 
         btnNewDataset = root.findViewById(R.id.fab_add_dataset);
         btnNewDataset.setOnClickListener(view -> {
@@ -105,7 +103,6 @@ public class GalleryFragment extends Fragment {
 
     /**
      * Method to check whether the required settings have been set, if not, move to settings fragment
-     *
      * @param view
      */
     public void checkSettings(View view) {
@@ -115,10 +112,44 @@ public class GalleryFragment extends Fragment {
             Navigation.findNavController(view).navigate(R.id.action_nav_gallery_to_settingsFragment);
         } else {
             //only continue if the client is connected to the API
-            if (!Utility.authenticationFailed()) {
+            if (Utility.isConnected()) {
                 displayDatasets(view);
             }
+            else
+            {
+                displayConnectionFailedPopup(view);
+            }
         }
+    }
+
+    /**
+     * Method to display a connection failure popup with one button leading to settings and the other to close the popup.
+     * @param v
+     */
+    public void displayConnectionFailedPopup(View v)
+    {
+        new SweetAlertDialog(getContext(), SweetAlertDialog.ERROR_TYPE)
+                .setTitleText("Connection Failed")
+                .setContentText("The connection has failed. Please check your login details and try again.")
+                .setCancelText("OK")
+                .setConfirmText("Go to Settings")
+
+                //clicking this button will navigate the user to the settings screen
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        sweetAlertDialog.dismissWithAnimation();
+                        Navigation.findNavController(v).navigate(R.id.action_nav_gallery_to_settingsFragment);
+                    }
+                })
+                //this button will just close the popup
+                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        sweetAlertDialog.dismissWithAnimation();
+                    }
+                })
+                .show();
     }
 
     /**

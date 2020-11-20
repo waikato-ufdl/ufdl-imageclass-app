@@ -1,9 +1,11 @@
 package io.github.waikato_ufdl.ui.settings;
+import android.graphics.Color;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import android.os.Handler;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.TextWatcher;
@@ -14,27 +16,24 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.Toast;
 
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.github.waikato_ufdl.R;
 
 import io.github.waikato_ufdl.R;
 
 
 public class SettingsFragment extends Fragment {
-    Button buttonToMain;
+    Button buttonToMain, buttonTestConnection;
     Switch themeSwitch;
-    EditText username;
-    EditText password;
-    EditText serverURL;
-    String prevUsername;
-    String prevPassword;
-    String prevServerURL;
+    EditText username, password,serverURL;
+    String prevUsername, prevPassword, prevServerURL;
 
-    public SettingsFragment()
-    {
-
-    }
-
+    public SettingsFragment() { }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,7 +59,7 @@ public class SettingsFragment extends Fragment {
         serverURL = (EditText) v.findViewById(R.id.URL);
 
         //load any saved settings from sharedPreferences
-        retrieveSavedSettings();
+        retrieveSavedSettings(true);
 
         //add text changed listener to ensure that the HTTP:// is set as the prefix
         serverURL.addTextChangedListener(new TextWatcher() {
@@ -77,12 +76,12 @@ public class SettingsFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 if(!s.toString().startsWith("http://")){
-                    serverURL.setText("http://");
+                    serverURL.setText("http://" + s);
                     Selection.setSelection(serverURL.getText(), serverURL.getText().length());
             }
         }});
 
-        if(Utility.loadDarkModeState() == true)
+        if(Utility.loadDarkModeState())
         {
             themeSwitch.setChecked(true);
         }
@@ -112,18 +111,11 @@ public class SettingsFragment extends Fragment {
                 boolean valid = checkDetailsEntered();
 
                 //only exit if the required fields are not empty & also check if the URL is valid
-                if(valid & Utility.isValidURL(serverURL.getText().toString().trim())) {
+                if (valid & Utility.isValidURL(serverURL.getText().toString().trim())) {
+                    //save user details and then try to establish a connection with the server
+                    login(v);
 
-                    //if the user has changed their details
-                    if(detailsHaveChanged()) {
-                        //save user details before exiting & also establish a connection to the API using the settings information
-                        saveSettings();
-                    }
-
-                    Navigation.findNavController(view).popBackStack();
-                }
-                else
-                {
+                } else {
                     //if the URL is invalid, inform the user about the issue
                     serverURL.setError("Invalid URL");
                 }
@@ -134,25 +126,111 @@ public class SettingsFragment extends Fragment {
         return v;
     }
 
-    public boolean detailsHaveChanged()
+    /**
+     * This method will display a loading animation while attempting to login and test the connection to the server
+     * @param v
+     */
+    public void login(View v)
     {
-        return (!prevUsername.equals(username.getText().toString().trim())|
-                !prevPassword.equals(password.getText().toString().trim())|
-                !prevServerURL.equals(serverURL.getText().toString().trim()));
+        //display loading dialog
+        SweetAlertDialog loadingDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
+        loadingDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        loadingDialog.setTitleText("Logging in...");
+        loadingDialog.setCancelable(false);
+        loadingDialog.show();
+
+        //after 1.5 seconds dismiss the loading animation and attempt to connect to server using login details
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadingDialog.dismissWithAnimation();
+                connectAndTestConnection(v);
+            }
+        }, 1500);
     }
 
     /**
-     * Method to retrieve a user's stored settings & display them to the EditTexts
+     * A method to connect to the server & then proceed to test the connection
+     * @param view
      */
-    public void retrieveSavedSettings()
+    public void connectAndTestConnection(View view)
+    {
+        saveSettings();
+        Thread t = new Thread(() ->
+        {
+            boolean connected;
+            try {
+                Utility.connectToServer();
+                connected =  (Utility.getClient().licenses().list().size() > 0) ? true : false;
+            } catch (Exception ex) {
+                connected = false;
+            }
+
+            boolean finalConnected = connected;
+            getActivity().runOnUiThread(() -> showConnectionResultDialog(view, finalConnected));
+
+        });
+        t.start();
+    }
+
+    /**
+     * Method to display a dialog informing the user whether the connection has been established or failed
+     * @param view
+     * @param connectionSuccessful boolean which represents if a connection is successful (true = success, false = failed)
+     */
+    public void showConnectionResultDialog(View view, boolean connectionSuccessful)
+    {
+        //if the connection is successful, display a success dialog
+        if(connectionSuccessful)
+        {
+            new SweetAlertDialog(getContext(), SweetAlertDialog.SUCCESS_TYPE)
+                    .setTitleText("Connection Successful")
+                    .setContentText("You have successfully established a connection to the server!")
+                    .setConfirmText("OK")
+                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                            //when the user clicks "OK" they will be taken back to the previous screen they were on prior to settings
+                            sweetAlertDialog.dismissWithAnimation();
+                            Navigation.findNavController(view).popBackStack();
+                        }
+                    })
+                    .show();
+        }
+        else
+        {
+            //display error dialog informing users to check their login details
+            new SweetAlertDialog(getContext(), SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Connection Failed")
+                    .setContentText("The connection has failed. Please check your login details and try again.")
+                    .setConfirmText("OK")
+                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                            //close the dialog but stay on settings screen
+                            sweetAlertDialog.dismissWithAnimation();
+                        }
+                    })
+                    .show();
+        }
+    }
+
+    /**
+     * Method to retrieve a user's stored settings & optionally display them to the EditTexts
+     * @param setFields boolean value indicating whether to set the text fields with the previous user details
+     */
+    public void retrieveSavedSettings(boolean setFields)
     {
         prevUsername = (Utility.loadUsername() != null) ? Utility.loadUsername() : "";
         prevPassword = (Utility.loadPassword() != null) ? Utility.loadPassword() : "";
         prevServerURL = (Utility.loadServerURL() != null) ? Utility.loadServerURL() : "";
 
-        username.setText(prevUsername);
-        password.setText(prevPassword);
-        serverURL.setText(prevServerURL);
+        if(setFields) {
+            username.setText(prevUsername);
+            password.setText(prevPassword);
+            serverURL.setText(prevServerURL);
+        }
     }
 
     /**
@@ -163,7 +241,6 @@ public class SettingsFragment extends Fragment {
         Utility.saveUsername(username.getText().toString().trim());
         Utility.savePassword(password.getText().toString().trim());
         Utility.saveServerURL(serverURL.getText().toString().trim());
-        Utility.connectToServer();
     }
 
     /**
@@ -203,18 +280,10 @@ public class SettingsFragment extends Fragment {
         return editText.getText().toString().trim().length() <= minLength;
     }
 
-
     /**
      * a method to restart the current fragment
      */
     public void restartActivity() {
-        /*
-        startActivity(new Intent(getContext(), MainActivity.class));
-        getActivity().finish();
-         */
-
         getActivity().recreate();
-
     }
-
 }
