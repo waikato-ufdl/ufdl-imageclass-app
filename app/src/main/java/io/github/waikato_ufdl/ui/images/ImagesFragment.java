@@ -410,12 +410,9 @@ public class ImagesFragment extends Fragment {
                 public void onClick(View v) {
                     String informativeMessage;
 
-                    if(allLabelsFilled(viewPager.getAdapter().getItemCount()))
-                    {
+                    if (allLabelsFilled(viewPager.getAdapter().getItemCount())) {
                         informativeMessage = "Save classified images?";
-                    }
-                    else
-                    {
+                    } else {
                         informativeMessage = "All labels have not been filled out. Any images with empty labels will be labeled as 'unlabelled'. Are you sure you wish to save these images?";
                     }
 
@@ -442,8 +439,7 @@ public class ImagesFragment extends Fragment {
                                                 @Override
                                                 public void onClick(SweetAlertDialog sweetAlertDialog) {
                                                     //if the recycler view has less images than the page_limit, load in the same amount of images that have been deleted
-                                                    if(images.size() < PAGE_LIMIT)
-                                                    {
+                                                    if (images.size() < PAGE_LIMIT) {
                                                         reload();
                                                     }
 
@@ -452,7 +448,6 @@ public class ImagesFragment extends Fragment {
 
                                                     //when the user clicks ok, dismiss the popup
                                                     sDialog.dismissWithAnimation();
-
                                                     dialog.dismiss();
                                                 }
                                             })
@@ -467,7 +462,6 @@ public class ImagesFragment extends Fragment {
                                 }
                             })
                             .show();
-
                 }
             });
 
@@ -506,7 +500,7 @@ public class ImagesFragment extends Fragment {
 
             ExecutorService executor = Executors.newSingleThreadExecutor();
 
-            executor.execute(() -> {;
+            executor.execute(() -> {
                 try{
                     //add image file + label to the backend
                     action.addFile(datasetKey, finalImageFile, finalImageFile.getName());

@@ -14,10 +14,16 @@ import io.github.waikato_ufdl.ui.images.ClassifiedImage;
 import com.github.waikatoufdl.ufdl4j.Client;
 import com.github.waikatoufdl.ufdl4j.action.Licenses;
 import com.github.waikatoufdl.ufdl4j.action.Projects;
+import com.github.waikatoufdl.ufdl4j.auth.Authentication;
 import com.github.waikatoufdl.ufdl4j.auth.MemoryOnlyStorage;
+import com.github.waikatoufdl.ufdl4j.auth.TokenStorageHandler;
+import com.github.waikatoufdl.ufdl4j.auth.Tokens;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -34,7 +40,6 @@ public class Utility {
 
     private static HashMap<Integer, ArrayList<ClassifiedImage>> imagesCollection = new HashMap<>();
     private static Client client;
-
 
     public static SharedPreferences getPrefs(Context context) {
         return context.getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
@@ -172,6 +177,34 @@ public class Utility {
         return getPrefs(context).getString("URL", null);
     }
 
+    public static void storeTokens(HashMap tokens)
+    {
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(tokens);
+        String accountDetails = loadServerURL()+"*"+loadUsername()+"*"+loadPassword();
+        editor.putString(accountDetails,json);
+        editor.apply();
+    }
+
+    public static HashMap<String,Tokens>  loadTokens()
+    {
+        SharedPreferences prefs = getPrefs(context);
+        Gson gson = new Gson();
+        //get from shared prefs in gson and convert to maps again
+        String storedHashMapString = prefs.getString("tokens",null);
+        String accountDetails = loadServerURL()+"*"+loadUsername()+"*"+loadPassword();
+        if(storedHashMapString!=null) {
+            java.lang.reflect.Type type = new TypeToken<HashMap<String, Tokens>>() {
+            }.getType();
+
+            //Get the hashMap
+            HashMap<String, Tokens> map = gson.fromJson(storedHashMapString, type);
+            return map;
+        }
+
+        return null;
+    }
 
     /**
      * Method to connect to the UFDL backend using the user's details which are stored in settings.  Need to also provide a tokenStorageHandler to
@@ -179,7 +212,8 @@ public class Utility {
      */
     public static void connectToServer() {
         System.out.println((loadServerURL() + " " + loadPassword() + " " + loadPassword()));
-        client = new Client(loadServerURL(), loadUsername(), loadPassword(), new MemoryOnlyStorage());
+        client = new Client(loadServerURL(), loadUsername(), loadPassword(), new tokenStorageHandler());
+
 
         ExecutorService clientConnection = Executors.newSingleThreadExecutor();
 

@@ -1,10 +1,10 @@
 package io.github.waikato_ufdl.ui.settings;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-
 import android.os.Handler;
 import android.text.Editable;
 import android.text.Selection;
@@ -16,19 +16,13 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
-import android.widget.Toast;
-
-import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
-
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.github.waikato_ufdl.R;
-
-import io.github.waikato_ufdl.R;
+import okhttp3.internal.Util;
 
 
 public class SettingsFragment extends Fragment {
-    Button buttonToMain, buttonTestConnection;
+    Button buttonToMain;
     Switch themeSwitch;
     EditText username, password,serverURL;
     String prevUsername, prevPassword, prevServerURL;
@@ -113,7 +107,8 @@ public class SettingsFragment extends Fragment {
                 //only exit if the required fields are not empty & also check if the URL is valid
                 if (valid & Utility.isValidURL(serverURL.getText().toString().trim())) {
                     //save user details and then try to establish a connection with the server
-                    login(v);
+                    saveSettings();
+                    login();
 
                 } else {
                     //if the URL is invalid, inform the user about the issue
@@ -128,58 +123,57 @@ public class SettingsFragment extends Fragment {
 
     /**
      * This method will display a loading animation while attempting to login and test the connection to the server
-     * @param v
      */
-    public void login(View v)
+    public void login()
     {
-        //display loading dialog
-        SweetAlertDialog loadingDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
-        loadingDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-        loadingDialog.setTitleText("Logging in...");
-        loadingDialog.setCancelable(false);
-        loadingDialog.show();
 
-        //after 1.5 seconds dismiss the loading animation and attempt to connect to server using login details
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        new AsyncTask<Void, Void, Void>() {
+            SweetAlertDialog loadingDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
+            Boolean connectionSuccessful;
+
             @Override
-            public void run() {
-                loadingDialog.dismissWithAnimation();
-                connectAndTestConnection(v);
+            protected void onPreExecute() {
+                super.onPreExecute();
+
+                //display loading dialog
+                loadingDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+                loadingDialog.setTitleText("Logging in...");
+                loadingDialog.setCancelable(false);
+                loadingDialog.show();
+
             }
-        }, 1500);
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                connectionSuccessful = connectAndTestConnection();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                loadingDialog.dismissWithAnimation();
+                showConnectionResultDialog(connectionSuccessful);
+
+            }
+        }.execute();
     }
 
     /**
      * A method to connect to the server & then proceed to test the connection
-     * @param view
+     * @return returns true if connection is successful
      */
-    public void connectAndTestConnection(View view)
+    public boolean connectAndTestConnection()
     {
-        saveSettings();
-        Thread t = new Thread(() ->
-        {
-            boolean connected;
-            try {
-                Utility.connectToServer();
-                connected =  (Utility.getClient().licenses().list().size() > 0) ? true : false;
-            } catch (Exception ex) {
-                connected = false;
-            }
-
-            boolean finalConnected = connected;
-            getActivity().runOnUiThread(() -> showConnectionResultDialog(view, finalConnected));
-
-        });
-        t.start();
+        Utility.connectToServer();
+        return Utility.isConnected();
     }
 
     /**
      * Method to display a dialog informing the user whether the connection has been established or failed
-     * @param view
      * @param connectionSuccessful boolean which represents if a connection is successful (true = success, false = failed)
      */
-    public void showConnectionResultDialog(View view, boolean connectionSuccessful)
+    public void showConnectionResultDialog(boolean connectionSuccessful)
     {
         //if the connection is successful, display a success dialog
         if(connectionSuccessful)
@@ -193,7 +187,7 @@ public class SettingsFragment extends Fragment {
                         public void onClick(SweetAlertDialog sweetAlertDialog) {
                             //when the user clicks "OK" they will be taken back to the previous screen they were on prior to settings
                             sweetAlertDialog.dismissWithAnimation();
-                            Navigation.findNavController(view).popBackStack();
+                            Navigation.findNavController(getView()).popBackStack();
                         }
                     })
                     .show();

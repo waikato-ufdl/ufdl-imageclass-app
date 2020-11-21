@@ -1,8 +1,11 @@
 package io.github.waikato_ufdl.ui.manage;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -79,7 +82,7 @@ public class ManageFragment extends Fragment {
             if(actionMode != null) {
                 actionMode.finish();
             }
-            //then proceed display dataset creation window
+            //then proceed to initiate dataset creation window
             initiateDatasetWindow(view, -1); });
 
         dbManager = new DBManager(getContext());
@@ -91,14 +94,18 @@ public class ManageFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //check that the user settings are not empty
-        checkSettings(view);
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.datasets_recyclerView);
-        adapter = new datasetRecyclerAdapter(getContext(), new ArrayList<>());
-        RecyclerView.LayoutManager lm = new LinearLayoutManager(getContext());
-        mRecyclerView.setLayoutManager(lm);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(adapter);
+        Handler handler = new Handler();
+        handler.postDelayed(() ->
+        {
+            //check that the user settings are not empty
+            checkSettings(view);
+            mRecyclerView = (RecyclerView) view.findViewById(R.id.datasets_recyclerView);
+            adapter = new datasetRecyclerAdapter(getContext(), new ArrayList<>());
+            RecyclerView.LayoutManager lm = new LinearLayoutManager(getContext());
+            mRecyclerView.setLayoutManager(lm);
+            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+            mRecyclerView.setAdapter(adapter);
+        }, 500);
     }
 
     /**
@@ -115,8 +122,7 @@ public class ManageFragment extends Fragment {
             if (Utility.isConnected()) {
                 displayDatasets(view);
             }
-            else
-            {
+            else {
                 displayConnectionFailedPopup(view);
             }
         }
