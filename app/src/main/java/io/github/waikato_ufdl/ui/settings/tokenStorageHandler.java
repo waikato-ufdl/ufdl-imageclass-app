@@ -54,7 +54,6 @@ public class tokenStorageHandler extends AbstractLoggingObject implements TokenS
 
             getLogger().info("Storing tokens for: " + url);
             tokensMap.put(url, tokens);
-            System.out.println("HELLLOOOO");
             Utility.storeTokens((HashMap) tokensMap);
         }
 

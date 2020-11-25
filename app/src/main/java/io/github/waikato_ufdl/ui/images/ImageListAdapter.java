@@ -14,91 +14,77 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
-
 import io.github.waikato_ufdl.MainActivity;
-import io.github.waikato_ufdl.R;
-
 import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.ui.settings.Utility;
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
-import com.github.waikatoufdl.ufdl4j.examples.ManagingImageClassificationDatasets;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-import static com.google.gson.reflect.TypeToken.get;
-
 public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.ViewHolder> {
-    private Fragment fragment;
-    private Context mContext;
-    private LayoutInflater mInflater;
-    private ArrayList<ClassifiedImage> images;
+    private ImagesFragment fragment;
+    private Context context;
+    private LayoutInflater inflater;
+    private ArrayList<ClassifiedImage> imageList;
     private ArrayList<ClassifiedImage> selectedImages;
     private boolean isActionMode;
     ImagesFragmentViewModel imagesViewModel;
     ImageClassificationDatasets action;
-    int datasetPK;
+    private int datasetPK;
 
 
     /**
-     * Constructor for image list adapater
-     * @param frag the images fragment
+     * Constructor for image list adapter
+     * @param fragment the images fragment
      * @param context the context
      * @param imageList the list of images within a particular data set
-     * @param act  the action which will be used to perform API requests specifically on Image Classification datasets
-     * @param dsPK the particular dataset's primary key
+     * @param action  the action which will be used to perform API requests specifically on Image Classification datasets
+     * @param datasetPK the particular dataset's primary key
      */
-    public ImageListAdapter(Fragment frag, Context context, ArrayList<ClassifiedImage> imageList, ImageClassificationDatasets act, int dsPK)
+    public ImageListAdapter(ImagesFragment fragment, Context context, ArrayList<ClassifiedImage> imageList, ImageClassificationDatasets action, int datasetPK)
     {
-        fragment = frag;
-        mContext = context;
-        mInflater = LayoutInflater.from(context);
-        images = imageList;
+        this.fragment = fragment;
+        this.context = context;
+        this.inflater = LayoutInflater.from(context);
+        this.imageList = imageList;
+        this.action = action;
+        this.datasetPK = datasetPK;
+
         isActionMode = false;
         selectedImages =  new ArrayList<>();
-        action = act;
-        datasetPK = dsPK;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         //initialise view
-        View view = mInflater.inflate(R.layout.image_display, parent, false);
+        View view = inflater.inflate(R.layout.image_display, parent, false);
 
         //initialise view model
         imagesViewModel =  ViewModelProviders.of(fragment).get(ImagesFragmentViewModel.class);
         return new ViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        ClassifiedImage image = images.get(position);
+        ClassifiedImage image = imageList.get(position);
 
         if(image != null)
         {
             //set the classification label
             holder.classification.setText(image.getClassification());
 
-            Glide.with(mContext).clear(holder.image);
+            Glide.with(context).clear(holder.image);
 
             //use glide to load image into the image view for display
-            Glide.with(mContext)
+            Glide.with(context)
                     .asBitmap()
                     .load(image.getImageArray())
                     .placeholder(R.drawable.progress_animation)
@@ -128,146 +114,111 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
         }
 
         //on long press of an image we want to invoke the action mode
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                //if action mode in not enabled, initialise action mode
-                if(!isActionMode) {
-                    //initialise Action mode
-                    ActionMode.Callback callback = new ActionMode.Callback() {
-                        @Override
-                        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                            //Initialise menu inflater & inflate menu
-                            MenuInflater menuInflater = mode.getMenuInflater();
-                            menuInflater.inflate(R.menu.context_menu, menu);
-                            return true;
+        holder.itemView.setOnLongClickListener(v -> {
+            //if action mode in not enabled, initialise action mode
+            if(!isActionMode) {
+                //initialise Action mode
+                ActionMode.Callback callback = new ActionMode.Callback() {
+
+                    /** show the action mode menu */
+                    @Override
+                    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                        //Initialise menu inflater & inflate menu
+                        MenuInflater menuInflater = mode.getMenuInflater();
+                        menuInflater.inflate(R.menu.context_menu, menu);
+                        return true;
+                    }
+
+                    /** setup the action mode */
+                    @Override
+                    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                        //When action mode is preparing
+                        isActionMode = true;
+                        onImageSelect(holder);
+
+                        //Whenever, a user selects/deselects an item
+                        imagesViewModel.getText().observe(fragment, s -> {
+                            //update the action bar title to show the number of selected images
+                            mode.setTitle(String.format("%s Selected", s));
+                        });
+
+                        return true;
+                    }
+
+                    /** A method which runs a particular operation based on the menu item pressed by the user */
+                    @Override
+                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                        //handles the click of an action mode item
+
+                        //get menu id
+                        int id = item.getItemId();
+
+                        //check which menu item was clicked
+                        switch (id)
+                        {
+                            case R.id.action_delete:
+                                //when user presses delete
+                                deleteConfirmation(mode);
+                                break;
+
+                            case R.id.action_relabel:
+                                //when the user presses edit
+                                confirmEditCategories(mode);
+                                break;
                         }
 
-                        @Override
-                        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                            //When action mode is preparing
-                            isActionMode = true;
-                            onImageSelect(holder);
+                        return false;
+                    }
 
-                            //Whenever, a user selects/deselects an item
-                            imagesViewModel.getText().observe(fragment, new Observer<String>() {
-                                @Override
-                                public void onChanged(String s) {
-                                    //update the action bar title to show the number of selected images
-                                    mode.setTitle(String.format("%s Selected", s));
-                                }
-                            });
+                    /** This method runs when the action mode is ended*/
+                    @Override
+                    public void onDestroyActionMode(ActionMode mode) {
+                        //when action mode is destroyed
+                        isActionMode = false;
 
-                            return true;
+                        //go through each selected image & update it's isSelected to false
+                        for (ClassifiedImage image1 : selectedImages) {
+                            image1.setSelected(false);
                         }
 
-                        @Override
-                        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                            //handles the click of an action mode item
-
-                            //get menu id
-                            int id = item.getItemId();
-
-                            //check which menu item was clicked
-                            switch (id)
-                            {
-                                case R.id.action_delete:
-                                    //when user presses delete
-                                    deleteConfirmation(mode);
-                                    break;
-
-                                case R.id.action_relabel:
-                                    //when the user presses edit
-                                    confirmEditCategories(mode);
-                                    break;
-                            }
-
-                            return false;
-                        }
-
-                        @Override
-                        public void onDestroyActionMode(ActionMode mode) {
-                            //when action mode is destroyed
-                            isActionMode = false;
-
-                            //go through each selected image & update it's isSelected to false
-                            for (ClassifiedImage image : selectedImages) {
-                                image.setSelected(false);
-                            }
-
-                            //clear selected images list & notify adapter
-                            selectedImages.clear();
-                            notifyDataSetChanged();
-                        }
-                    };
-                    //Start action mode
-                    ((MainActivity) v.getContext()).startActionMode(callback);
-                }
-                else
-                {
-                    //when action mode is already enabled call the onImageSelect method
-                    onImageSelect(holder);
-                }
-                return true;
+                        //clear selected images list & notify adapter
+                        selectedImages.clear();
+                        notifyDataSetChanged();
+                    }
+                };
+                //Start action mode
+                ((MainActivity) v.getContext()).startActionMode(callback);
             }
+            else
+            {
+                //when action mode is already enabled call the onImageSelect method
+                onImageSelect(holder);
+            }
+            return true;
         });
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //if action mode is enabled
-                if(isActionMode)
-                {
-                    //if a user selects an image,
-                    onImageSelect(holder);
-                }
-                else
-                {
-                    //an image has been selected (but not in selection mode)
-                    Log.v("TAG", holder.getAdapterPosition() + " ");
-                }
+        holder.itemView.setOnClickListener(v -> {
+            //if action mode is enabled
+            if(isActionMode)
+            {
+                //if a user selects an image,
+                onImageSelect(holder);
+            }
+            else
+            {
+                //an image has been selected (but not in selection mode)
+                Log.v("TAG", holder.getAdapterPosition() + " ");
             }
         });
-    }
-
-    /**
-     * Method to delete all the selected images from recycler view & backend
-     */
-    public void deleteImages()
-    {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-
-        for(ClassifiedImage image : selectedImages)
-        {
-            //remove image from list
-            images.remove(image);
-
-
-            //make an API request to delete an image
-            executor.execute(()-> {
-                try {
-                    //delete image file pk images categories
-                    action.deleteFile(datasetPK, image.getImageFileName());
-                    Utility.saveImageList(datasetPK, images);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            });
-
-        }
-        notifyDataSetChanged();
-        executor.shutdown();
     }
 
     /**
      * Method to handle image selection/deselection
-     * @param holder
+     * @param holder the view holder
      */
     private void onImageSelect(ViewHolder holder) {
         //set selected item value
-        ClassifiedImage image = images.get(holder.getAdapterPosition());
+        ClassifiedImage image = imageList.get(holder.getAdapterPosition());
 
         //if an image has been selected
         if(!image.isSelected())
@@ -292,8 +243,9 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
 
     @Override
     public int getItemCount() {
-        return images.size();
+        return imageList.size();
     }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder
     {
@@ -317,166 +269,54 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
      */
     public void deleteConfirmation(ActionMode mode)
     {
-        new SweetAlertDialog(mContext, SweetAlertDialog.WARNING_TYPE)
+        new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText("Are you sure?")
                 .setContentText("You won't be able to recover the image(s) after deletion")
                 .setConfirmText("Delete")
-                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sDialog) {
-                        //if a user accepts the deletion, delete all the selected images
-                        deleteImages();
+                .setConfirmClickListener(sDialog -> {
+                    sDialog.dismissWithAnimation();
 
-                        //show a successful deletion popup
-                        sDialog
-                                .setTitleText("Deleted!")
-                                .setContentText("The selected images have been deleted!")
-                                .setConfirmText("OK")
-                                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                    @Override
-                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-
-                                        //set the data set modified flag to true in the image fragment
-                                        ((ImagesFragment) fragment).setDatasetModified(true);
-
-                                        //if the recycler view has less images than the page_limit, load in the same amount of images that have been deleted
-                                        if(images.size() > 0 && images.size() < ((ImagesFragment) fragment).PAGE_LIMIT)
-                                        {
-                                            Thread t = new Thread(() -> {((ImagesFragment) fragment).processImages(); });
-                                            t.start();
-                                        }
-
-                                        //when the user clicks ok, dismiss the popup
-                                        sDialog.dismissWithAnimation();
-                                        //finish action mode once a user has confirmed the deletion of images, else keep users in selection mode
-                                        mode.finish();
-                                    }
-                                })
-                                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
-                    }
+                    //delete the selected images
+                    DeleteTask deleteImages = new DeleteTask(fragment, context, selectedImages, datasetPK, action, mode);
+                    deleteImages.execute();
                 })
-                .setCancelButton("Cancel", new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sDialog) {
-                        //if the user cancels deletion close the popup but leave them on the selection mode
-                        sDialog.dismissWithAnimation();
-                    }
+                .setCancelButton("Cancel", sDialog -> {
+                    //if the user cancels deletion close the popup but leave them on the selection mode
+                    sDialog.dismissWithAnimation();
                 })
                 .show();
     }
 
 
+    /**
+     * A method which displays a confirmation dialog prompting the user to confirm the action of reclassifying images
+     * @param mode the action mode
+     */
     public void confirmEditCategories(ActionMode mode) {
-        final EditText editText = new EditText(mContext);
-                new SweetAlertDialog(mContext, SweetAlertDialog.WARNING_TYPE)
+        final EditText editText = new EditText(context);
+                new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText("Reclassify all selected images as: ")
                 .setConfirmText("Reclassify")
                 .setCustomView(editText)
-                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                        String newClassification = editText.getText().toString().trim();
+                .setConfirmClickListener(sweetAlertDialog -> {
+                    String newClassification = editText.getText().toString().trim();
 
-                        //if a value has been entered
-                        if(newClassification.length() > 0) {
-                            //reclassify all selected images
-                            editImageCategories(newClassification);
+                    //if a value has been entered
+                    if(newClassification.length() > 0) {
+                        sweetAlertDialog.dismissWithAnimation();
 
-                            //show a success popup
-                            sweetAlertDialog
-                                    .setTitleText("Success!")
-                                    .setContentText("The selected images have been reclassified as: " + newClassification)
-                                    .setConfirmText("OK")
-                                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                        @Override
-                                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                            //when the user clicks ok, dismiss the popup
-                                            sweetAlertDialog.dismissWithAnimation();
-                                            //finish action mode once a user has confirmed the reclassification
-                                            mode.finish();
-                                        }
-                                    })
-                                    .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
-                        }
-                        else
-                            editText.setError("Please enter a classification label");
+                        //reclassify selected images
+                        ReclassifyTask editCategoriesTask = new ReclassifyTask(fragment, context, selectedImages, newClassification, datasetPK, action, mode);
+                        editCategoriesTask.execute();
                     }
+                    else
+                        editText.setError("Please enter a classification label");
                 })
-                .setCancelButton("Cancel", new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sDialog) {
-                        //if the user clicks cancel close the popup but leave them on the selection mode
-                        sDialog.dismissWithAnimation();
-                    }
+                .setCancelButton("Cancel", sDialog -> {
+                    //if the user clicks cancel close the popup but leave them on the selection mode
+                    sDialog.dismissWithAnimation();
                 })
                 .show();
-    }
-
-    /**
-     * Method to edit image categories locally and on the API
-     * @param label the new classification label for the selected images
-     */
-    private void editImageCategories(String label)
-    {
-        //first go through and remove the category label for each of the images & then relabel them
-        removeCurrentCategories(label);
-        addCategories(label);
-
-        //set the data set modified flag to true in the image fragment
-        ((ImagesFragment) fragment).setDatasetModified(true);
-    }
-
-    /**
-     * A method to remove the current labels for the selected images
-     * @param label the new classification label to set for the selected images
-     */
-    private void removeCurrentCategories(String label)
-    {
-        for(ClassifiedImage image : selectedImages)
-        {
-            Thread t = new Thread(() -> {
-                try {
-                    System.out.println(image.getClassification());
-
-                    //make an API request to remove current the categories for each image
-                    action.removeCategories(datasetPK, Arrays.asList(image.getImageFileName()), Arrays.asList(image.getClassification()));
-
-                    //reclassify all the selected images locally with the user defined label
-                    image.setClassificationLabel(label);
-                    Utility.saveImageList(datasetPK, images);
-                    return;
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            });
-            t.start();
-
-        }
-        notifyDataSetChanged();
-    }
-
-    /**
-     * A method to add categories to each of the selected images
-     * @param label the new category to set for the images
-     */
-    private void addCategories(String label)
-    {
-        Thread s = new Thread(() -> {
-            try {
-                //retrieve the image file names and make an API request to assign the new label to each of the images
-                ArrayList<String> imageFileNames = (ArrayList<String>) selectedImages.stream().map(i ->  i.getImageFileName()).collect(Collectors.toList());
-                action.addCategories(datasetPK, imageFileNames, Arrays.asList(label));
-                return;
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        });
-
-        s.start();
     }
 
     /**
@@ -485,8 +325,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
      */
     public void searchCategory(ArrayList<ClassifiedImage> list)
     {
-        images = list;
+        imageList = list;
         notifyDataSetChanged();
     }
-
 }

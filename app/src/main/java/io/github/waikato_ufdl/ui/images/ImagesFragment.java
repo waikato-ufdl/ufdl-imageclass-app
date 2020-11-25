@@ -6,7 +6,6 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
@@ -15,7 +14,6 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -33,13 +31,9 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
-
-import io.github.waikato_ufdl.R;
-
 import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.ui.UriUtils;
 import io.github.waikato_ufdl.ui.settings.Utility;
-
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator;
 import com.zhihu.matisse.Matisse;
@@ -47,18 +41,12 @@ import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
 import com.zhihu.matisse.filter.Filter;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import cn.pedant.SweetAlert.SweetAlertDialog;
-import id.zelory.compressor.Compressor;
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
-
 import static android.app.Activity.RESULT_OK;
 
 public class ImagesFragment extends Fragment {
@@ -71,11 +59,12 @@ public class ImagesFragment extends Fragment {
     private ProgressBar progressBar;
     private ImageButton addImages;
     private SearchView searchView;
+    private final int MAX_GALLERY_SELECTION = 20;
 
     //Lazy loading variables
     private ImageClassificationDatasets action;
     private String[] imageFileNames;
-    private boolean retrievedAll = false, isScrolling = false,  isLoading = false, datasetModified = false;
+    private boolean retrievedAll, isScrolling,  isLoading, datasetModified;
     private int currentItems, totalItems, scrolledItems;
     private int totalImages;
     private int REQUEST_CODE = 1;
@@ -131,7 +120,6 @@ public class ImagesFragment extends Fragment {
         });
     }
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -140,8 +128,11 @@ public class ImagesFragment extends Fragment {
         Utility.setContext(getContext());
         getContext().setTheme(Utility.getTheme());
 
-        //get Bundle from the previous fragment
+        //get Bundle from the previous fragment & initialise variables
         datasetKey = getArguments().getInt("datasetPK");
+        retrievedAll = false;
+        isLoading = false;
+        datasetModified = true;
 
         try {
             action = Utility.getClient().action(ImageClassificationDatasets.class);
@@ -155,6 +146,7 @@ public class ImagesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
 
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
@@ -179,7 +171,7 @@ public class ImagesFragment extends Fragment {
                         .countable(true)    //show count on selected images
                         .capture(true)  //show preview of images
                         .captureStrategy(new CaptureStrategy(true, "io.github.waikato_ufdl.fileprovider")) //where to store images
-                        .maxSelectable(9)   //maximum amount of images which can be selected
+                        .maxSelectable(MAX_GALLERY_SELECTION)   //maximum amount of images which can be selected
                         .addFilter(new GifSizeFilter(320, 320, 5 * Filter.K * Filter.K)) //define the preview size
                         .gridExpectedSize(getResources().getDimensionPixelSize(R.dimen.grid_expected_size)) //show images in grid format
                         .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
@@ -258,7 +250,7 @@ public class ImagesFragment extends Fragment {
 
                         // load content in background
                         //start a thread to start the process of displaying the dataset's images to the gridview
-                        Thread t = new Thread(() -> { processImages(); });
+                        Thread t = new Thread(() -> processImages());
                         t.start();
                     }
                 }
@@ -288,17 +280,16 @@ public class ImagesFragment extends Fragment {
 
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             galleryImages = Matisse.obtainResult(data);
-            Log.d("Matisse", "mSelected: " + galleryImages);
 
             final Dialog dialog = new Dialog(getContext(), ViewGroup.LayoutParams.MATCH_PARENT);
 
             //initialise index position;
             indexPosition = 0;
             prevIndex = 0;
-            labels = new String[9];
+            labels = new String[MAX_GALLERY_SELECTION];
 
             //create a backup of the current labels
-            String[] backup = new String[9];
+            String[] backup = new String[MAX_GALLERY_SELECTION];
 
             dialog.setContentView(R.layout.gallery_selection_label);
 
@@ -328,7 +319,6 @@ public class ImagesFragment extends Fragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    System.out.println("POS: " + viewPager.getCurrentItem());
                     labels[viewPager.getCurrentItem()] =  editText.getText().toString().trim();
                 }
             });
@@ -420,46 +410,27 @@ public class ImagesFragment extends Fragment {
                             .setTitleText("Are you sure?")
                             .setContentText(informativeMessage)
                             .setConfirmText("Yes")
-                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                @Override
-                                public void onClick(SweetAlertDialog sDialog) {
-                                    //if a user accepts, save all images
-                                    try {
-                                        saveImageFiles();
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
+                            .setConfirmClickListener(sDialog -> {
+                                sDialog.dismissWithAnimation();
 
-                                    //show a successful popup
-                                    sDialog
-                                            .setTitleText("Successful!")
-                                            .setContentText("Successfully saved images!")
-                                            .setConfirmText("OK")
-                                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                                @Override
-                                                public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                                    //if the recycler view has less images than the page_limit, load in the same amount of images that have been deleted
-                                                    if (images.size() < PAGE_LIMIT) {
-                                                        reload();
-                                                    }
+                                /*
+                                NetworkTask uploadTask = new NetworkTask(ImagesFragment.this, getContext(), galleryImages, labels, datasetKey, action, NetworkTask.UPLOAD_IMAGES);
+                                uploadTask.execute();
+                                */
 
-                                                    retrievedAll = false;
-                                                    datasetModified = true;
+                                Log.e("LABELS", Arrays.toString(labels));
 
-                                                    //when the user clicks ok, dismiss the popup
-                                                    sDialog.dismissWithAnimation();
-                                                    dialog.dismiss();
-                                                }
-                                            })
-                                            .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
-                                }
+                                UploadTask up = new UploadTask(ImagesFragment.this, getContext(), galleryImages, labels, datasetKey, action);
+                                up.execute();
+
+
+
+                                dialog.dismiss();
+
                             })
-                            .setCancelButton("No", new SweetAlertDialog.OnSweetClickListener() {
-                                @Override
-                                public void onClick(SweetAlertDialog sDialog) {
-                                    //if the user cancels deletion close the popup but leave them on the selection mode
-                                    sDialog.dismissWithAnimation();
-                                }
+                            .setCancelButton("No", sDialog -> {
+                                //if the user cancels deletion close the popup but leave them on the selection mode
+                                sDialog.dismissWithAnimation();
                             })
                             .show();
                 }
@@ -468,7 +439,6 @@ public class ImagesFragment extends Fragment {
             dialog.show();
         }
     }
-
 
     /**
      * A method to reload the current fragment
@@ -480,41 +450,6 @@ public class ImagesFragment extends Fragment {
             ft.setReorderingAllowed(false);
         }
         ft.detach(this).attach(this).commit();
-    }
-
-
-    /**
-     * A method to store classified images into the backend via API requests.
-     * @throws Exception
-     */
-    public void saveImageFiles() throws Exception {
-        //iterate through the selected images
-        for (int i = 0; i < galleryImages.size(); i++) {
-            //use the image URI path to create image file
-            Uri selectedImageUri = galleryImages.get(i);
-            File imageFile = new File(UriUtils.getPathFromUri(getContext(), selectedImageUri));
-            imageFile = new Compressor(getContext()).compressToFile(imageFile);
-
-            String label = (labels[i] != null && labels[i].length() > 0) ? labels[i] : "unlabelled";
-            File finalImageFile = imageFile;
-
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-
-            executor.execute(() -> {
-                try{
-                    //add image file + label to the backend
-                    action.addFile(datasetKey, finalImageFile, finalImageFile.getName());
-                    action.addCategories(datasetKey, Arrays.asList(finalImageFile.getName()), Arrays.asList(label));
-                    datasetModified = true;
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            });
-
-            executor.shutdown();
-        }
     }
 
     /**
@@ -565,6 +500,16 @@ public class ImagesFragment extends Fragment {
         datasetModified = bool;
     }
 
+    public void setRetrievedAll(boolean bool)
+    {
+        retrievedAll = bool;
+    }
+
+    public int getNumImages()
+    {
+        return images.size();
+    }
+
     /**
      * This method will be used to create the filtered list containing all images which match the keyword
      * @param keyword
@@ -587,7 +532,6 @@ public class ImagesFragment extends Fragment {
         adapter.searchCategory(filteredSearchList);
     }
 
-
     /**
      * A method to load in and process a certain number of images at a time so that not all images are processed and displayed at once.
      * @throws Exception
@@ -602,14 +546,14 @@ public class ImagesFragment extends Fragment {
         String imageFileName;
         String classificationLabel;
 
-        //if the start index is 0, then we have never loaded this dataset before
-        if (startIndex == 0 || datasetModified) {
+
+        if(startIndex == 0 || datasetModified)
+        {
             datasetModified = false;
             //retrieve categories as this contains the image names + classifications that we need
             imageFileNames = action.load(datasetKey).getFiles();
             totalImages = imageFileNames.length;
         }
-
 
         //if we haven't retrieved all images from the dataset yet
         if (!(startIndex >= totalImages)) {
@@ -658,3 +602,4 @@ public class ImagesFragment extends Fragment {
         }
     }
 }
+

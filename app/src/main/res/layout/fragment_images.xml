@@ -29,5 +29,4 @@
         android:background="@drawable/floating_button_background"
         android:elevation="8dp" />
 
-
 </FrameLayout>

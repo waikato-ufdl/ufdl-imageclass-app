@@ -1,16 +1,26 @@
 package io.github.waikato_ufdl.ui.settings;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.util.Log;
 import android.util.Patterns;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.github.waikato_ufdl.DBManager;
 
 import io.github.waikato_ufdl.R;
 
 import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.ui.images.ClassifiedImage;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 import com.github.waikatoufdl.ufdl4j.Client;
 import com.github.waikatoufdl.ufdl4j.action.Licenses;
 import com.github.waikatoufdl.ufdl4j.action.Projects;
@@ -21,6 +31,9 @@ import com.github.waikatoufdl.ufdl4j.auth.Tokens;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Array;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,10 +48,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Utility {
     public static Context context = null;
     public static final String[] PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                                Manifest.permission.READ_EXTERNAL_STORAGE,
-                                                Manifest.permission.CAMERA};
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA};
 
     private static HashMap<Integer, ArrayList<ClassifiedImage>> imagesCollection = new HashMap<>();
+
+    /** this stores the boolean states of ImageFragment's retrievedAll and datasetModified variables*/
+    private static HashMap<Integer, int[]> storedVariables = new HashMap<>();
     private static Client client;
 
     public static SharedPreferences getPrefs(Context context) {
@@ -47,19 +63,19 @@ public class Utility {
 
     /**
      * A method that will set the current Context
+     *
      * @param con: context of the activity
      */
-    public static void setContext (Context con)
-    {
+    public static void setContext(Context con) {
         context = con;
     }
 
     /**
      * This method will save the dark mode state
+     *
      * @param state : True (Dark Theme) or False (Light Theme)
      */
-    public static void saveDarkModeState(Boolean state)
-    {
+    public static void saveDarkModeState(Boolean state) {
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putBoolean("DarkMode", state);
         editor.commit();
@@ -67,20 +83,20 @@ public class Utility {
 
     /**
      * A method to load/retrieve the saved dark mode state
+     *
      * @return : a boolean value indicating whether dark mode is set to true or false
      */
-    public static Boolean loadDarkModeState()
-    {
+    public static Boolean loadDarkModeState() {
         Boolean state = getPrefs(context).getBoolean("DarkMode", false);
         return state;
     }
 
     /**
      * A method to return the theme to set
+     *
      * @return int: a value which will indicate the theme to set
      */
-    public static int getTheme()
-    {
+    public static int getTheme() {
         //check to see if dark mode theme is set to true, if it is return dark theme
         if (loadDarkModeState()) {
             return R.style.DarkTheme;
@@ -92,23 +108,23 @@ public class Utility {
 
     /**
      * Store an image list into the hashmap (imagesCollection)
+     *
      * @param key   : The primary key (int) of the dataset for which the image list belongs
      * @param value : An arraylist of ClassifiedImages to store
      */
-    public static void saveImageList(Integer key, ArrayList<ClassifiedImage> value)
-    {
+    public static void saveImageList(Integer key, ArrayList<ClassifiedImage> value) {
         imagesCollection.put(key, value);
     }
 
     /**
      * Retrieve an image list from the hashmap (imagesCollection)
+     *
      * @param key : the primary key of the dataset for which the image list belongs
      * @return
      */
-    public static ArrayList<ClassifiedImage> getImageList(Integer key)
-    {
+    public static ArrayList<ClassifiedImage> getImageList(Integer key) {
         //check if an image list has been stored for the particular dataset and if so, return it
-        if(imagesCollection.containsKey(key)) {
+        if (imagesCollection.containsKey(key)) {
             return imagesCollection.get(key);
         }
 
@@ -117,10 +133,10 @@ public class Utility {
 
     /**
      * A method to save the user's username into shared preference
+     *
      * @param username The username to store
      */
-    public static void saveUsername(String username)
-    {
+    public static void saveUsername(String username) {
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putString("Username", username);
         editor.commit();
@@ -128,20 +144,20 @@ public class Utility {
 
     /**
      * A method to retrieve the user's username
+     *
      * @return
      */
-    public static String loadUsername()
-    {
+    public static String loadUsername() {
         return getPrefs(context).getString("Username", null);
     }
 
 
     /**
      * A method to save the user's password to sharedPreferences
+     *
      * @param password the password to save
      */
-    public static void savePassword(String password)
-    {
+    public static void savePassword(String password) {
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putString("Password", password);
         editor.commit();
@@ -149,20 +165,20 @@ public class Utility {
 
     /**
      * A method to retrieve a stored password from sharedPreferences
+     *
      * @return
      */
-    public static String loadPassword()
-    {
+    public static String loadPassword() {
         return getPrefs(context).getString("Password", null);
     }
 
 
     /**
      * A method to save the server's URL to sharedPreference
+     *
      * @param URL the server URL
      */
-    public static void saveServerURL(String URL)
-    {
+    public static void saveServerURL(String URL) {
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putString("URL", URL);
         editor.commit();
@@ -170,31 +186,29 @@ public class Utility {
 
     /**
      * A method to retrieve the server's URL from sharedPreference
+     *
      * @return
      */
-    public static String loadServerURL()
-    {
+    public static String loadServerURL() {
         return getPrefs(context).getString("URL", null);
     }
 
-    public static void storeTokens(HashMap tokens)
-    {
+    public static void storeTokens(HashMap tokens) {
         SharedPreferences.Editor editor = getPrefs(context).edit();
         Gson gson = new Gson();
         String json = gson.toJson(tokens);
-        String accountDetails = loadServerURL()+"*"+loadUsername()+"*"+loadPassword();
-        editor.putString(accountDetails,json);
+        String accountDetails = loadServerURL() + "*" + loadUsername() + "*" + loadPassword();
+        editor.putString(accountDetails, json);
         editor.apply();
     }
 
-    public static HashMap<String,Tokens>  loadTokens()
-    {
+    public static HashMap<String, Tokens> loadTokens() {
         SharedPreferences prefs = getPrefs(context);
         Gson gson = new Gson();
         //get from shared prefs in gson and convert to maps again
-        String storedHashMapString = prefs.getString("tokens",null);
-        String accountDetails = loadServerURL()+"*"+loadUsername()+"*"+loadPassword();
-        if(storedHashMapString!=null) {
+        String accountDetails = loadServerURL() + "*" + loadUsername() + "*" + loadPassword();
+        String storedHashMapString = prefs.getString(accountDetails, null);
+        if (storedHashMapString != null) {
             java.lang.reflect.Type type = new TypeToken<HashMap<String, Tokens>>() {
             }.getType();
 
@@ -247,50 +261,53 @@ public class Utility {
 
     /**
      * Getter method to retrieve client
+     *
      * @return
      */
-    public static Client getClient()
-    {
+    public static Client getClient() {
         return client;
     }
 
     /**
      * Method to check whether a URL is valid
+     *
      * @param URL
      * @return
      */
-    public static boolean isValidURL(String URL)
-    {
+    public static boolean isValidURL(String URL) {
         return Patterns.WEB_URL.matcher(URL).matches();
     }
 
     /**
      * Method to check there is a connection established between the device and the server by trying to retrieve data via an API request
+     *
      * @return
      */
-    public static boolean isConnected(){
+    public static boolean isConnected() {
         // create the shared boolean variable
-        final AtomicBoolean b = new AtomicBoolean();
 
-        Thread t = new Thread(new Runnable() {
-            public void run() {
+        if(loadTokens() != null) {
+            final AtomicBoolean b = new AtomicBoolean();
+
+            Thread t = new Thread(() -> {
                 try {
                     boolean val = (client.licenses().list().size() > 0) ? true : false;
                     b.set(val);
                 } catch (Exception ex) {
                     b.set(false);
                 }
+            });
+            t.start();
+
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        });
-        t.start();
 
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            //return the boolean value
+            return b.get();
         }
-
-        //return the boolean value
-        return b.get();
+        return false;
     }
 }

@@ -50,7 +50,8 @@ public class DBManager {
                 Log.d("getLicenses: ", cursor.getString(0));
             }while (cursor.moveToNext());
         }
-//        close();
+
+        close();
         Log.d("getLicenses: ", licenses.toString());
         return licenses;
     }
@@ -70,6 +71,8 @@ public class DBManager {
         }
         Log.d("getLicenseKey: ", "RESULT IS " + result);
         cursor.close();
+
+        close();
         return result;
     }
 
@@ -106,6 +109,7 @@ public class DBManager {
         }
         Log.d("getLicenseName: ", "RESULT IS " + result);
         cursor.close();
+        close();
         return result;
     }
 
@@ -164,6 +168,7 @@ public class DBManager {
         }
         Log.d("getProjectKey: ", "RESULT IS " + result);
         cursor.close();
+        close();
         return result;
     }
 
@@ -183,7 +188,8 @@ public class DBManager {
         contentValues.put(dbHelper.PROJECT_COL_2, projectName);
         database.insert(dbHelper.TABLE_PROJECT, null, contentValues);
         Log.d("insertLicenses: ", projectKey + " " + projectName + " INSERTED");
-//        close();
+
+        close();
     }
 
     public Cursor getDatasets() {

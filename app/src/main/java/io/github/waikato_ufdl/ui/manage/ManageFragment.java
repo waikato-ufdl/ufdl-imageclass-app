@@ -2,10 +2,10 @@ package io.github.waikato_ufdl.ui.manage;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -43,9 +43,13 @@ import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
 import java.util.ArrayList;
 import java.util.List;
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class ManageFragment extends Fragment {
-    private ImageButton btnNewDataset;
     private DBManager dbManager;
     private EditText datasetName, datasetDescription, datasetTags;
     private Button buttonCreateDataset;
@@ -76,7 +80,7 @@ public class ManageFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_manage, container, false);
 
-        btnNewDataset = root.findViewById(R.id.fab_add_dataset);
+        ImageButton btnNewDataset = root.findViewById(R.id.fab_add_dataset);
         btnNewDataset.setOnClickListener(view -> {
             //if actionMode is on, turn it off
             if(actionMode != null) {
@@ -94,17 +98,16 @@ public class ManageFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Handler handler = new Handler();
-        handler.postDelayed(() ->
-        {
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.datasets_recyclerView);
+        adapter = new datasetRecyclerAdapter(getContext(), new ArrayList<>());
+        RecyclerView.LayoutManager lm = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(lm);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(adapter);
+
+        new Handler(Looper.getMainLooper()).postDelayed((Runnable) () -> {
             //check that the user settings are not empty
             checkSettings(view);
-            mRecyclerView = (RecyclerView) view.findViewById(R.id.datasets_recyclerView);
-            adapter = new datasetRecyclerAdapter(getContext(), new ArrayList<>());
-            RecyclerView.LayoutManager lm = new LinearLayoutManager(getContext());
-            mRecyclerView.setLayoutManager(lm);
-            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-            mRecyclerView.setAdapter(adapter);
         }, 500);
     }
 
@@ -118,21 +121,55 @@ public class ManageFragment extends Fragment {
             //navigate to settings and make them enter these details
             Navigation.findNavController(view).navigate(R.id.action_nav_gallery_to_settingsFragment);
         } else {
-            //only continue if the client is connected to the API
-            if (Utility.isConnected()) {
-                displayDatasets(view);
-            }
-            else {
-                displayConnectionFailedPopup(view);
-            }
+            testConnection();
         }
     }
 
     /**
-     * Method to display a connection failure popup with one button leading to settings and the other to close the popup.
-     * @param v
+     * Method to test connection and then display datasets if connection successful
      */
-    public void displayConnectionFailedPopup(View v)
+    public void testConnection()
+    {
+        //only continue if the client is connected to the API
+        Observable.fromCallable(() -> Utility.isConnected())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Boolean>() {
+
+                    boolean connectionSuccessful = false;
+
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull Boolean connected) {
+                        if(connected)
+                            connectionSuccessful = true;
+                    }
+
+                    /** if an error occurs, show connection failure dialog*/
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        displayConnectionFailedPopup();
+                    }
+
+                    /** on completion, if the connection is successful, display datasets or else show connection failure dialog*/
+                    @Override
+                    public void onComplete() {
+                        if ((connectionSuccessful)) {
+                            displayDatasets();
+                        } else {
+                            displayConnectionFailedPopup();
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Method to display a connection failure popup with one button leading to settings and the other to close the popup.
+     */
+    public void displayConnectionFailedPopup()
     {
         new SweetAlertDialog(getContext(), SweetAlertDialog.ERROR_TYPE)
                 .setTitleText("Connection Failed")
@@ -141,12 +178,9 @@ public class ManageFragment extends Fragment {
                 .setConfirmText("Go to Settings")
 
                 //clicking this button will navigate the user to the settings screen
-                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                        sweetAlertDialog.dismissWithAnimation();
-                        Navigation.findNavController(v).navigate(R.id.action_nav_gallery_to_settingsFragment);
-                    }
+                .setConfirmClickListener(sweetAlertDialog -> {
+                    sweetAlertDialog.dismissWithAnimation();
+                    Navigation.findNavController(getView()).navigate(R.id.action_nav_gallery_to_settingsFragment);
                 })
                 //this button will just close the popup
                 .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
@@ -161,19 +195,19 @@ public class ManageFragment extends Fragment {
     /**
      * Method to populate the listview with the dataset information
      */
-    public void displayDatasets(View v) {
+    public void displayDatasets() {
         try {
             //must start a thread to retrieve the dataset information as networking operations cannot be done on the main thread
             Thread t = new Thread(() -> {
                 try {
                     action = Utility.getClient().action(ImageClassificationDatasets.class);
-                    final ArrayList<Datasets.Dataset> datasetList = (ArrayList) action.list();
+                    final ArrayList<Datasets.Dataset> datasetList = (ArrayList<Datasets.Dataset>) action.list();
                     //set the adapter data, listener and notify change to see datasets
                     adapter.setData(datasetList);
                     getActivity().runOnUiThread(() -> {
                         layoutAnimation();
                     });
-                    setRecyclerViewListener(datasetList, v);
+                    setRecyclerViewListener(datasetList);
 
 
                 } catch (IllegalStateException e) {
@@ -191,10 +225,9 @@ public class ManageFragment extends Fragment {
 
     /**
      * Initialises the recyclerView listener to deal with onClick and onLongClick of dataset itemviews
-     * @param datasetList
-     * @param root
+     * @param datasetList the list of datasets to display
      */
-    private void setRecyclerViewListener(ArrayList<Datasets.Dataset> datasetList, View root) {
+    private void setRecyclerViewListener(ArrayList<Datasets.Dataset> datasetList) {
         listener = new datasetRecyclerAdapter.RecyclerViewClickListener() {
             @Override
             public void onClick(View v, int position) {
@@ -220,6 +253,8 @@ public class ManageFragment extends Fragment {
 
                 //initialise Action mode
                 ActionMode.Callback callback = new ActionMode.Callback() {
+
+                    /** displays the action menu */
                     @Override
                     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                         //Initialise menu inflater & inflate menu
@@ -229,6 +264,7 @@ public class ManageFragment extends Fragment {
                         return true;
                     }
 
+                    /** prepare the action mode and display the number of items selected by the user*/
                     @Override
                     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
                         //When action mode is preparing
@@ -237,6 +273,7 @@ public class ManageFragment extends Fragment {
                         return true;
                     }
 
+                    /** performs a particular operation based on the menu item pressed by the user */
                     @Override
                     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                         //handles the click of an action mode item
@@ -248,7 +285,7 @@ public class ManageFragment extends Fragment {
                         switch (id) {
                             case R.id.action_relabel_dataset:
                                 //when the user presses edit
-                                initiateDatasetWindow(root, dKey);
+                                initiateDatasetWindow(getView(), dKey);
                                 break;
 
                             case R.id.action_copy_dataset:
@@ -265,6 +302,7 @@ public class ManageFragment extends Fragment {
                         return false;
                     }
 
+                    /** finish the action mode and remove any image background highlights*/
                     @Override
                     public void onDestroyActionMode(ActionMode mode) {
                         //when action mode is destroyed
@@ -391,28 +429,25 @@ public class ManageFragment extends Fragment {
     }
 
     /**
-     * Method to check if any of the required user setting fields are empty
-     *
-     * @return boolean
+     * Method to check if all required fields are non-empty
+     * @return true if all required details have been provided
      */
     public boolean checkDetailsEntered() {
         //check if any of the inputs are empty and if so, set an error message
-        if (isEmpty(datasetName, 0)) {
+        if (isEmpty(datasetName)) {
             datasetName.setError("Required");
-            return false;
-        }
+            return false; }
 
         return true;
     }
 
     /**
-     * Method to check if an EditText is empty
-     *
+     * Method to check if an EditText field is empty
      * @param editText The EditText to check
      * @return
      */
-    public boolean isEmpty(EditText editText, int minLength) {
-        return editText.getText().toString().trim().length() <= minLength;
+    public boolean isEmpty(EditText editText) {
+        return editText.getText().toString().trim().length() <= 0;
     }
 
     /**
@@ -429,7 +464,6 @@ public class ManageFragment extends Fragment {
 
     /**
      * A method to darken the background when a popup window is displayed
-     *
      * @param popupWindow The popup window being displayed
      */
     public static void darkenBackground(PopupWindow popupWindow) {
@@ -447,7 +481,6 @@ public class ManageFragment extends Fragment {
 
     /**
      * A method to confirm the deletion process via a popup before deleting a dataset
-     *
      * @param mode the action mode
      */
     public void deleteConfirmation(ActionMode mode, int datasetKey) {
@@ -455,28 +488,25 @@ public class ManageFragment extends Fragment {
                 .setTitleText("Are you sure?")
                 .setContentText("You won't be able to recover the dataset after deletion")
                 .setConfirmText("Delete")
-                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sDialog) {
-                        //if a user accepts the deletion, delete all the selected images
-                        deleteDataset(datasetKey);
+                .setConfirmClickListener(sDialog -> {
+                    //if a user accepts the deletion, delete all the selected images
+                    deleteDataset(datasetKey);
 
-                        //show a successful deletion popup
-                        sDialog
-                                .setTitleText("Deleted!")
-                                .setContentText("The selected dataset has been deleted!")
-                                .setConfirmText("OK")
-                                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                    @Override
-                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                        //when the user clicks ok, dismiss the popup
-                                        sDialog.dismissWithAnimation();
-                                        //finish action mode once a user has confirmed the deletion of images, else keep users in selection mode
-                                        mode.finish();
-                                    }
-                                })
-                                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
-                    }
+                    //show a successful deletion popup
+                    sDialog
+                            .setTitleText("Deleted!")
+                            .setContentText("The selected dataset has been deleted!")
+                            .setConfirmText("OK")
+                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                @Override
+                                public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                    //when the user clicks ok, dismiss the popup
+                                    sDialog.dismissWithAnimation();
+                                    //finish action mode once a user has confirmed the deletion of images, else keep users in selection mode
+                                    mode.finish();
+                                }
+                            })
+                            .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
                 })
                 .setCancelButton("Cancel", new SweetAlertDialog.OnSweetClickListener() {
                     @Override
@@ -489,10 +519,11 @@ public class ManageFragment extends Fragment {
     }
 
     /**
-     * Method to delete the selected dataset from list view & backend
+     * Method to delete the selected dataset from recycler view & backend
+     * @param: the primary of the dataset to delete
      */
     public void deleteDataset(int datasetKey) {
-        //make an API request to delete an image
+        //make an API request to delete a dataset
         Thread t = new Thread(() -> {
             try {
                 //delete image file
@@ -507,57 +538,56 @@ public class ManageFragment extends Fragment {
         reload();
     }
 
+    /**
+     * A method which prompts the user for confirmation prior to creating a copy of a dataset
+     * @param mode the action mode
+     * @param datasetName the name to give the copied dataset
+     * @param datasetKey the primary key of the dataset
+     */
     public void confirmCopyDataset(ActionMode mode, String datasetName, int datasetKey) {
         final EditText editText = new EditText(getContext());
         new SweetAlertDialog(getContext(), SweetAlertDialog.WARNING_TYPE)
                 .setTitleText("Copy dataset " + datasetName + " as: ")
                 .setConfirmText("Copy")
                 .setCustomView(editText)
-                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                        String newDatasetName = editText.getText().toString().trim();
+                .setConfirmClickListener(sweetAlertDialog -> {
+                    String newDatasetName = editText.getText().toString().trim();
 
-                        //if a value has been entered
-                        if (newDatasetName.length() > 0) {
-                            if (!newDatasetName.equals(datasetName)) {
-                                //copy dataset
-                                copyDataset(datasetKey, newDatasetName);
+                    //if a value has been entered
+                    if (newDatasetName.length() > 0) {
+                        if (!newDatasetName.equals(datasetName)) {
+                            //copy dataset
+                            copyDataset(datasetKey, newDatasetName);
 
-                                //show a success popup
-                                sweetAlertDialog
-                                        .setTitleText("Success!")
-                                        .setContentText("The dataset " + datasetName + " has been copied as: " + newDatasetName)
-                                        .setConfirmText("OK")
-                                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                            @Override
-                                            public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                                //when the user clicks ok, dismiss the popup
-                                                sweetAlertDialog.dismissWithAnimation();
-                                                //finish action mode once a user has confirmed the reclassification
-                                                mode.finish();
-                                            }
-                                        })
-                                        .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
-                            } else {
-                                editText.setError("Dataset name must be different");
-                            }
-                        } else
-                            editText.setError("Please enter a classification label");
-                    }
+                            //show a success popup
+                            sweetAlertDialog
+                                    .setTitleText("Success!")
+                                    .setContentText("The dataset " + datasetName + " has been copied as: " + newDatasetName)
+                                    .setConfirmText("OK")
+                                    .setConfirmClickListener(sweetAlertDialog1 -> {
+                                        //when the user clicks ok, dismiss the popup
+                                        sweetAlertDialog1.dismissWithAnimation();
+                                        //finish action mode once a user has confirmed the reclassification
+                                        mode.finish();
+                                    })
+                                    .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                        } else {
+                            editText.setError("Dataset name must be different");
+                        }
+                    } else
+                        editText.setError("Please enter a classification label");
                 })
-                .setCancelButton("Cancel", new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sDialog) {
-                        //if the user clicks cancel close the popup but leave them on the selection mode
-                        sDialog.dismissWithAnimation();
-                    }
+                .setCancelButton("Cancel", sDialog -> {
+                    //if the user clicks cancel close the popup but leave them on the selection mode
+                    sDialog.dismissWithAnimation();
                 })
                 .show();
     }
 
     /**
-     * Method to delete the selected dataset from list view & backend
+     * Method to delete the selected dataset from the recyclerview & backend
+     * @param datasetKey the primary key of the dataset
+     * @param newDatasetName the name to give the copied dataset
      */
     public void copyDataset(int datasetKey, String newDatasetName) {
         //make an API request to copy a dataset
@@ -608,6 +638,7 @@ public class ManageFragment extends Fragment {
         thread.start();
     }
 
+    /** Method which animates the loading of datasets */
     private void layoutAnimation()
     {
         LayoutAnimationController layoutAnimationController = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.layout_animation_fall_down);
@@ -616,6 +647,10 @@ public class ManageFragment extends Fragment {
         mRecyclerView.scheduleLayoutAnimation();
     }
 
+    /**
+     * Method to highlight the background of the selected dataset
+     * @param position the position of the selected dataset in the recyclerview
+     */
     private void highlightBackground(int position)
     {
         adapter.setSelectedIndex(position);

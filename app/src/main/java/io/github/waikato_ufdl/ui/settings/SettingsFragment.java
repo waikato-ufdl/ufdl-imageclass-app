@@ -1,11 +1,9 @@
 package io.github.waikato_ufdl.ui.settings;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.TextWatcher;
@@ -18,7 +16,15 @@ import android.widget.EditText;
 import android.widget.Switch;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.github.waikato_ufdl.R;
-import okhttp3.internal.Util;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.internal.operators.completable.CompletableToObservable;
+import io.reactivex.rxjava3.internal.operators.observable.ObservableFromCompletable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 
 public class SettingsFragment extends Fragment {
@@ -80,40 +86,32 @@ public class SettingsFragment extends Fragment {
             themeSwitch.setChecked(true);
         }
 
-        themeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if(isChecked)
-                {
-                    Utility.saveDarkModeState(true);
-                }
-                else
-                {
-                    Utility.saveDarkModeState(false);
-                }
-
-                //complete theme switch + animation by restarting the activity
-                restartActivity();
+        themeSwitch.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            if(isChecked) {
+                Utility.saveDarkModeState(true);
             }
+            else {
+                Utility.saveDarkModeState(false);
+            }
+
+            //complete theme switch + animation by restarting the activity
+            restartActivity();
         });
 
         //set an onclick listener to the 'Save & Exit' button
-        buttonToMain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        buttonToMain.setOnClickListener(view -> {
 
-                boolean valid = checkDetailsEntered();
+            boolean valid = checkDetailsEntered();
 
-                //only exit if the required fields are not empty & also check if the URL is valid
-                if (valid & Utility.isValidURL(serverURL.getText().toString().trim())) {
-                    //save user details and then try to establish a connection with the server
-                    saveSettings();
-                    login();
+            //only exit if the required fields are not empty & also check if the URL is valid
+            if (valid & Utility.isValidURL(serverURL.getText().toString().trim())) {
+                //save user details and then try to establish a connection with the server
+                saveSettings();
+                login();
 
-                } else {
-                    //if the URL is invalid, inform the user about the issue
-                    serverURL.setError("Invalid URL");
-                }
+            } else {
+                //if the URL is invalid, inform the user about the issue
+                serverURL.setError("Invalid URL");
             }
         });
 
@@ -126,37 +124,38 @@ public class SettingsFragment extends Fragment {
      */
     public void login()
     {
+        Observable.fromCallable(() -> connectAndTestConnection())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Boolean>() {
+                    SweetAlertDialog loadingDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
+                    Boolean connectionSuccessful;
 
-        new AsyncTask<Void, Void, Void>() {
-            SweetAlertDialog loadingDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
-            Boolean connectionSuccessful;
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        //display loading dialog
+                        loadingDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+                        loadingDialog.setTitleText("Logging in...");
+                        loadingDialog.setCancelable(false);
+                        loadingDialog.show();
+                    }
 
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
+                    @Override
+                    public void onNext(@NonNull Boolean aBoolean) {
+                        connectionSuccessful = aBoolean;
+                    }
 
-                //display loading dialog
-                loadingDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-                loadingDialog.setTitleText("Logging in...");
-                loadingDialog.setCancelable(false);
-                loadingDialog.show();
+                    @Override
+                    public void onError(@NonNull Throwable e) {
 
-            }
+                    }
 
-            @Override
-            protected Void doInBackground(Void... params) {
-                connectionSuccessful = connectAndTestConnection();
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                loadingDialog.dismissWithAnimation();
-                showConnectionResultDialog(connectionSuccessful);
-
-            }
-        }.execute();
+                    @Override
+                    public void onComplete() {
+                        loadingDialog.dismissWithAnimation();
+                        showConnectionResultDialog(connectionSuccessful);
+                    }
+                });
     }
 
     /**
@@ -182,13 +181,10 @@ public class SettingsFragment extends Fragment {
                     .setTitleText("Connection Successful")
                     .setContentText("You have successfully established a connection to the server!")
                     .setConfirmText("OK")
-                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                        @Override
-                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-                            //when the user clicks "OK" they will be taken back to the previous screen they were on prior to settings
-                            sweetAlertDialog.dismissWithAnimation();
-                            Navigation.findNavController(getView()).popBackStack();
-                        }
+                    .setConfirmClickListener(sweetAlertDialog -> {
+                        //when the user clicks "OK" they will be taken back to the previous screen they were on prior to settings
+                        sweetAlertDialog.dismissWithAnimation();
+                        Navigation.findNavController(getView()).popBackStack();
                     })
                     .show();
         }
@@ -199,12 +195,9 @@ public class SettingsFragment extends Fragment {
                     .setTitleText("Connection Failed")
                     .setContentText("The connection has failed. Please check your login details and try again.")
                     .setConfirmText("OK")
-                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                        @Override
-                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-                            //close the dialog but stay on settings screen
-                            sweetAlertDialog.dismissWithAnimation();
-                        }
+                    .setConfirmClickListener(sweetAlertDialog -> {
+                        //close the dialog but stay on settings screen
+                        sweetAlertDialog.dismissWithAnimation();
                     })
                     .show();
         }
