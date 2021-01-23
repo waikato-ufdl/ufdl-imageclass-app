@@ -3,30 +3,84 @@ package io.github.waikato_ufdl.ui.images;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-public class ClassifiedImage {
-    private byte[] imageArray;
+import io.github.waikato_ufdl.DBManager;
+import io.github.waikato_ufdl.ui.settings.Utility;
+
+public class ClassifiedImage{
+    private byte[] image;
     private String classification;
     private boolean selected;
-    private String imageFileName;
+    private String filename;
+    private String filepath;
+    private String cachePath;
+    private String datasetName;
+    private int syncStatus;
+
 
     /**
      * Constructor for a classified Image object
-     * @param imgArray The byte array of the image
+     * @param image The byte array of the image
      * @param label The image's classification
      */
-    public ClassifiedImage(byte[] imgArray, String label, String filename)
+    public ClassifiedImage(byte[] image, String label, String filename)
     {
-        imageArray = imgArray;
-        classification = label;
+        this.image = image;
+        this.classification = label;
+        this.filename = filename;
         selected = false;
-        imageFileName = filename;
+    }
+
+    /**
+     * Alternative constructor for a classified Image object
+     * @param filename the name of the image file
+     * @param label the classification label
+     * @param cachePath the filepath of the cached image
+     */
+    public ClassifiedImage(String filename, String label, String cachePath)
+    {
+        this.filename = filename;
+        this.classification = label;
+        this.cachePath = cachePath;
+        selected = false;
+    }
+
+    public ClassifiedImage(String filename, String label, String filepath, String cachePath)
+    {
+        this(filename, label, cachePath);
+        this.filepath = filepath;
+    }
+
+
+    public ClassifiedImage(String datasetName, String filename, String label, String filepath, int syncStatus)
+    {
+        this.datasetName = datasetName;
+        this.filename = filename;
+        this.classification = label;
+        this.filepath = filepath;
+        this.syncStatus = syncStatus;
+    }
+
+    public String getDatasetName() {
+        return datasetName;
+    }
+
+    public void setDatasetName(String datasetName) {
+        this.datasetName = datasetName;
+    }
+
+    public int getSyncStatus() {
+        return syncStatus;
+    }
+
+    public void setSyncStatus(int syncOperation) {
+        this.syncStatus = syncOperation;
     }
 
     /**
      * Method to retrieve the label of the image
      * @return classification label string
      */
-    public String getClassification() {
+    public String getClassificationLabel() {
         return classification;
     }
 
@@ -34,17 +88,17 @@ public class ClassifiedImage {
      * Method to retrieve the image as a bitmap
      * @return image Bitmap
      */
-    public Bitmap getImage()
+    public Bitmap getImageBitmap()
     {
-        return BitmapFactory.decodeByteArray(imageArray, 0, imageArray.length);
+        return BitmapFactory.decodeByteArray(image, 0, image.length);
     }
 
     /**
      * Method to retrieve the image array
      * @return
      */
-    public byte[] getImageArray() {
-        return imageArray;
+    public byte[] getImageBytes() {
+        return image;
     }
 
     /**
@@ -68,15 +122,34 @@ public class ClassifiedImage {
      * @return
      */
     public String getImageFileName() {
-        return imageFileName;
+        return filename;
     }
 
     /**
      * Setter method for setting the classification label of an image
-     * @param label
+     * @param label the classification label
      */
     public void setClassificationLabel(String label)
     {
         classification = label;
+    }
+
+    /**
+     * method to retrieve the path of the cached image
+     * @return the filepath of the cached image file
+     */
+    public String getCachedFilePath()
+    {
+        return cachePath;
+    }
+
+    public void setCachePath(String path)
+    {
+        cachePath = path;
+    }
+
+    public String getFullImageFilePath()
+    {
+        return filepath;
     }
 }
