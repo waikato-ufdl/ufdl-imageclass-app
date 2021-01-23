@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
@@ -14,6 +15,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -31,9 +33,14 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import id.zelory.compressor.Compressor;
+import io.github.waikato_ufdl.DBManager;
+import io.github.waikato_ufdl.NetworkConnectivityMonitor;
 import io.github.waikato_ufdl.R;
-import io.github.waikato_ufdl.ui.UriUtils;
 import io.github.waikato_ufdl.ui.settings.Utility;
+
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator;
 import com.zhihu.matisse.Matisse;
@@ -41,34 +48,37 @@ import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
 import com.zhihu.matisse.filter.Filter;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
+
 import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
+
 import static android.app.Activity.RESULT_OK;
 
 public class ImagesFragment extends Fragment {
     private ArrayList<ClassifiedImage> images;
-    private ArrayList<ClassifiedImage> filteredSearchList;
     private int datasetKey;
+    private String datasetName;
     private ImageListAdapter adapter;
-    private RecyclerView recyclerView;
+    public RecyclerView recyclerView;
     private GridLayoutManager gridLayoutManager;
     private ProgressBar progressBar;
-    private ImageButton addImages;
-    private SearchView searchView;
     private final int MAX_GALLERY_SELECTION = 20;
 
     //Lazy loading variables
     private ImageClassificationDatasets action;
     private String[] imageFileNames;
-    private boolean retrievedAll, isScrolling,  isLoading, datasetModified;
+    private boolean retrievedAll, isScrolling, isLoading, datasetModified;
     private int currentItems, totalItems, scrolledItems;
     private int totalImages;
-    private int REQUEST_CODE = 1;
-
+    private final int REQUEST_CODE = 1;
     //specify the number of images to load upon scroll
     public final int PAGE_LIMIT = 8;
 
@@ -78,7 +88,7 @@ public class ImagesFragment extends Fragment {
 
     //the index position of the selected image (from gallery)
     private int indexPosition, prevIndex;
-
+    private DBManager dbManager;
 
     public ImagesFragment() {
         // Required empty public constructor
@@ -91,7 +101,7 @@ public class ImagesFragment extends Fragment {
 
         inflater.inflate(R.menu.main, menu);
         MenuItem item = menu.findItem(R.id.action_search);
-        searchView = (SearchView) item.getActionView();
+        SearchView searchView = (SearchView) item.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -130,9 +140,12 @@ public class ImagesFragment extends Fragment {
 
         //get Bundle from the previous fragment & initialise variables
         datasetKey = getArguments().getInt("datasetPK");
+        datasetName = getArguments().getString("datasetName");
+
         retrievedAll = false;
         isLoading = false;
         datasetModified = true;
+        dbManager = Utility.dbManager;
 
         try {
             action = Utility.getClient().action(ImageClassificationDatasets.class);
@@ -152,19 +165,18 @@ public class ImagesFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_images, container, false);
-
+        images = dbManager.getCachedImageList(datasetName);
         //initialising views & initialising variables
-        images = Utility.getImageList(datasetKey);
         recyclerView = (RecyclerView) v.findViewById(R.id.imageRecyclerView);
         progressBar = (ProgressBar) v.findViewById(R.id.progressBar);
-        addImages = (ImageButton) v.findViewById(R.id.fab_add_images);
+        ImageButton addImages = (ImageButton) v.findViewById(R.id.fab_add_images);
 
         //set on click listener which will start up the gallery
         addImages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                int galleryTheme = (Utility.loadDarkModeState()) ? R.style.Matisse_Dracula: R.style.Matisse_Zhihu;
+                isLoading = true;
+                int galleryTheme = (Utility.loadDarkModeState()) ? R.style.Matisse_Dracula : R.style.Matisse_Zhihu;
 
                 Matisse.from(ImagesFragment.this)
                         .choose(MimeType.ofImage()) //show only images
@@ -186,23 +198,48 @@ public class ImagesFragment extends Fragment {
 
         setupImageGrid();
 
-        //start a thread to start the process of displaying the dataset's images to the gridview
-       Thread t = new Thread(() -> processImages());
-       t.start();
+        //create network connectivity monitor to observe any connectivity changes whilst on this fragment
+        NetworkConnectivityMonitor connectivityMonitor = new NetworkConnectivityMonitor(getContext());
+
+        connectivityMonitor.observe(getViewLifecycleOwner(), isConnected ->
+        {
+            Utility.isOnlineMode = isConnected;
+
+            //if the dataset we are currently viewing has recently been synced, get it's updated dataset key from the local database
+            if (datasetKey == -1 && isConnected) {
+                datasetKey = dbManager.getDatasetPK(datasetName);
+            }
+
+            //if there is an internet connection and there is no visible items in the recyler view
+            if (isConnected && (gridLayoutManager.findFirstVisibleItemPosition() == RecyclerView.NO_POSITION ||
+                    gridLayoutManager.findLastVisibleItemPosition() <= PAGE_LIMIT) && dbManager.getUnsycnedImages().isEmpty() && !isLoading) {
+                //start the process of displaying the dataset's images to the gridview
+                Thread t = new Thread(() -> processImages());
+                t.start();
+            }
+        });
 
         return v;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        //scrollToPosition();
     }
 
     /**
      * Method to call lazy load
      */
-    public void processImages()
-    {
+    public void processImages() {
         try {
-            LazyLoadImages();
-
+            if (Utility.isOnlineMode) {
+                LazyLoadImages();
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            if (!Utility.isOnlineMode) {
+                getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "No Internet Connection", Toast.LENGTH_SHORT).show());
+            }
         }
     }
 
@@ -212,7 +249,7 @@ public class ImagesFragment extends Fragment {
      */
     private void setupImageGrid() {
         //get the recycler view, set it's layout to a gridlayout with 2 columns & then set the adapter
-        adapter = new ImageListAdapter(this, getContext(), images, action, datasetKey);
+        adapter = new ImageListAdapter(this, getContext(), images, action, datasetKey, datasetName);
         gridLayoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(gridLayoutManager);
         OverScrollDecoratorHelper.setUpOverScroll(recyclerView, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
@@ -224,7 +261,7 @@ public class ImagesFragment extends Fragment {
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
 
-                if(newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) ;
                 {
                     isScrolling = true;
                 }
@@ -234,24 +271,29 @@ public class ImagesFragment extends Fragment {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                if(dy > 0 && !retrievedAll){ // only when scrolling up
-
+                if (dy > 0 && !retrievedAll) { // only when scrolling up
                     currentItems = gridLayoutManager.getChildCount();
                     totalItems = gridLayoutManager.getItemCount();
                     scrolledItems = gridLayoutManager.findFirstVisibleItemPosition();
 
-                    if(isScrolling && (currentItems + scrolledItems == totalItems) && !isLoading){
 
-                        isScrolling = false;
-                        isLoading = true;
+                    if (isScrolling && (currentItems + scrolledItems == totalItems) && !isLoading) {
 
-                        //show progress bar
-                        progressBar.setVisibility(View.VISIBLE);
+                        if (Utility.isOnlineMode) {
+                            isScrolling = false;
+                            isLoading = true;
 
-                        // load content in background
-                        //start a thread to start the process of displaying the dataset's images to the gridview
-                        Thread t = new Thread(() -> processImages());
-                        t.start();
+                            //show progress bar
+                            progressBar.setVisibility(View.VISIBLE);
+
+
+                            // load content in background
+                            //start a thread to start the process of displaying the dataset's images to the gridview
+                            Thread t = new Thread(() -> processImages());
+                            t.start();
+                        } else {
+                            getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "No Internet Connection", Toast.LENGTH_SHORT).show());
+                        }
                     }
                 }
             }
@@ -261,8 +303,7 @@ public class ImagesFragment extends Fragment {
     /**
      * Method to save any processing changes to the image list in memory & then signals the end of any data loading
      */
-    public void saveChanges()
-    {
+    public void saveChanges() {
         //once all the processing has been done, save the image list
         Utility.saveImageList(datasetKey, images);
         getActivity().runOnUiThread(() -> progressBar.setVisibility(View.GONE));
@@ -281,129 +322,121 @@ public class ImagesFragment extends Fragment {
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             galleryImages = Matisse.obtainResult(data);
 
-            final Dialog dialog = new Dialog(getContext(), ViewGroup.LayoutParams.MATCH_PARENT);
+            if (!galleryImages.isEmpty()) {
+                final Dialog dialog = new Dialog(getContext(), ViewGroup.LayoutParams.MATCH_PARENT);
 
-            //initialise index position;
-            indexPosition = 0;
-            prevIndex = 0;
-            labels = new String[MAX_GALLERY_SELECTION];
+                //initialise index position;
+                indexPosition = 0;
+                prevIndex = 0;
+                labels = new String[MAX_GALLERY_SELECTION];
 
-            //create a backup of the current labels
-            String[] backup = new String[MAX_GALLERY_SELECTION];
+                //create a backup of the current labels
+                String[] backup = new String[MAX_GALLERY_SELECTION];
 
-            dialog.setContentView(R.layout.gallery_selection_label);
+                dialog.setContentView(R.layout.gallery_selection_label);
 
-            //initialise views
-            ViewPager2 viewPager = dialog.findViewById(R.id.labelViewPager);
-            GallerySelectionAdapter galleryAdapter = new GallerySelectionAdapter(getContext(), galleryImages);
-            SpringDotsIndicator indicator = (SpringDotsIndicator) dialog.findViewById(R.id.spring_dots_indicator);
-            EditText editText = (EditText)  dialog.findViewById(R.id.editTextCategory);
-            CheckBox checkBox = (CheckBox) dialog.findViewById(R.id.labelCheckBox);
-            Button saveImages = (Button) dialog.findViewById(R.id.saveImages);
+                //initialise views
+                ViewPager2 viewPager = dialog.findViewById(R.id.labelViewPager);
+                GallerySelectionAdapter galleryAdapter = new GallerySelectionAdapter(getContext(), galleryImages);
+                SpringDotsIndicator indicator = (SpringDotsIndicator) dialog.findViewById(R.id.spring_dots_indicator);
+                EditText editText = (EditText) dialog.findViewById(R.id.editTextCategory);
+                CheckBox checkBox = (CheckBox) dialog.findViewById(R.id.labelCheckBox);
+                Button saveImages = (Button) dialog.findViewById(R.id.saveImages);
 
-            //set adapter & default start position
-            viewPager.getChildAt(indexPosition).setOverScrollMode(View.OVER_SCROLL_NEVER);
-            viewPager.setAdapter(galleryAdapter);
-            indicator.setViewPager2(viewPager);
+                //set adapter & default start position
+                viewPager.getChildAt(indexPosition).setOverScrollMode(View.OVER_SCROLL_NEVER);
+                viewPager.setAdapter(galleryAdapter);
+                indicator.setViewPager2(viewPager);
 
-            editText.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    labels[viewPager.getCurrentItem()] =  editText.getText().toString().trim();
-                }
-            });
-
-            //set a listener to listen for page changes caused by user swipes
-            viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                    super.onPageScrolled(position, positionOffset, positionOffsetPixels);
-
-                    //the user is scrolling from the right to the left
-                    if(prevIndex > position)
-                    {
-                        //labels[prevIndex] = editText.getText().toString().trim();
-                    }
-                    //user has scrolled from left to right
-                    else if (position > prevIndex)
-                    {
-                        //display the label associated with the particular image if one has previously been entered
-                        displayImageLabel(editText, viewPager.getCurrentItem());
                     }
 
-                    prevIndex = position;
-                }
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                @Override
-                public void onPageSelected(int position) {
-                    super.onPageSelected(position);
-
-                    //scrolling from left to right
-                    if(prevIndex != position)
-                    {
-                        //set the label to the image if a user has entered one in
-                        //labels[prevIndex] = editText.getText().toString().trim();
-                    }
-                    //user has swiped right to left
-                    else
-                    {
-                        //display the label associated with the particular image if one has previously been entered
-                        displayImageLabel(editText, viewPager.getCurrentItem());
                     }
 
-                    indexPosition = position;
-                }
-
-                @Override
-                public void onPageScrollStateChanged(int state) {
-                    super.onPageScrollStateChanged(state);
-                }
-            });
-
-            //set listener to listen for check box state changes
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    String classification = editText.getText().toString().trim();
-
-                    //if the user has checked the checkbox
-                    if(isChecked)
-                    {
-                        labels[indexPosition] = classification;
-                        //create a backup of the current labels
-                        System.arraycopy(labels, 0, backup, 0, labels.length);
-
-                        //fill the labels array with the current classification
-                        Arrays.fill(labels, classification);
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        labels[viewPager.getCurrentItem()] = editText.getText().toString().trim();
                     }
-                    else
-                    {
-                        //set labels to the backup labels
-                        System.arraycopy(backup, 0, labels, 0, backup.length);
-                        editText.setText(labels[indexPosition]);
-                    }
-                }
-            });
+                });
 
-            saveImages.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+                //set a listener to listen for page changes caused by user swipes
+                viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+                    @Override
+                    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                        super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+
+                        //the user is scrolling from the right to the left
+                        if (prevIndex > position) {
+                            //labels[prevIndex] = editText.getText().toString().trim();
+                        }
+                        //user has scrolled from left to right
+                        else if (position > prevIndex) {
+                            //display the label associated with the particular image if one has previously been entered
+                            displayImageLabel(editText, viewPager.getCurrentItem());
+                        }
+
+                        prevIndex = position;
+                    }
+
+                    @Override
+                    public void onPageSelected(int position) {
+                        super.onPageSelected(position);
+
+                        //scrolling from left to right
+                        if (prevIndex != position) {
+                            //set the label to the image if a user has entered one in
+                            //labels[prevIndex] = editText.getText().toString().trim();
+                        }
+                        //user has swiped right to left
+                        else {
+                            //display the label associated with the particular image if one has previously been entered
+                            displayImageLabel(editText, viewPager.getCurrentItem());
+                        }
+
+                        indexPosition = position;
+                    }
+
+                    @Override
+                    public void onPageScrollStateChanged(int state) {
+                        super.onPageScrollStateChanged(state);
+                    }
+                });
+
+                //set listener to listen for check box state changes
+                checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        String classification = editText.getText().toString().trim();
+
+                        //if the user has checked the checkbox
+                        if (isChecked) {
+                            labels[indexPosition] = classification;
+                            //create a backup of the current labels
+                            System.arraycopy(labels, 0, backup, 0, labels.length);
+
+                            //fill the labels array with the current classification
+                            Arrays.fill(labels, classification);
+                        } else {
+                            //set labels to the backup labels
+                            System.arraycopy(backup, 0, labels, 0, backup.length);
+                            editText.setText(labels[indexPosition]);
+                        }
+                    }
+                });
+
+                saveImages.setOnClickListener(v -> {
                     String informativeMessage;
 
                     if (allLabelsFilled(viewPager.getAdapter().getItemCount())) {
                         informativeMessage = "Save classified images?";
                     } else {
-                        informativeMessage = "All labels have not been filled out. Any images with empty labels will be labeled as 'unlabelled'. Are you sure you wish to save these images?";
+                        informativeMessage = "All label fields have not been filled out. Any images with empty labels will be classified as 'unlabelled'. Are you sure you wish to save these images?";
                     }
 
                     new SweetAlertDialog(getContext(), SweetAlertDialog.WARNING_TYPE)
@@ -413,17 +446,10 @@ public class ImagesFragment extends Fragment {
                             .setConfirmClickListener(sDialog -> {
                                 sDialog.dismissWithAnimation();
 
-                                /*
-                                NetworkTask uploadTask = new NetworkTask(ImagesFragment.this, getContext(), galleryImages, labels, datasetKey, action, NetworkTask.UPLOAD_IMAGES);
-                                uploadTask.execute();
-                                */
 
-                                Log.e("LABELS", Arrays.toString(labels));
-
-                                UploadTask up = new UploadTask(ImagesFragment.this, getContext(), galleryImages, labels, datasetKey, action);
-                                up.execute();
-
-
+                                //upload images to backend
+                                UploadTask uploadImages = new UploadTask(ImagesFragment.this, getContext(), galleryImages, labels, datasetName, action);
+                                uploadImages.execute();
 
                                 dialog.dismiss();
 
@@ -433,37 +459,36 @@ public class ImagesFragment extends Fragment {
                                 sDialog.dismissWithAnimation();
                             })
                             .show();
-                }
-            });
-
-            dialog.show();
+                });
+                dialog.show();
+            }
         }
     }
 
     /**
      * A method to reload the current fragment
      */
-    public void reload(){
+    public void reload() {
         // Reload current fragment
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        isLoading = true;
+        FragmentTransaction ft = getParentFragmentManager().beginTransaction();
         if (Build.VERSION.SDK_INT >= 26) {
             ft.setReorderingAllowed(false);
         }
         ft.detach(this).attach(this).commit();
+        isLoading = false;
     }
 
     /**
      * A method to check if all images have been labelled
+     *
      * @param numImages The number of images to check
      * @return True if all images has been assigned a label
      */
-    public boolean allLabelsFilled(int numImages)
-    {
-        for(int i=0; i < numImages; i++)
-        {
+    public boolean allLabelsFilled(int numImages) {
+        for (int i = 0; i < numImages; i++) {
             String label = labels[i];
-            if(label  == null || label.length() < 1)
-            {
+            if (label == null || label.length() < 1) {
                 return false;
             }
         }
@@ -473,13 +498,13 @@ public class ImagesFragment extends Fragment {
 
     /**
      * //display the label associated with a particular image if one has previously been entered
+     *
      * @param editText the editText to display a label if any
      * @param position the position indicating the image the user is current looking at
      */
-    public void displayImageLabel(EditText editText, int position)
-    {
+    public void displayImageLabel(EditText editText, int position) {
         //if a user has entered a label for the image being observed, then show the label in the edit text
-        if(labels[position] != null) {
+        if (labels[position] != null) {
             editText.setText(labels[position]);
         }
         //else show an empty text box
@@ -493,37 +518,33 @@ public class ImagesFragment extends Fragment {
 
     /**
      * A method to set the boolean value indicating whether a dataset change to the API has taken place
+     *
      * @param bool true if a dataset has been modified
      */
-    public void setDatasetModified(boolean bool)
-    {
+    public void setDatasetModified(boolean bool) {
         datasetModified = bool;
     }
 
-    public void setRetrievedAll(boolean bool)
-    {
+    public void setRetrievedAll(boolean bool) {
         retrievedAll = bool;
     }
 
-    public int getNumImages()
-    {
+    public int getNumImages() {
         return images.size();
     }
 
     /**
      * This method will be used to create the filtered list containing all images which match the keyword
+     *
      * @param keyword
      */
-    private void search(String keyword)
-    {
-        filteredSearchList = new ArrayList<>();
+    private void search(String keyword) {
+        ArrayList<ClassifiedImage> filteredSearchList = new ArrayList<>();
 
         //iterate through the classified images
-        for (ClassifiedImage image: images)
-        {
+        for (ClassifiedImage image : images) {
             //if the classification label contains the keyword entered by the user, add the image to the filtered list
-            if(image.getClassification().toLowerCase().contains(keyword.toLowerCase()))
-            {
+            if (image.getClassificationLabel().toLowerCase().contains(keyword.toLowerCase())) {
                 filteredSearchList.add(image);
             }
         }
@@ -534,6 +555,7 @@ public class ImagesFragment extends Fragment {
 
     /**
      * A method to load in and process a certain number of images at a time so that not all images are processed and displayed at once.
+     *
      * @throws Exception
      */
 
@@ -544,16 +566,19 @@ public class ImagesFragment extends Fragment {
         int loadedItems = 0;
         byte[] img;
         String imageFileName;
+        List<String> allLabels;
         String classificationLabel;
 
+        Log.e("CHECK: ", "OKAY");
 
-        if(startIndex == 0 || datasetModified)
-        {
+        if (startIndex == 0 || datasetModified) {
             datasetModified = false;
             //retrieve categories as this contains the image names + classifications that we need
             imageFileNames = action.load(datasetKey).getFiles();
             totalImages = imageFileNames.length;
         }
+
+        Log.e("CHECK", startIndex + " , total: " + totalImages);
 
         //if we haven't retrieved all images from the dataset yet
         if (!(startIndex >= totalImages)) {
@@ -569,22 +594,39 @@ public class ImagesFragment extends Fragment {
                     try {
                         //retrieve the byte array of images from the API using the dataset's primary key + image name
                         img = action.getFile(datasetKey, imageFileName);
-                        classificationLabel = (action.getCategories(datasetKey, imageFileName).size() > 0)? action.getCategories(datasetKey, imageFileName).get(0): "Unlabelled";
+                        allLabels = action.getCategories(datasetKey, imageFileName);
+                        classificationLabel = (allLabels.size() > 0) ? allLabels.get(0) : "Unlabelled";
                     } catch (Exception e) {
                         continue;
                     }
 
                     //create a classifiedImage object using image name and classification label and add it to the images arrayList
-                    images.add(new ClassifiedImage(img, classificationLabel, imageFileName));
-                    loadedItems++;
+                    ClassifiedImage image = new ClassifiedImage(img, classificationLabel, imageFileName);
+                    if (cacheImage(image)) {
+                        images.add(image);
+                        loadedItems++;
 
-                    //update the recycler view
-                    getActivity().runOnUiThread(() -> {
-                        adapter.notifyItemChanged(images.size() - 1);
-                    });
+                        //update the recycler view
+                        getActivity().runOnUiThread(() -> {
+                            adapter.notifyItemChanged(images.size() - 1);
+
+                            /*
+                            if(ImagePagerFragment.viewPager != null)
+                            {
+                                ImagePagerFragment.viewPager.getAdapter().notifyDataSetChanged();
+                            }
+                             */
+
+                            if (adapter.viewer != null) {
+                                adapter.viewer.updateImages(images);
+                            }
+                            //adapter.updateViewerList();
+                        });
+                    }
                 }
                 //all images have been retrieved from backend
                 else if (startIndex + loadedItems > totalImages) {
+                    Log.e("CHECK", "I FINISH HERE");
                     retrievedAll = true;
                     saveChanges();
                     return;
@@ -594,12 +636,61 @@ public class ImagesFragment extends Fragment {
             saveChanges();
         }
 
-        if(startIndex >= totalImages)
-        {
+        if (startIndex >= totalImages) {
+            Log.e("CHECK", "I FINISH HERE * 2");
             retrievedAll = true;
             saveChanges();
             return;
         }
     }
+
+    public boolean cacheImage(ClassifiedImage image) {
+        String filename = image.getImageFileName();
+        String classificationLabel = image.getClassificationLabel();
+        byte[] imageData = image.getImageBytes();
+        String cache_folder = "UFDL_Cache";
+
+        //create a cache folder if it doesn't already exist
+        File cacheFolder = new File(getContext().getCacheDir(), cache_folder);
+        if (!cacheFolder.exists()) {
+            cacheFolder.mkdirs();
+        }
+
+        //create image file
+        File imageFile = new File(cacheFolder, filename);
+
+        if (!imageFile.exists()) {
+
+            try {
+                //write image content to file in cache directory
+                FileOutputStream fos = new FileOutputStream(imageFile.getPath());
+                fos.write(imageData);
+                fos.close();
+
+                //create a compressed version of the image file
+                Compressor compressor = new Compressor(getContext());
+                File compressedImage = compressor.compressToFile(imageFile);
+
+                //replace original file with compressed file
+                Files.move(compressedImage.toPath(), imageFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                //delete the parent folder of where the compressed image was initially stored
+                if (compressedImage.getParentFile().exists()) {
+                    compressedImage.getParentFile().delete();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        //add the image information to the database
+        boolean cacheSuccessful = dbManager.insertSyncedImage(filename, classificationLabel, null, imageFile.getPath(), datasetName);
+        image.setCachePath(imageFile.getPath());
+
+        return cacheSuccessful;
+    }
 }
+
+
 
