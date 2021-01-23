@@ -2,6 +2,7 @@ package io.github.waikato_ufdl.ui.manage;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,17 +18,17 @@ import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.ui.settings.Utility;
 
 public class datasetRecyclerAdapter extends RecyclerView.Adapter<datasetRecyclerAdapter.ViewHolder> {
-    private ArrayList<Datasets.Dataset> datasetList;
+    private ArrayList<ImageDataset> datasetList;
     private RecyclerViewClickListener listener;
     private LayoutInflater mInflater;
     private DBManager dbManager;
     private int selectedIndex = -1;
 
-    public datasetRecyclerAdapter(Context context, ArrayList<Datasets.Dataset> dsList)
+    public datasetRecyclerAdapter(Context context, ArrayList<ImageDataset> dsList)
     {
         mInflater = LayoutInflater.from(context);
         datasetList = dsList;
-        dbManager = new DBManager(context);
+        dbManager = Utility.dbManager;
     }
 
     @NonNull
@@ -102,7 +103,7 @@ public class datasetRecyclerAdapter extends RecyclerView.Adapter<datasetRecycler
         }
     }
 
-    public void setData(ArrayList<Datasets.Dataset> dsList)
+    public void setData(ArrayList<ImageDataset> dsList)
     {
         datasetList = dsList;
     }
@@ -117,6 +118,16 @@ public class datasetRecyclerAdapter extends RecyclerView.Adapter<datasetRecycler
         selectedIndex = index;
     }
 
+    public ImageDataset getSelectedDataset()
+    {
+        return datasetList.get(selectedIndex);
+    }
+
+    public void deleteSelectedDataset()
+    {
+        datasetList.remove(selectedIndex);
+        notifyDataSetChanged();
+    }
 
     /**
      * method to colour substrings of one text view
