@@ -19,12 +19,11 @@ public class DeleteTask extends NetworkTask {
      * @param fragment the ImagesFragment
      * @param context the context
      * @param images the list of selected images (ClassifiedImage objects)
-     * @param datasetPK the primary key of the dataset that will be modified
      * @param action the action used to perform operations on ImageClassification datasets
      * @param mode the action mode
      */
-    public DeleteTask(ImagesFragment fragment, Context context, ArrayList<ClassifiedImage> images, int datasetPK, ImageClassificationDatasets action, ActionMode mode) {
-        super(fragment, context, datasetPK, action, mode);
+    public DeleteTask(ImagesFragment fragment, Context context, ArrayList<ClassifiedImage> images, String datasetName, ImageClassificationDatasets action, ActionMode mode) {
+        super(fragment, context, datasetName, action, mode);
 
         this.selectedImages = images;
         processingMessage = "Deleting image ";
@@ -39,8 +38,28 @@ public class DeleteTask extends NetworkTask {
      */
     @Override
     public void backgroundTask(Object image) throws Exception {
-        action.deleteFile(datasetPK, ((ClassifiedImage) image).getImageFileName());
-        storedImages.remove(image);
+        String imageFilename = ((ClassifiedImage) image).getImageFileName();
+
+        //set the image sync status to delete
+        dbManager.deleteImage(datasetName, imageFilename);
+
+        //if we are in online mode, attempt to delete the image file from the backend
+        if(Utility.isOnlineMode) {
+
+            //if the image has been successfully deleted
+            if(action.deleteFile(datasetPK, imageFilename))
+            {
+                //set it's sync status of the image to synced and then delete it's record from the local database
+                dbManager.setImageSynced(datasetName, imageFilename);
+                dbManager.deleteSyncedImage(datasetName, imageFilename);
+            }
+        }
+
+        /*
+        else {
+            fragment.reload();
+        }
+         */
     }
 
     /**
@@ -49,14 +68,5 @@ public class DeleteTask extends NetworkTask {
     @Override
     public void execute() {
         run(selectedImages);
-    }
-
-    /**
-     * save the modified list to Utilities
-     */
-    @Override
-    public void runOnCompletion() {
-        Utility.saveImageList(datasetPK, storedImages);
-        super.runOnCompletion();
     }
 }
