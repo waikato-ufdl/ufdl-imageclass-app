@@ -3,43 +3,17 @@ package io.github.waikato_ufdl.ui.settings;
 import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.util.Log;
 import android.util.Patterns;
-
-import cn.pedant.SweetAlert.SweetAlertDialog;
-import io.github.waikato_ufdl.DBManager;
-
-import io.github.waikato_ufdl.R;
-
-import io.github.waikato_ufdl.R;
-import io.github.waikato_ufdl.ui.images.ClassifiedImage;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Observer;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-
 import com.github.waikatoufdl.ufdl4j.Client;
-import com.github.waikatoufdl.ufdl4j.action.Licenses;
-import com.github.waikatoufdl.ufdl4j.action.Projects;
-import com.github.waikatoufdl.ufdl4j.auth.Authentication;
-import com.github.waikatoufdl.ufdl4j.auth.MemoryOnlyStorage;
-import com.github.waikatoufdl.ufdl4j.auth.TokenStorageHandler;
 import com.github.waikatoufdl.ufdl4j.auth.Tokens;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Array;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import io.github.waikato_ufdl.DBManager;
+import io.github.waikato_ufdl.R;
+import io.github.waikato_ufdl.ui.images.ClassifiedImage;
 
 /**
  * This is a class that will be used to store and retrieve user settings from shared storage
@@ -52,10 +26,12 @@ public class Utility {
             Manifest.permission.CAMERA};
 
     private static HashMap<Integer, ArrayList<ClassifiedImage>> imagesCollection = new HashMap<>();
-
-    /** this stores the boolean states of ImageFragment's retrievedAll and datasetModified variables*/
-    private static HashMap<Integer, int[]> storedVariables = new HashMap<>();
     private static Client client;
+
+    /**  boolean value which is used to distinguish whether the app is currently in online mode or offline mode (true : online mode)*/
+    public static boolean isOnlineMode = false;
+
+    public static DBManager dbManager;
 
     public static SharedPreferences getPrefs(Context context) {
         return context.getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
@@ -143,9 +119,8 @@ public class Utility {
     }
 
     /**
-     * A method to retrieve the user's username
-     *
-     * @return
+     * A method to retrieve the user's username from local storage
+     * @return stored username
      */
     public static String loadUsername() {
         return getPrefs(context).getString("Username", null);
@@ -154,7 +129,6 @@ public class Utility {
 
     /**
      * A method to save the user's password to sharedPreferences
-     *
      * @param password the password to save
      */
     public static void savePassword(String password) {
@@ -165,8 +139,7 @@ public class Utility {
 
     /**
      * A method to retrieve a stored password from sharedPreferences
-     *
-     * @return
+     * @return the user's stored password
      */
     public static String loadPassword() {
         return getPrefs(context).getString("Password", null);
@@ -175,7 +148,6 @@ public class Utility {
 
     /**
      * A method to save the server's URL to sharedPreference
-     *
      * @param URL the server URL
      */
     public static void saveServerURL(String URL) {
@@ -186,8 +158,7 @@ public class Utility {
 
     /**
      * A method to retrieve the server's URL from sharedPreference
-     *
-     * @return
+     * @return the server UrL stored in local storage
      */
     public static String loadServerURL() {
         return getPrefs(context).getString("URL", null);
@@ -229,11 +200,12 @@ public class Utility {
         client = new Client(loadServerURL(), loadUsername(), loadPassword(), new tokenStorageHandler());
 
 
+
+        /*
         ExecutorService clientConnection = Executors.newSingleThreadExecutor();
 
         clientConnection.execute(() -> {
             try {
-                DBManager dbManager = new DBManager(context);
                 System.out.println("\nLicenses:");
                 for (Licenses.License license : client.licenses().list()) {
                     System.out.println(license);
@@ -257,6 +229,9 @@ public class Utility {
         });
 
         clientConnection.shutdown();
+
+         */
+
     }
 
     /**
@@ -280,34 +255,42 @@ public class Utility {
 
     /**
      * Method to check there is a connection established between the device and the server by trying to retrieve data via an API request
-     *
-     * @return
+     * @return true if API connection is established
      */
     public static boolean isConnected() {
         // create the shared boolean variable
 
-        if(loadTokens() != null) {
-            final AtomicBoolean b = new AtomicBoolean();
+        final AtomicBoolean b = new AtomicBoolean();
 
-            Thread t = new Thread(() -> {
-                try {
-                    boolean val = (client.licenses().list().size() > 0) ? true : false;
-                    b.set(val);
-                } catch (Exception ex) {
-                    b.set(false);
-                }
-            });
-            t.start();
-
+        Thread t = new Thread(() -> {
             try {
-                t.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                boolean val = (client.licenses().list().size() > 0) ? true : false;
+                b.set(val);
+            } catch (Exception ex) {
+                b.set(false);
             }
+        });
+        t.start();
 
-            //return the boolean value
-            return b.get();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        return false;
+
+        //return the boolean value
+        return b.get();
+    }
+
+
+    public static void setInitialSetupComplete(boolean isComplete)
+    {
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putBoolean("initialSetup", isComplete);
+        editor.commit();
+    }
+
+    public static boolean isInitialSetupComplete() {
+        return getPrefs(context).getBoolean("initialSetup", false);
     }
 }
