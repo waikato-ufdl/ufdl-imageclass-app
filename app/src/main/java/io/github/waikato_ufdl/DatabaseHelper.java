@@ -9,30 +9,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "UFDL.db";
 
     public static final String TABLE_DATASET = "dataset_table";
-    public static final String DATASET_COL_1 = "DATASET_ID"; //Local ID
-    public static final String DATASET_COL_2 = "DATASET_PK"; //API ID
-    public static final String DATASET_COL_3 = "DATASET_NAME";
-    public static final String DATASET_COL_4 = "DATASET_PROJECT";
-    public static final String DATASET_COL_5 = "DATASET_PRIVATE";
-    public static final String DATASET_COL_6 = "DATASET_LICENSE";
-    public static final String DATASET_COL_7 = "DATASET_TAGS";
-    public static final String DATASET_COL_8 = "DATASET_SYNC_OPERATIONS";
+    public static final String DS_COL_PK = "DATASET_PK";
+    public static final String DS_COL_NAME = "DATASET_NAME";
+    public static final String DS_COL_DESCRIPTION = "DATASET_DESCRIPTION";
+    public static final String DS_COL_PROJECT = "DATASET_PROJECT";
+    public static final String DS_COL_PUBLIC = "DATASET_IS_PUBLIC";
+    public static final String DS_COL_LICENSE = "DATASET_LICENSE";
+    public static final String DS_COL_TAGS = "DATASET_TAGS";
+    public static final String DS_COL_SYNC_OPS = "DATASET_SYNC_OPERATIONS";
 
     public static final String TABLE_IMAGE = "image_table";
-    public static final String IMAGE_COL_1 = "IMAGE_NAME";
-    public static final String IMAGE_COL_2 = "IMAGE_CATEGORY";
-    public static final String IMAGE_COL_3 = "IMAGE_FULL_PATH";
-    public static final String IMAGE_COL_4 = "IMAGE_THUMBNAIL_PATH";
-    public static final String IMAGE_COL_5 = "DATASET_ID";
-    public static final String IMAGE_COL_6 = "IMAGE_SYNC_OPERATIONS";
+    public static final String IMAGE_COL_NAME = "IMAGE_NAME";
+    public static final String IMAGE_COL_LABEL = "IMAGE_CATEGORY";
+    public static final String IMAGE_COL_FILE_PATH = "IMAGE_FILE_PATH";
+    public static final String IMAGE_COL_CACHE_PATH = "CACHE_FILE_PATH";
+    public static final String IMAGE_COL_DATASET_NAME = "DATASET_NAME";
+    public static final String IMAGE_COL_SYNC_OPS = "IMAGE_SYNC_OPERATIONS";
 
     public static final String TABLE_LICENSE = "license_table";
-    public static final String LICENSE_COL_1 = "LICENSE_PK";
-    public static final String LICENSE_COL_2 = "LICENSE_NAME";
+    public static final String LICENSE_COL_PK = "LICENSE_PK";
+    public static final String LICENSE_COL_NAME = "LICENSE_NAME";
 
     public static final String TABLE_PROJECT = "project_table";
-    public static final String PROJECT_COL_1 = "PROJECT_PK";
-    public static final String PROJECT_COL_2 = "PROJECT_NAME";
+    public static final String PROJECT_COL_PK = "PROJECT_PK";
+    public static final String PROJECT_COL_NAME = "PROJECT_NAME";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -43,42 +43,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d("onCreate: ", "CREATING DATASET TABLE");
         sqLiteDatabase.execSQL("create table " +
                 TABLE_DATASET + " (" +
-                DATASET_COL_1 + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                DATASET_COL_2 + " INTEGER, " +
-                DATASET_COL_3 + " TEXT, " +
-                DATASET_COL_4 + " TEXT, " +
-                DATASET_COL_5 + " INTEGER DEFAULT 1 NOT NULL, " +
-                DATASET_COL_6 + " TEXT, " +
-                DATASET_COL_7 + " TEXT, " +
-                DATASET_COL_8 + " TEXT, " +
-                        "FOREIGN KEY (" + DATASET_COL_6 + ")" +
-                        "REFERENCES " + TABLE_LICENSE + " (" + LICENSE_COL_1 + "))"
-                );
+                DS_COL_PK + " INTEGER DEFAULT -1 NOT NULL, " +
+                DS_COL_NAME + " TEXT PRIMARY KEY NOT NULL, " +
+                DS_COL_DESCRIPTION + " TEXT NOT NULL DEFAULT '', " +
+                DS_COL_PROJECT + " INTEGER DEFAULT 1 NOT NULL, " +
+                DS_COL_PUBLIC + " INTEGER DEFAULT 0 NOT NULL, " +
+                DS_COL_LICENSE + " INTEGER DEFAULT 1 NOT NULL, " +
+                DS_COL_TAGS + " TEXT NOT NULL DEFAULT '', " +
+                DS_COL_SYNC_OPS + " INTEGER NOT NULL DEFAULT 0, " +
+                "FOREIGN KEY (" + DS_COL_LICENSE + ") " +
+                "REFERENCES " + TABLE_LICENSE + " (" + LICENSE_COL_PK + "), " +
+                "FOREIGN KEY (" + DS_COL_PROJECT + ") " +
+                "REFERENCES " + TABLE_PROJECT+ " (" + PROJECT_COL_PK + "))"
+        );
 
         Log.d("onCreate: ", "CREATING IMAGE TABLE");
         sqLiteDatabase.execSQL("create table " +
                 TABLE_IMAGE + " (" +
-                IMAGE_COL_1 + " TEXT PRIMARY KEY, " +
-                IMAGE_COL_2 + " TEXT, " +
-                IMAGE_COL_3 + " TEXT, " +
-                IMAGE_COL_4 + " TEXT, " +
-                IMAGE_COL_5 + " INTEGER, " +
-                IMAGE_COL_6 + " TEXT, " +
-                        "FOREIGN KEY (" + IMAGE_COL_5 + ")" +
-                        "REFERENCES " + TABLE_DATASET + " (" + DATASET_COL_1 + "))"
-                );
-
+                IMAGE_COL_NAME + " TEXT, " +
+                IMAGE_COL_LABEL + " TEXT NOT NULL, " +
+                IMAGE_COL_FILE_PATH + " TEXT, " +
+                IMAGE_COL_CACHE_PATH + " TEXT, " +
+                IMAGE_COL_DATASET_NAME + " TEXT NOT NULL, " +
+                IMAGE_COL_SYNC_OPS + " INTEGER, " +
+                "PRIMARY KEY (" + IMAGE_COL_NAME + " , " + IMAGE_COL_DATASET_NAME + "), " +
+                "FOREIGN KEY (" + IMAGE_COL_DATASET_NAME + ")" +
+                "REFERENCES " + TABLE_DATASET + " (" + DS_COL_NAME + ") ON DELETE CASCADE)"
+        );
         Log.d("onCreate: ", "CREATING LICENSE TABLE");
         sqLiteDatabase.execSQL("create table " +
                 TABLE_LICENSE + " (" +
-                LICENSE_COL_1 + " INTEGER PRIMARY KEY, " +
-                LICENSE_COL_2 + " TEXT)");
+                LICENSE_COL_PK + " INTEGER PRIMARY KEY, " +
+                LICENSE_COL_NAME + " TEXT)");
 
         Log.d("onCreate: ", "CREATING PROJECT TABLE");
         sqLiteDatabase.execSQL("create table " +
                 TABLE_PROJECT + " (" +
-                PROJECT_COL_1 + " INTEGER PRIMARY KEY, " +
-                PROJECT_COL_2 + " TEXT)");
+                PROJECT_COL_PK + " INTEGER PRIMARY KEY, " +
+                PROJECT_COL_NAME + " TEXT)");
     }
 
     @Override
