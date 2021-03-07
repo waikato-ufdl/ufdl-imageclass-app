@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -44,12 +45,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 
 import io.github.waikato_ufdl.Classifier;
 import io.github.waikato_ufdl.MainActivity;
 import io.github.waikato_ufdl.Prediction;
 import io.github.waikato_ufdl.R;
+import io.github.waikato_ufdl.SessionManager;
 import io.github.waikato_ufdl.databinding.FragmentCameraBinding;
 
 public class cameraFragment extends Fragment implements AdapterView.OnItemSelectedListener {
@@ -85,6 +86,9 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        SessionManager sessionManager = new SessionManager(requireContext());
+        if (!sessionManager.isLoggedIn())
+            Navigation.findNavController(requireView()).navigate(R.id.action_nav_home_to_settingsFragment);
 
         //set the orientation to portrait and change the colour of the navigation bar
         requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -120,7 +124,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
                 //check which camera features are available & hide the support action bar
                 checkFeaturesAvailable(options);
                 Log.e("TAG", "Camera Started");
-                Objects.requireNonNull(((MainActivity) requireActivity()).getSupportActionBar()).hide();
+                hideActionBar();
             }
 
             /**
@@ -170,6 +174,15 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
                 startCamera();
             }
         });
+    }
+
+    /***
+     * Method to hide the default action bar
+     */
+    public void hideActionBar()
+    {
+        ActionBar supportActionBar = ((MainActivity) requireActivity()).getSupportActionBar();
+        if (supportActionBar != null) supportActionBar.hide();
     }
 
     /***
@@ -332,6 +345,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
 
     /**
      * Method to update the model spinner entries to display the models associated to the framework selected
+     *
      * @param framework the selected framework (Pytorch Mobile or TensorFlow Lite)
      */
     public void updateModelSpinnerEntries(String framework) {
@@ -426,10 +440,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
     public void onStart() {
         super.onStart();
         Log.e("TAG", "Started");
-        try {
-            Objects.requireNonNull(((MainActivity) requireActivity()).getSupportActionBar()).hide();
-        } catch (Exception ignored) {
-        }
+        hideActionBar();
     }
 
     /***
@@ -438,7 +449,8 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onStop() {
         super.onStop();
-        Objects.requireNonNull(((MainActivity) requireActivity()).getSupportActionBar()).show();
+        ActionBar supportActionBar = ((MainActivity) requireActivity()).getSupportActionBar();
+        if (supportActionBar != null) supportActionBar.show();
     }
 
     /***
@@ -505,7 +517,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
 
                 ClassifierDetails details = ClassifierUtils.deserializeModelJSON(requireContext(), model.value);
                 //imageClassifier.setModel(requireContext(), details);
-                if(details != null)
+                if (details != null)
                     imageClassifier = Classifier.createInstance(requireContext(), details);
             }
         }).start();
@@ -522,7 +534,8 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
 
     /**
      * Method to remove the file extension from a filename string
-     * @param filename the original filename
+     *
+     * @param filename            the original filename
      * @param removeAllExtensions true - to remove all extensions in the filename string
      * @return filename without any extension
      */
@@ -545,7 +558,8 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
 
         /**
          * Constructor for tuple objects
-         * @param key the integer key - selected model index
+         *
+         * @param key   the integer key - selected model index
          * @param value the string value - the selected model name
          */
         public Tuple(int key, String value) {
@@ -555,6 +569,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
 
         /**
          * setter method to change the selected index
+         *
          * @param key the index position of a selected model
          */
         public void setKey(int key) {
@@ -563,6 +578,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
 
         /**
          * Setter method to change the selected model name
+         *
          * @param value the selected model's name
          */
         public void setValue(String value) {
