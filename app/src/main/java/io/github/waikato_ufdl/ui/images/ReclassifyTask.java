@@ -3,33 +3,31 @@ package io.github.waikato_ufdl.ui.images;
 import android.content.Context;
 import android.view.ActionMode;
 
-import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
-
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 
-import io.github.waikato_ufdl.ui.settings.Utility;
+import io.github.waikato_ufdl.ImageOperations;
 
 /**
  * A ReclassifyTask will be used to reclassify all selected images with a single given label
  */
 
 public class ReclassifyTask extends NetworkTask {
-    private ArrayList<ClassifiedImage> selectedImages;
-    private String label;
+    private final ArrayList<ClassifiedImage> selectedImages;
+    private final String label;
 
     /**
      * The constructor for generating an UploadTask
      *
-     * @param fragment  the ImagesFragment
-     * @param context   the context
-     * @param images    the list of images selected by the user (ClassifiedImage objects)
-     * @param label     the classification label to allocate to all selected images
-     * @param action    the action used to perform operations on ImageClassification datasets
-     * @param mode      the action mode
+     * @param fragment    the ImagesFragment
+     * @param context     the context
+     * @param images      the list of images selected by the user (ClassifiedImage objects)
+     * @param label       the classification label to allocate to all selected images
+     * @param datasetName the name of the dataset in which the image belongs
+     * @param mode        the action mode
      */
-    public ReclassifyTask(ImagesFragment fragment, Context context, ArrayList<ClassifiedImage> images, String label, String datasetName, ImageClassificationDatasets action, ActionMode mode) {
-        super(fragment, context, datasetName, action, mode);
+    public ReclassifyTask(ImagesFragment fragment, Context context, ArrayList<ClassifiedImage> images, String label, String datasetName, ActionMode mode) {
+        super(fragment, context, datasetName, mode);
 
         this.selectedImages = images;
         this.label = label;
@@ -37,33 +35,15 @@ public class ReclassifyTask extends NetworkTask {
         completedMessage = "The selected images have been reclassified as: " + label;
     }
 
-    /**
+    /***
      * Method to reclassify images with the given classification label
-     *
      * @param image either a ClassifiedImage object or URI object
-     * @throws Exception
      */
     @Override
-    public void backgroundTask(Object image) throws Exception {
-
+    public void backgroundTask(Object image) {
         String imageFileName = ((ClassifiedImage) image).getImageFileName();
         String classificationLabel = ((ClassifiedImage) image).getClassificationLabel();
-
-        //update the sync status of the particular image to reclassi
-        dbManager.reclassifyImage(datasetName, imageFileName, label);
-
-        if (Utility.isOnlineMode) {
-            //make an API request to remove current the categories for each image & reclassify the image using the new label
-            if (action.removeCategories(datasetPK, Arrays.asList(imageFileName), Arrays.asList(classificationLabel)) &
-                    (action.addCategories(datasetPK, Arrays.asList(imageFileName), Arrays.asList(label)))) {
-
-                //update the image information in the local database
-                dbManager.setImageSynced(datasetName, imageFileName);
-            }
-        }
-
-        //reload the fragment after making the change to the local database
-        //fragment.reload();
+        ImageOperations.updateImage(dbManager, datasetPK, datasetName, imageFileName, Collections.singletonList(classificationLabel), label);
     }
 
     /**

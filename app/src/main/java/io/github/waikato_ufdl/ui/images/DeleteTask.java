@@ -2,68 +2,49 @@ package io.github.waikato_ufdl.ui.images;
 
 import android.content.Context;
 import android.view.ActionMode;
-import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
+
 import java.util.ArrayList;
-import io.github.waikato_ufdl.ui.settings.Utility;
+
+import io.github.waikato_ufdl.ImageOperations;
 
 /**
- * A DeleteTask will be used to deleted selected images from the backend
- * */
+ * A DeleteTask will be used to delete selected images from the backend (if online mode) or
+ * set the sync status of the images to delete (in offline mode).
+ */
 
 public class DeleteTask extends NetworkTask {
-    private ArrayList<ClassifiedImage> selectedImages;
-    ArrayList<ClassifiedImage> storedImages;
+    private final ArrayList<ClassifiedImage> selectedImages;
 
     /**
      * The constructor for generating an UploadTask
+     *
      * @param fragment the ImagesFragment
-     * @param context the context
-     * @param images the list of selected images (ClassifiedImage objects)
-     * @param action the action used to perform operations on ImageClassification datasets
-     * @param mode the action mode
+     * @param context  the context
+     * @param images   the list of selected images (ClassifiedImage objects)
+     * @param mode     the action mode
      */
-    public DeleteTask(ImagesFragment fragment, Context context, ArrayList<ClassifiedImage> images, String datasetName, ImageClassificationDatasets action, ActionMode mode) {
-        super(fragment, context, datasetName, action, mode);
+    public DeleteTask(ImagesFragment fragment, Context context, ArrayList<ClassifiedImage> images, String datasetName, ActionMode mode) {
+        super(fragment, context, datasetName, mode);
 
         this.selectedImages = images;
         processingMessage = "Deleting image ";
         completedMessage = "Successfully deleted selected images";
-        storedImages = Utility.getImageList(datasetPK);
     }
 
     /**
+     * Method to delete images from a dataset
      *
-     * @param image represents a classified image object
-     * @throws Exception
+     * @param image the classified image object
      */
     @Override
-    public void backgroundTask(Object image) throws Exception {
+    public void backgroundTask(Object image) {
         String imageFilename = ((ClassifiedImage) image).getImageFileName();
-
-        //set the image sync status to delete
-        dbManager.deleteImage(datasetName, imageFilename);
-
-        //if we are in online mode, attempt to delete the image file from the backend
-        if(Utility.isOnlineMode) {
-
-            //if the image has been successfully deleted
-            if(action.deleteFile(datasetPK, imageFilename))
-            {
-                //set it's sync status of the image to synced and then delete it's record from the local database
-                dbManager.setImageSynced(datasetName, imageFilename);
-                dbManager.deleteSyncedImage(datasetName, imageFilename);
-            }
-        }
-
-        /*
-        else {
-            fragment.reload();
-        }
-         */
+        String cachePath = ((ClassifiedImage) image).getCachedFilePath();
+        ImageOperations.deleteImage(dbManager, datasetPK, datasetName, imageFilename, cachePath);
     }
 
     /**
-     * will execute the deletion process and display a progress dialog to the user
+     * Method will execute the deletion process and display a progress dialog to the user
      */
     @Override
     public void execute() {
