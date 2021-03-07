@@ -16,8 +16,8 @@ public class ImagesFragmentViewModel extends ViewModel {
     }
 
     /**
-     * Method to get text
-     * @return
+     * Method to get retrieve live data
+     * @return mutable live data containing set text
      */
     public MutableLiveData<String> getText()
     {
