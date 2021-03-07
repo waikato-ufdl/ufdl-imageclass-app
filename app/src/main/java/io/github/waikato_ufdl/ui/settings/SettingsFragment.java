@@ -1,135 +1,177 @@
 package io.github.waikato_ufdl.ui.settings;
+
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CompoundButton;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Switch;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
+import com.github.waikatoufdl.ufdl4j.Client;
+import com.github.waikatoufdl.ufdl4j.action.Datasets;
+import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
+import com.github.waikatoufdl.ufdl4j.action.Licenses;
+import com.github.waikatoufdl.ufdl4j.action.Projects;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+
 import cn.pedant.SweetAlert.SweetAlertDialog;
-import io.github.waikato_ufdl.R;
+import io.github.waikato_ufdl.DBManager;
+import io.github.waikato_ufdl.SessionManager;
+import io.github.waikato_ufdl.databinding.FragmentSettingsBinding;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.internal.operators.completable.CompletableToObservable;
-import io.reactivex.rxjava3.internal.operators.observable.ObservableFromCompletable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-
 public class SettingsFragment extends Fragment {
-    Button buttonToMain;
-    Switch themeSwitch;
-    EditText username, password,serverURL;
+    SessionManager sessionManager;
+    FragmentSettingsBinding binding;
     String prevUsername, prevPassword, prevServerURL;
+    DBManager dbManager;
+    ImageClassificationDatasets action;
 
-    public SettingsFragment() { }
+    /***
+     * Default constructor for the Settings Fragment
+     */
+    public SettingsFragment() {
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-
-        //pass context to to Utility class & set the theme
-        Utility.setContext(getContext());
-        getContext().setTheme(Utility.getTheme());
+        sessionManager = new SessionManager(requireContext());
+        requireContext().setTheme(sessionManager.getTheme());
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.fragment_settings, container, false);
+        dbManager = sessionManager.getDbManager();
+        binding = FragmentSettingsBinding.inflate(inflater, container, false);
 
-        //initialise views
-        themeSwitch = (Switch) v.findViewById(R.id.themeSwitch);
-        buttonToMain = (Button) v.findViewById(R.id.SettingsButton);
-        username = (EditText) v.findViewById(R.id.Username);
-        password = (EditText) v.findViewById(R.id.Password);
-        serverURL = (EditText) v.findViewById(R.id.URL);
-
-        //load any saved settings from sharedPreferences
+        //load stored settings from the previous login session
         retrieveSavedSettings(true);
+        setURLTextChangeListener();
+        setThemeSwitchListener();
+        setLoginButtonClickListener();
+        setupAutoCompleteFields();
 
-        //add text changed listener to ensure that the HTTP:// is set as the prefix
-        serverURL.addTextChangedListener(new TextWatcher() {
+        // Inflate the layout for this fragment
+        return binding.getRoot();
+    }
+
+    /***
+     * Loads the known server and user lists from the local database uses them to set the adapters for the URL & Username fields to show
+     * auto complete suggestions to the user while they type.
+     */
+    private void setupAutoCompleteFields() {
+        ArrayList<String> knownServers = dbManager.getServers();
+        ArrayList<String> knownUsers = dbManager.getUsernames();
+
+        if (!knownServers.isEmpty())
+            binding.URL.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, knownServers));
+
+        if (!knownUsers.isEmpty())
+            binding.Username.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, knownUsers));
+    }
+
+    /***
+     * Sets the click listener on the login button. When this button is pressed, the user input fields are checked to ensure they are non-empty
+     * and the server URL is valid prior to making a login attempt.
+     */
+    private void setLoginButtonClickListener() {
+        //set an onclick listener to the 'Login' button
+        binding.loginButton.setOnClickListener(view -> {
+            //only exit if the required fields are not empty & also check if the URL is valid
+            if (inputFieldsAreValid()) {
+                sessionManager.removeSession();
+                saveSettings();
+                login();
+            }
+        });
+    }
+
+    /***
+     * Method to store the URL, username and password text to shared preferences
+     */
+    private void saveSettings() {
+        sessionManager.saveServerURL(binding.URL.getText().toString().trim());
+        sessionManager.saveUsername(binding.Username.getText().toString().trim());
+        sessionManager.savePassword(binding.Password.getText().toString().trim());
+    }
+
+    /***
+     * Sets a text change listener on the server URL field so that the http:// prefix is automatically added once a user starts typing the server URL.
+     */
+    private void setURLTextChangeListener() {
+        binding.URL.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
+            @SuppressLint("SetTextI18n")
             @Override
             public void afterTextChanged(Editable s) {
-                if(!s.toString().startsWith("http://")){
-                    serverURL.setText("http://" + s);
-                    Selection.setSelection(serverURL.getText(), serverURL.getText().length());
+                if (!s.toString().startsWith("http://")) {
+                    binding.URL.setText("http://" + s);
+                    Selection.setSelection(binding.URL.getText(), binding.URL.getText().length());
+                }
             }
-        }});
+        });
+    }
 
-        if(Utility.loadDarkModeState())
-        {
-            themeSwitch.setChecked(true);
+    /***
+     * Set the theme switch listener to toggle between light & dark mode on upon the checked state. When the checked state is true, turn on dark mode.
+     * Else, set light theme when the checked state is false;
+     */
+    private void setThemeSwitchListener() {
+        binding.themeSwitch.setChecked(sessionManager.loadDarkModeState());
+        if (binding.themeSwitch.isChecked()) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }
 
-        themeSwitch.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            if(isChecked) {
-                Utility.saveDarkModeState(true);
-            }
-            else {
-                Utility.saveDarkModeState(false);
-            }
+        binding.themeSwitch.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            sessionManager.saveDarkModeState(isChecked);
 
-            //complete theme switch + animation by restarting the activity
-            restartActivity();
-        });
-
-        //set an onclick listener to the 'Save & Exit' button
-        buttonToMain.setOnClickListener(view -> {
-
-            boolean valid = checkDetailsEntered();
-
-            //only exit if the required fields are not empty & also check if the URL is valid
-            if (valid & Utility.isValidURL(serverURL.getText().toString().trim())) {
-                //save user details and then try to establish a connection with the server
-                saveSettings();
-                login();
-
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             } else {
-                //if the URL is invalid, inform the user about the issue
-                serverURL.setError("Invalid URL");
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             }
         });
-
-        // Inflate the layout for this fragment
-        return v;
     }
 
     /**
-     * This method will display a loading animation while attempting to login and test the connection to the server
+     * This method will display a loading animation while attempting to login and test the connection to the server.
      */
-    public void login()
-    {
-        Observable.fromCallable(() -> connectAndTestConnection())
+    public void login() {
+
+        Observable.fromCallable(this::connectAndTestConnection)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Boolean>() {
-                    SweetAlertDialog loadingDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
-                    Boolean connectionSuccessful;
+                    final SweetAlertDialog loadingDialog = new SweetAlertDialog(requireContext(), SweetAlertDialog.PROGRESS_TYPE);
 
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
@@ -142,135 +184,188 @@ public class SettingsFragment extends Fragment {
 
                     @Override
                     public void onNext(@NonNull Boolean aBoolean) {
-                        connectionSuccessful = aBoolean;
+                        showConnectionResultDialog(aBoolean);
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-
                     }
 
                     @Override
                     public void onComplete() {
                         loadingDialog.dismissWithAnimation();
-                        showConnectionResultDialog(connectionSuccessful);
                     }
                 });
     }
 
-    /**
-     * A method to connect to the server & then proceed to test the connection
+    /***
+     * A method to connect to the server & then proceed to test the connection via data retrieval
      * @return returns true if connection is successful
      */
-    public boolean connectAndTestConnection()
-    {
-        Utility.connectToServer();
-        return Utility.isConnected();
+    public boolean connectAndTestConnection() {
+        sessionManager.connectToServer();
+
+        try {
+            return SessionManager.getClient().licenses().list().size() > 0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    /**
-     * Method to display a dialog informing the user whether the connection has been established or failed
+    /***
+     * Displays a dialog informing the user whether their login attempt was successful or not. If it was successful,
+     * also inform the user if they are in offline mode or online mode.
      * @param connectionSuccessful boolean which represents if a connection is successful (true = success, false = failed)
      */
-    public void showConnectionResultDialog(boolean connectionSuccessful)
-    {
-        //if the connection is successful, display a success dialog
-        if(connectionSuccessful)
-        {
-            new SweetAlertDialog(getContext(), SweetAlertDialog.SUCCESS_TYPE)
-                    .setTitleText("Connection Successful")
-                    .setContentText("You have successfully established a connection to the server!")
-                    .setConfirmText("OK")
-                    .setConfirmClickListener(sweetAlertDialog -> {
-                        //when the user clicks "OK" they will be taken back to the previous screen they were on prior to settings
-                        sweetAlertDialog.dismissWithAnimation();
-                        Navigation.findNavController(getView()).popBackStack();
-                    })
-                    .show();
-        }
-        else
-        {
+    public void showConnectionResultDialog(boolean connectionSuccessful) {
+        String serverURL = binding.URL.getText().toString().trim();
+        String username = binding.Username.getText().toString().trim();
+        String password = binding.Password.getText().toString().trim();
+        int userPK;
+
+        String titleText = "Login Successful";
+        String contentText;
+        int dialogType = SweetAlertDialog.SUCCESS_TYPE;
+        SweetAlertDialog.OnSweetClickListener listener = sweetAlertDialog -> {
+            sweetAlertDialog.dismissWithAnimation();
+            Navigation.findNavController(requireView()).popBackStack();
+        };
+
+        //if the connection is successful, display the appropriate success dialog
+        if (connectionSuccessful && SessionManager.isOnlineMode) {
+            storeLoginDetails(serverURL, username, password);
+            contentText = "You have successfully established a connection to the server.";
+        } else if ((userPK = dbManager.getUserPK(serverURL, username, password)) != -1) {
+            sessionManager.createSession(userPK);
+            contentText = "Authentication successful. You are in offline mode.";
+        } else {
             //display error dialog informing users to check their login details
-            new SweetAlertDialog(getContext(), SweetAlertDialog.ERROR_TYPE)
-                    .setTitleText("Connection Failed")
-                    .setContentText("The connection has failed. Please check your login details and try again.")
-                    .setConfirmText("OK")
-                    .setConfirmClickListener(sweetAlertDialog -> {
-                        //close the dialog but stay on settings screen
-                        sweetAlertDialog.dismissWithAnimation();
-                    })
-                    .show();
+            dialogType = SweetAlertDialog.ERROR_TYPE;
+            titleText = "Authentication Failed";
+            contentText = "Please check your login details and try again.";
+            sessionManager.removeSession();
+            listener = SweetAlertDialog::dismissWithAnimation;
         }
+
+        new SweetAlertDialog(requireContext(), dialogType)
+                .setTitleText(titleText)
+                .setContentText(contentText)
+                .setConfirmText("OK")
+                .setConfirmClickListener(listener)
+                .show();
     }
 
-    /**
+    /***
+     * Stores a user's login details into the local database.
+     * @param serverURL the server URL
+     * @param username the username
+     * @param password the password
+     */
+    private void storeLoginDetails(String serverURL, String username, String password) {
+        new Thread(() -> {
+            try {
+                int pk = SessionManager.getClient().users().load(username).getPK();
+                boolean firstLogin = dbManager.getUserPK(serverURL, username, password) == -1;
+                Log.d("TAG", "First time logged in: " + firstLogin);
+                dbManager.storeUserDetails(pk, serverURL, username, password);
+                sessionManager.createSession(pk);
+                action = sessionManager.getDatasetAction();
+
+                if (firstLogin) {
+                    loadRequiredDataFromServer();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    /***
      * Method to retrieve a user's stored settings & optionally display them to the EditTexts
      * @param setFields boolean value indicating whether to set the text fields with the previous user details
      */
-    public void retrieveSavedSettings(boolean setFields)
-    {
-        prevUsername = (Utility.loadUsername() != null) ? Utility.loadUsername() : "";
-        prevPassword = (Utility.loadPassword() != null) ? Utility.loadPassword() : "";
-        prevServerURL = (Utility.loadServerURL() != null) ? Utility.loadServerURL() : "";
+    public void retrieveSavedSettings(boolean setFields) {
+        prevServerURL = ((prevServerURL = sessionManager.loadServerURL()) != null) ? prevServerURL : "";
+        prevUsername = ((prevUsername = sessionManager.loadUsername()) != null) ? prevUsername : "";
+        prevPassword = ((prevPassword = sessionManager.loadPassword()) != null) ? prevPassword : "";
 
-        if(setFields) {
-            username.setText(prevUsername);
-            password.setText(prevPassword);
-            serverURL.setText(prevServerURL);
+        if (setFields) {
+            binding.Username.setText(prevUsername);
+            binding.Password.setText(prevPassword);
+            binding.URL.setText(prevServerURL);
         }
     }
 
-    /**
-     * Method to save the main user settings to local storage
+    /***
+     * Checks if any of the required user login fields are empty and also validates the URL.
+     * @return true if all the required information has been provided and the URL is valid. Else, returns false and displays errors on the appropriate fields.
      */
-    public void saveSettings()
-    {
-        Utility.saveUsername(username.getText().toString().trim());
-        Utility.savePassword(password.getText().toString().trim());
-        Utility.saveServerURL(serverURL.getText().toString().trim());
-    }
-
-    /**
-     * Method to check if any of the required user setting fields are empty
-     * @return boolean
-     */
-    public boolean checkDetailsEntered()
-    {
+    public boolean inputFieldsAreValid() {
         boolean valid = true;
 
-        //check if any of the inputs are empty and if so, set an error message
-        if(isEmpty(username, 0)) {
-            username.setError("Required");
+        if (isEmpty(binding.Username, 1)) {
+            binding.Username.setError("Required");
             valid = false;
         }
-        if(isEmpty(password, 0))
-        {
-            password.setError("Required");
+        if (isEmpty(binding.Password, 1)) {
+            binding.Password.setError("Required");
             valid = false;
         }
-        if(isEmpty(serverURL, 7))
-        {
-            serverURL.setError("Required");
+        if (isEmpty(binding.URL, 7)) {
+            binding.URL.setError("Required");
+            valid = false;
+        }
+        if (!SessionManager.isValidURL(binding.URL.getText().toString().trim())) {
+            binding.URL.setError("Invalid URL");
             valid = false;
         }
 
         return valid;
     }
 
-    /**
-     * Method to check if an EditText is empty
-     * @param editText The EditText to check
-     * @return
+    /***
+     * Method to check if an EditText field is empty or doesn't meet the required minimum character limit.
+     * @param editText  the edit text field to check
+     * @param minLength minimum character length required
+     * @return true if edit text field is empty or doesn't meet the minimum character requirement.
      */
-    public boolean isEmpty(EditText editText, int minLength)
-    {
-        return editText.getText().toString().trim().length() <= minLength;
+    public boolean isEmpty(EditText editText, int minLength) {
+        return editText.getText().toString().trim().length() < minLength;
     }
 
-    /**
-     * a method to restart the current fragment
+    /***
+     * Loads the licenses, projects and dataset information from the server via an API request
      */
-    public void restartActivity() {
-        getActivity().recreate();
+    private void loadRequiredDataFromServer() {
+        Observable.fromCallable(() ->
+        {
+            Client client = SessionManager.getClient();
+            ImageClassificationDatasets action = client.action(ImageClassificationDatasets.class);
+
+            for (Licenses.License license : client.licenses().list())
+                dbManager.insertLicense(license.getPK(), license.getName());
+
+            for (Projects.Project project : client.projects().list())
+                dbManager.insertProject(project.getPK(), project.getName());
+
+            for (Datasets.Dataset dataset : action.list())
+                dbManager.insertSyncedDataset(dataset.getPK(), dataset.getName(), dataset.getDescription(), dataset.getProject(), dataset.getLicense(), dataset.isPublic(), dataset.getTags());
+
+            return true;
+        })
+                // Execute in IO thread, i.e. background thread.
+                .subscribeOn(Schedulers.io())
+                // report or post the result to main thread.
+                .observeOn(AndroidSchedulers.mainThread())
+                //if an error occurs, display the error message in the log
+                .doOnError(e -> Log.e("TAG", "Failed to load data from the server \nError: " + e.getMessage()))
+                // execute this
+                .subscribe();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }
