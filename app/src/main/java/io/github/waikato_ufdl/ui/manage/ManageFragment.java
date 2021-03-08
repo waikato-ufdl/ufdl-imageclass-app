@@ -633,27 +633,16 @@ public class ManageFragment extends Fragment {
             int id = item.getItemId();
 
             //check which menu item was clicked
-            switch (id) {
-                case R.id.action_relabel_dataset:
-                    //when the user presses the edit icon
-                    initiateDatasetWindow(false);
-                    break;
-
-                case R.id.action_copy_dataset:
-                    //when the user presses the copy icon
-                    confirmCopyDataset(mode, datasetName);
-                    break;
-
-                case R.id.action_delete_dataset:
-                    //when user presses the delete icon
-                    deleteConfirmation(mode);
-                    break;
-
-                case R.id.action_download_dataset:
-                    //when the user presses the download icon
-                    if (SessionManager.isOnlineMode) {
-                        confirmDatasetDownload();
-                    }
+            if (id == R.id.action_relabel_dataset) {//when the user presses the edit icon
+                initiateDatasetWindow(false);
+            } else if (id == R.id.action_copy_dataset) {//when the user presses the copy icon
+                confirmCopyDataset(mode, datasetName);
+            } else if (id == R.id.action_delete_dataset) {//when user presses the delete icon
+                deleteConfirmation(mode);
+            } else if (id == R.id.action_download_dataset) {//when the user presses the download icon
+                if (SessionManager.isOnlineMode) {
+                    confirmDatasetDownload();
+                }
             }
 
             return false;
@@ -679,7 +668,7 @@ public class ManageFragment extends Fragment {
         super.onDestroyView();
         binding = null;
         newDatasetBinding = null;
-        //networkMonitor.removeObservers(this);
+        networkMonitor.removeObservers(this);
     }
 
     /***

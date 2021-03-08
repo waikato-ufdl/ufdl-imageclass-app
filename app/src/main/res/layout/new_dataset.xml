@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/backgroundColor"
@@ -10,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="DATASET NAME"
+        android:text="@string/dataset_name_header"
         android:textColor="@color/colorAccent"
         android:textSize="@dimen/settingsLabelSizes" />
 
@@ -21,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:background="@drawable/edit_text_design"
-        android:hint="Dataset Name"
+        android:hint="@string/dataset_name"
         android:padding="10dp"
         android:textColor="?attr/textColor"
         android:textColorHint="@color/grey"
@@ -30,7 +31,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="DESCRIPTION"
+        android:text="@string/description_header"
         android:textColor="@color/colorAccent"
         android:textSize="@dimen/settingsLabelSizes" />
 
@@ -40,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:background="@drawable/edit_text_design"
-        android:hint="Dataset Description"
+        android:hint="@string/dataset_description"
         android:textColor="?attr/textColor"
         android:textColorHint="@color/grey"
         android:gravity="top|start"
@@ -50,8 +51,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Project"
-        android:text="PROJECT"
+        android:hint="@string/project"
+        android:text="@string/project_header"
         android:textColor="@color/colorAccent"
         android:textColorHint="@color/grey"
         android:textSize="@dimen/settingsLabelSizes" />
@@ -102,8 +103,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Tags"
-        android:text="TAGS (OPTIONAL)"
+        android:hint="@string/tags"
+        android:text="@string/tags_header"
         android:textColor="@color/colorAccent"
         android:textColorHint="@color/grey"
         android:textSize="@dimen/settingsLabelSizes" />
@@ -114,7 +115,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:background="@drawable/edit_text_design"
-        android:hint="Tags"
+        android:hint="@string/tags"
         android:textColor="?attr/textColor"
         android:textColorHint="@color/grey"
         android:gravity="top|start"
@@ -125,17 +126,17 @@
         android:id="@+id/isPublicSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/datasetTagsEditText"
         android:layout_marginBottom="40dp"
         android:showText="true"
         android:switchPadding="@dimen/switchPadding"
-        android:text="PUBLIC"
+        android:text="@string/SwitchName"
         android:textColor="?attr/textColor"
-        android:textOff="Off"
-        android:textOn="On"
+        android:textOff="@string/off"
+        android:textOn="@string/on"
         android:textSize="@dimen/settingsLabelSizes"
         android:thumb="@drawable/thumb"
-        android:track="@drawable/track" />
+        android:track="@drawable/track"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
 
     <Button
         android:id="@+id/createDatasetButton"
@@ -143,7 +144,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/button_design"
         android:padding="10dp"
-        android:text="CREATE DATASET"
+        android:text="@string/create_dataset"
         android:textSize="@dimen/buttonTextSize" />
 
 </LinearLayout>

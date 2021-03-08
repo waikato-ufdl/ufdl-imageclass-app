@@ -207,26 +207,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-        switch (item.getItemId()) {
-            case R.id.nav_home: {
-                Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.nav_home);
-                break;
-            }
-
-            case R.id.nav_gallery: {
-                Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.nav_gallery);
-                break;
-            }
-
-            case R.id.settingsFragment: {
-                Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.settingsFragment);
-                break;
-            }
-
-            case R.id.website: {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String.valueOf(R.string.application_url))));
-                break;
-            }
+        int itemId = item.getItemId();
+        if (itemId == R.id.nav_home) {
+            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.nav_home);
+        } else if (itemId == R.id.nav_gallery) {
+            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.nav_gallery);
+        } else if (itemId == R.id.settingsFragment) {
+            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.settingsFragment);
+        } else if (itemId == R.id.website) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String.valueOf(R.string.application_url))));
         }
 
         item.setChecked(true);
@@ -328,6 +317,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onDestroy();
         networkMonitor.removeObservers(this);
         networkMonitor.unregisterDefaultNetworkCallback();
-        dbManager.close();
     }
 }

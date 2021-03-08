@@ -159,9 +159,7 @@ public class ImageOperations {
                 //delete cached image
                 if (removed && cachePath != null) {
                     File file = new File(cachePath);
-                    if (file.exists()) {
-                        Log.d("TAG", "Cache File Deleted: " + file.delete());
-                    }
+                    if (file.exists()) file.delete();
                 }
 
                 //delete full image only if it is in the UFDL directory

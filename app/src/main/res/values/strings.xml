@@ -44,8 +44,30 @@
     <string name="enter_classification_label">Enter Classification Label</string>
     <string name="image_label">Image Label:</string>
     <string name="please_classify_the_image_and_select_a_dataset_to_store_the_image">Please classify the image and select a dataset to store the image:</string>
-    <string name="label">Label</string>
+    <string name="labelSelect">Label</string>
     <string name="probability">Probability</string>
+    <string name="please_select_a_model_and_the_minimum_confidence_score_required_for_the_classifier_to_reclassify_the_image">Please select a model and the minimum confidence score required for the classifier to reclassify the image.</string>
+    <string name="minimum_confidence">Minimum Confidence:</string>
+    <string name="enter_a_decimal_between_0_1">Enter a decimal between 0 – 1</string>
+    <string name="dataset_name_header">DATASET NAME</string>
+    <string name="project">Project</string>
+    <string name="tag_s">Tag(s)</string>
+    <string name="folder">Folder</string>
+    <string name="captured_imaage">Captured Imaage</string>
+    <string name="save_button">save button</string>
+    <string name="datasetimage">datasetImage</string>
+    <string name="classification_label">Classification label</string>
+    <string name="label_all_images_with_this_category">Label all images with this category</string>
+    <string name="save_images">Save Images</string>
+    <string name="dataset_name">Dataset Name</string>
+    <string name="description_header">DESCRIPTION</string>
+    <string name="dataset_description">Dataset Description</string>
+    <string name="project_header">PROJECT</string>
+    <string name="tags">Tags</string>
+    <string name="tags_header">TAGS (OPTIONAL)</string>
+    <string name="SwitchName">PUBLIC</string>
+    <string name="create_dataset">CREATE DATASET</string>
+    <string name="index">Index</string>
 
 
     <string-array name="model_frameworks" translatable="false">

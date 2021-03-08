@@ -476,10 +476,6 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding.camera.clearFrameProcessors();
-        binding.camera.clearCameraListeners();
-        predictionAdapter = null;
-        predictionListViewModel = null;
 
         new Thread(() ->
         {

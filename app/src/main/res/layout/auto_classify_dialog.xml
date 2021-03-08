@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Please select a model and the minimum confidence score required for the classifier to reclassify the image."
+        android:text="@string/please_select_a_model_and_the_minimum_confidence_score_required_for_the_classifier_to_reclassify_the_image"
         android:textColor="@android:color/black"
         android:textSize="12sp" />
 
@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Model:"
+        android:text="@string/model"
         android:textColor="@color/colorAccent"
         android:textSize="13sp" />
 
@@ -45,7 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Minimum Confidence:"
+        android:text="@string/minimum_confidence"
         android:textColor="@color/colorAccent"
         android:textSize="13sp"
         android:textAlignment="center"/>
@@ -55,7 +55,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:hint="Enter a decimal between 0 - 1"
+        android:hint="@string/enter_a_decimal_between_0_1"
         android:paddingTop="0dp"
         android:singleLine="true"
         android:textSize="15sp"

@@ -17,7 +17,8 @@
             android:layout_width="0dp"
             android:layout_height="64dp"
             android:src="@drawable/dataset_folder"
-            android:layout_weight="2"/>
+            android:layout_weight="2"
+            android:contentDescription="@string/folder" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -30,27 +31,25 @@
                 android:id="@+id/dataseName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="DATASET NAME"
+                android:text="@string/dataset_name_header"
                 android:textColor="?attr/textColor" />
 
             <TextView
                 android:id="@+id/projectName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Project"
+                android:text="@string/project"
                 android:textColor="?attr/textColor"/>
 
             <TextView
                 android:id="@+id/datasetTags"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tag(s)"
+                android:text="@string/tag_s"
                 android:textColor="?attr/textColor"/>
 
         </LinearLayout>
 
     </LinearLayout>
-
-
 
 </LinearLayout>

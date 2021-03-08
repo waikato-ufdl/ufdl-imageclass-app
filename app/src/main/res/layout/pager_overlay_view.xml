@@ -11,7 +11,7 @@
         android:id="@+id/imageIndex"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Index"
+        android:text="@string/index"
         android:textSize="18sp"
         android:textColor="@color/white"
         android:background="@drawable/rounded_corners"
@@ -25,12 +25,11 @@
         android:id="@+id/imageLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Label"
+        android:text="@string/labelSelect"
         android:textSize="20sp"
         android:textColor="@color/white"
         android:layout_centerInParent="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="30dp"
-        />
+        android:layout_marginBottom="30dp"/>
 
 </RelativeLayout>

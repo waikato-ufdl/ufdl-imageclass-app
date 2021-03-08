@@ -422,24 +422,15 @@ public class ImageListAdapter extends ListAdapter<ClassifiedImage, ImageListAdap
             }
 
             //check which menu item was clicked
-            switch (item.getItemId()) {
-                case R.id.action_delete:
-                    //when user presses delete
-                    deleteConfirmation(mode);
-                    break;
-
-                case R.id.action_relabel:
-                    //when the user presses edit
-                    confirmEditCategories(mode);
-                    break;
-
-                case R.id.action_select_all:
-                    selectAll();
-                    break;
-
-                case R.id.action_classify:
-                    showAutoClassifierDialog(mode);
-                    break;
+            int itemId = item.getItemId();
+            if (itemId == R.id.action_delete) {//when user presses delete
+                deleteConfirmation(mode);
+            } else if (itemId == R.id.action_relabel) {//when the user presses edit
+                confirmEditCategories(mode);
+            } else if (itemId == R.id.action_select_all) {
+                selectAll();
+            } else if (itemId == R.id.action_classify) {
+                showAutoClassifierDialog(mode);
             }
 
             return false;
