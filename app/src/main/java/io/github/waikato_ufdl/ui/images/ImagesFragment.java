@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -447,6 +448,7 @@ public class ImagesFragment extends Fragment {
 
                 //if the user has checked the checkbox
                 if (isChecked) {
+                    disableEditText(editText);
                     labels[indexPosition] = classification;
                     //create a backup of the current labels
                     System.arraycopy(labels, 0, backup, 0, labels.length);
@@ -454,15 +456,43 @@ public class ImagesFragment extends Fragment {
                     //fill the labels array with the current classification
                     Arrays.fill(labels, classification);
                 } else {
+                    enableEditText(editText);
                     //set labels to the backup labels
                     System.arraycopy(backup, 0, labels, 0, backup.length);
                     editText.setText(labels[indexPosition]);
                 }
             });
 
-            saveImages.setOnClickListener(v -> confirmAddFromGallery(viewPager, dialog));
+            saveImages.setOnClickListener(v ->
+            {
+                confirmAddFromGallery(viewPager, dialog);
+            });
             dialog.show();
         }
+    }
+
+    /***
+     * Disables an edit text
+     * @param editText the edit text to disable
+     */
+    public void disableEditText(EditText editText)
+    {
+        editText.setHint("");
+        editText.setFocusable(true);
+        editText.setFocusableInTouchMode(true);
+        editText.setInputType(InputType.TYPE_NULL);
+    }
+
+    /***
+     * Enables a EditText
+     * @param editText the edit text to enable
+     */
+    public void enableEditText(EditText editText)
+    {
+        editText.setHint("Classification label");
+        editText.setFocusable(true);
+        editText.setFocusableInTouchMode(true);
+        editText.setInputType(InputType.TYPE_CLASS_TEXT);
     }
 
     /***
@@ -478,7 +508,7 @@ public class ImagesFragment extends Fragment {
         if (allLabelsFilled(viewPager.getAdapter().getItemCount())) {
             informativeMessage = "Save classified images?";
         } else {
-            informativeMessage = "All label fields have not been filled out. Any images with empty labels will be classified as 'unlabelled'. Are you sure you wish to save these images?";
+            informativeMessage = "All label fields have not been filled out. Any images with empty labels will be classified as '-'. Are you sure you wish to save these images?";
         }
 
         //if the user cancels deletion close the popup but leave them on the selection mode
@@ -619,7 +649,7 @@ public class ImagesFragment extends Fragment {
                         //retrieve the image data and classification label of the image
                         img = action.getFile(datasetKey, imageFileName);
                         allLabels = action.getCategories(datasetKey, imageFileName);
-                        classificationLabel = (allLabels.size() > 0) ? allLabels.get(0) : "Unlabelled";
+                        classificationLabel = (allLabels.size() > 0) ? allLabels.get(0) : "-";
                     } catch (Exception e) {
                         continue;
                     }
