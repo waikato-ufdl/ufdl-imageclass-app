@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:viewBindingIgnore="true"
+    android:id="@+id/saveImageDialogLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/please_classify_the_image_and_select_a_dataset_to_store_the_image"
+        android:textColor="@android:color/black"
+        android:textSize="12sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/image_label"
+        android:textColor="@color/colorAccent"
+        android:textSize="13sp" />
+
+    <EditText
+        android:id="@+id/classificationLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:hint="@string/enter_classification_label"
+        android:paddingTop="0dp"
+        android:singleLine="true"
+        android:textSize="15sp"
+        android:autofillHints="@string/image_label"
+        android:inputType="text"/>
+
+
+    <CheckBox
+        android:id="@+id/checkboxUsePredicted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/use_predicted_label"
+        android:textSize="12sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/dataset"
+        android:textColor="@color/colorAccent"
+        android:textSize="13sp" />
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#D4D4D4">
+
+        <Spinner
+            android:id="@+id/datasetSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:dropDownWidth="match_parent"
+            android:ellipsize="end"
+            android:popupBackground="#D4D4D4"
+            android:textSize="15sp" />
+    </FrameLayout>
+
+</LinearLayout>
