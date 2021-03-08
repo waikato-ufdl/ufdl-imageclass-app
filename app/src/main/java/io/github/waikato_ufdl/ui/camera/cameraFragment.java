@@ -179,8 +179,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
     /***
      * Method to hide the default action bar
      */
-    public void hideActionBar()
-    {
+    public void hideActionBar() {
         ActionBar supportActionBar = ((MainActivity) requireActivity()).getSupportActionBar();
         if (supportActionBar != null) supportActionBar.hide();
     }
@@ -361,7 +360,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
         pyTorchModels = new ArrayList<>();
         tfliteModels = new ArrayList<>();
 
-        AssetManager assetManager = requireActivity().getApplicationContext().getAssets();
+        AssetManager assetManager = requireContext().getAssets();
         try {
             for (String modelName : assetManager.list("")) {
                 if (modelName.endsWith(".pt")) {
@@ -477,8 +476,13 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        binding.camera.clearFrameProcessors();
+        binding.camera.clearCameraListeners();
+        predictionAdapter = null;
+        predictionListViewModel = null;
 
-        new Thread(() -> {
+        new Thread(() ->
+        {
             binding.camera.destroy();
             binding = null;
         }).start();
@@ -516,7 +520,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
                 model.setValue(parent.getItemAtPosition(position).toString());
 
                 ClassifierDetails details = ClassifierUtils.deserializeModelJSON(requireContext(), model.value);
-                //imageClassifier.setModel(requireContext(), details);
+
                 if (details != null)
                     imageClassifier = Classifier.createInstance(requireContext(), details);
             }
