@@ -386,6 +386,12 @@ public class ImageListAdapter extends ListAdapter<ClassifiedImage, ImageListAdap
             //Initialise menu inflater & inflate menu
             MenuInflater menuInflater = mode.getMenuInflater();
             menuInflater.inflate(R.menu.context_menu_contents, menu);
+
+            //display all icons on the action bar rather than in a dropdown
+            for (int i = 0; i < menu.size(); i++) {
+                menu.getItem(i).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            }
+
             return true;
         }
 
@@ -402,7 +408,7 @@ public class ImageListAdapter extends ListAdapter<ClassifiedImage, ImageListAdap
             //Whenever, a user selects/deselects an item
             imagesViewModel.getText().observe(fragment, s -> {
                 //update the action bar title to show the number of selected images
-                mode.setTitle(String.format("%s Selected", s));
+                mode.setTitle(String.format("%s", s));
             });
 
             return true;
@@ -492,11 +498,11 @@ public class ImageListAdapter extends ListAdapter<ClassifiedImage, ImageListAdap
                     String selectedModel = spinner.getSelectedItem().toString();
                     double confidence = getConfidence(confidenceEditText);
 
-                    if (confidence > 0 && confidence <=1) {
+                    if (confidence > 0 && confidence <= 1) {
                         dialog.dismiss();
                         classify(selectedModel, confidence, mode);
-                    }
-                    else confidenceEditText.setError("Required value must be greater than 0 and less than or equal to 1");
+                    } else
+                        confidenceEditText.setError("Required value must be greater than 0 and less than or equal to 1");
 
                 })
                 .show();
@@ -569,7 +575,5 @@ public class ImageListAdapter extends ListAdapter<ClassifiedImage, ImageListAdap
             Log.e("TAG", "Failed to populate model spinner");
         }
     }
-
-
 }
 
