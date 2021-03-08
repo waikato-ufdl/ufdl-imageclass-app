@@ -2,7 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="?attr/backgroundColor"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:viewBindingIgnore="true">
 
 
     <androidx.viewpager2.widget.ViewPager2
@@ -59,8 +62,9 @@
         android:layout_marginLeft="25dp"
         android:layout_marginRight="25dp"
         android:layout_marginBottom="10dp"
-        android:hint="Image classification"
-        />
+        android:textColor="?attr/textColor"
+        android:hint="Classification label"
+        android:textColorHint="@color/grey" />
 
     <CheckBox
         android:id="@+id/labelCheckBox"
@@ -69,6 +73,9 @@
         android:text="Label all images with this category"
         android:layout_below="@id/editTextCategory"
         android:layout_marginLeft="25dp"
+        android:textColor="?attr/textColor"
+        android:paddingLeft="10dp"
+        android:buttonTint="@color/colorAccent"
         android:layout_marginBottom="50dp"/>
 
     <Button

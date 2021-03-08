@@ -7,25 +7,36 @@
     tools:context="io.github.waikato_ufdl.ui.manage.ManageFragment"
     android:orientation="vertical">
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:progressTint="@color/main_green_color"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:secondaryProgressTint="@color/black"
+        android:visibility="gone"/>
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/datasets_recyclerView"
+        android:id="@+id/datasetRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layoutAnimation="@anim/layout_animation_fall_down"
         android:choiceMode="singleChoice"/>
 
-
-    <ImageButton
-        android:id="@+id/fab_add_dataset"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/buttonCreateDataset"
         android:layout_width="56dp"
         android:layout_height="56dp"
+        app:maxImageSize="35dp"
         android:layout_marginBottom="15dp"
-        android:layout_marginRight="15dp"
+        android:layout_marginEnd="15dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:src="@drawable/add_circle"
+        android:layout_alignParentEnd="true"
+        android:backgroundTint="@color/red"
+        app:borderWidth="0dp"
+        android:src="@drawable/ic_baseline_add_24"
+        android:tint="@color/float_transparent"
         android:contentDescription="@string/add_dataset"
-        android:background="@drawable/ripple_oval"
-        android:elevation="8dp"/>
+        android:elevation="8dp" />
 
 </RelativeLayout>

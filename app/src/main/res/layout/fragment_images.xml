@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="io.github.waikato_ufdl.ui.images.ImagesFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="io.github.waikato_ufdl.ui.images.ImagesFragment"
+    tools:viewBindingIgnore="true">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/imageRecyclerView"
@@ -17,16 +19,16 @@
         android:visibility="gone"
         android:layout_gravity="bottom"/>
 
-    <ImageButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_images"
         android:layout_width="56dp"
         android:layout_height="56dp"
+        app:maxImageSize="35dp"
         android:layout_marginBottom="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_gravity="bottom|right"
+        android:layout_marginEnd="15dp"
+        android:layout_gravity="bottom|end"
         android:src="@drawable/add_image"
         android:contentDescription="@string/add_image"
-        android:background="@drawable/floating_button_background"
+        android:clickable="true"
         android:elevation="8dp" />
-
 </FrameLayout>
