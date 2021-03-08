@@ -311,11 +311,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawerLayout.openDrawer(GravityCompat.START);
         }
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        networkMonitor.removeObservers(this);
-        networkMonitor.unregisterDefaultNetworkCallback();
-    }
 }

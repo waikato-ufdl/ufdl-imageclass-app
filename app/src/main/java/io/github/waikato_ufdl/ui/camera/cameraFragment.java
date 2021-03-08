@@ -320,8 +320,11 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
         modelSpinner = bottomSheetDialog.findViewById(R.id.model_spinner);
         frameworkSpinner = bottomSheetDialog.findViewById(R.id.framework_spinner);
 
-        //display the available models depending on the selected framework
-        updateModelSpinnerEntries(framework.value);
+        if (framework != null) {
+            //display the available models depending on the selected framework
+            updateModelSpinnerEntries(framework.value);
+        }
+
         modelSpinner.setOnItemSelectedListener(this);
         frameworkSpinner.setOnItemSelectedListener(this);
         bottomSheetDialog.show();
@@ -331,19 +334,19 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
         if (framework == null && (selectedItem = frameworkSpinner.getSelectedItem()) != null) {
             framework = new Tuple(frameworkSpinner.getSelectedItemPosition(), selectedItem.toString());
         } else {
-            //else set the framework to the previously selected framework
-            frameworkSpinner.setSelection(framework.key);
+            //else set the framework to the previously selected framework (if the framework isn't null)
+            if (framework != null) frameworkSpinner.setSelection(framework.key);
         }
 
         if (model == null && (selectedItem = modelSpinner.getSelectedItem()) != null) {
             model = new Tuple(modelSpinner.getSelectedItemPosition(), selectedItem.toString());
         } else {
-            modelSpinner.setSelection(model.key);
+            if (model != null) modelSpinner.setSelection(model.key);
         }
     }
 
     /**
-     * Method to update the model spinner entries to display the models associated to the framework selected
+     * Method to update the model spinner entries to display the models for the selected framework
      *
      * @param framework the selected framework (Pytorch Mobile or TensorFlow Lite)
      */
@@ -353,7 +356,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
         requireActivity().runOnUiThread(() -> modelSpinner.setAdapter(arrayAdapter));
     }
 
-    /**
+    /***
      * Load the available model names from the assets folder and store them into the appropriate model list depending on the model extension
      */
     public void createModelListsFromAssets() {
@@ -369,26 +372,52 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
                     tfliteModels.add(modelName);
                 }
             }
-
-            if (model == null && framework == null) {
-                framework = new Tuple(0, FRAMEWORK_PYTORCH);
-                model = new Tuple(0, pyTorchModels.get(0));
-            }
-
-            ClassifierDetails details = ClassifierUtils.deserializeModelJSON(requireContext(), model.value);
-            if (details != null) {
-                imageClassifier = Classifier.createInstance(requireContext(), details);
-            }
+            if (initialiseModelAndFramework()) createClassifier();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    /**
+    /***
+     * Initialise the default model and framework
+     * @return true if initialisation succeeded or false;
+     */
+    private boolean initialiseModelAndFramework() {
+        if (model == null && framework == null) {
+            if (!pyTorchModels.isEmpty()) {
+                framework = new Tuple(0, FRAMEWORK_PYTORCH);
+                model = new Tuple(0, pyTorchModels.get(0));
+                return true;
+            } else if (!tfliteModels.isEmpty()) {
+                framework = new Tuple(1, "TensorFlow Lite");
+                model = new Tuple(0, tfliteModels.get(0));
+                Log.e("TAG", framework + " " + model);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /***
+     * Method to create an image classifier instance
+     */
+    public void createClassifier() {
+        ClassifierDetails details = ClassifierUtils.deserializeModelJSON(requireContext(), model.value);
+        if (details != null) {
+            imageClassifier = Classifier.createInstance(requireContext(), details);
+        }
+    }
+
+    /***
      * Method to toggle the image analyzer on/off
      */
     private void toggleImageAnalyzer() {
         if (binding.camera.isOpened()) {
+            if (model == null) {
+                Toast.makeText(requireContext(), "No model selected", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             int buttonTint = R.color.white;
             IMAGE_ANALYZER_ENABLED = !IMAGE_ANALYZER_ENABLED;
             if (IMAGE_ANALYZER_ENABLED) {
@@ -430,7 +459,6 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
         if (binding.camera.isTakingPicture()) return;
         binding.camera.takePicture();
     }
-
 
     /**
      * hide the support action bar if it isn't null
@@ -503,7 +531,6 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
                 String selectedFramework = parent.getItemAtPosition(position).toString();
 
                 if (!framework.value.equals(selectedFramework)) {
-                    Log.e("TAG", "Changed Framework");
                     framework.setKey(position);
                     framework.setValue(selectedFramework);
                     updateModelSpinnerEntries(framework.value);
@@ -511,14 +538,9 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
             }
 
             if (parent == modelSpinner) {
-                Log.e("TAG", "Model Spinner Updated");
                 model.setKey(position);
                 model.setValue(parent.getItemAtPosition(position).toString());
-
-                ClassifierDetails details = ClassifierUtils.deserializeModelJSON(requireContext(), model.value);
-
-                if (details != null)
-                    imageClassifier = Classifier.createInstance(requireContext(), details);
+                createClassifier();
             }
         }).start();
     }
@@ -530,7 +552,6 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
     }
-
 
     /**
      * Method to remove the file extension from a filename string
@@ -547,7 +568,6 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
         String extPattern = "(?<!^)[.]" + (removeAllExtensions ? ".*" : "[^.]*$");
         return filename.replaceAll(extPattern, "");
     }
-
 
     /**
      * Tuple class to store key-value pairs. In this case, the key will be the index value of the selected model in the selector and the string will represent the selected model name.

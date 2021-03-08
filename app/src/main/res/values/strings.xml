@@ -68,6 +68,7 @@
     <string name="SwitchName">PUBLIC</string>
     <string name="create_dataset">CREATE DATASET</string>
     <string name="index">Index</string>
+    <string name="auto_classify">Auto Classify</string>
 
 
     <string-array name="model_frameworks" translatable="false">

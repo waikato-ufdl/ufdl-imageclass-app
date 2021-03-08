@@ -3,9 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_select_all"
+        android:title="@string/select_all_loaded_images"
+        android:icon="@drawable/ic_baseline_select_all_24"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_relabel"
         android:title="@string/edit_label"
         android:icon="@drawable/edit_icon"
+        app:showAsAction="always" />
+
+
+    <item
+        android:id="@+id/action_classify"
+        android:title="@string/auto_classify"
+        android:icon="@drawable/ic_baseline_analytics_24"
         app:showAsAction="always" />
 
     <item
@@ -13,17 +26,4 @@
         android:title="@string/Delete"
         android:icon="@drawable/ic_baseline_delete_24"
         app:showAsAction="always" />
-
-    <item
-        android:id="@+id/action_select_all"
-        android:title="@string/select_all_loaded_images"
-        android:icon="@drawable/ic_baseline_select_all_24"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/action_classify"
-        android:title="Auto Classify"
-        android:icon="@drawable/ic_baseline_analytics_24"
-        app:showAsAction="ifRoom" />
-
 </menu>
