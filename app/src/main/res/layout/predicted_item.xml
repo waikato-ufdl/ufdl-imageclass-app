@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#8000"
+    android:orientation="horizontal"
+    tools:viewBindingIgnore="true">
+
+        <TextView
+            android:id="@+id/predictedLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:padding="8dp"
+            android:text="@string/label"
+            android:textColor="#FFFFFF"/>
+
+        <TextView
+            android:id="@+id/predictedProb"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:padding="8dp"
+            android:text="@string/probability"
+            android:textColor="#FFFFFF" />
+
+</LinearLayout>
