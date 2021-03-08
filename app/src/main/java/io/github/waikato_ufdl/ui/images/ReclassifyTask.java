@@ -17,7 +17,7 @@ public class ReclassifyTask extends NetworkTask {
     private final String label;
 
     /**
-     * The constructor for generating an UploadTask
+     * The constructor for generating a Reclassification task
      *
      * @param fragment    the ImagesFragment
      * @param context     the context

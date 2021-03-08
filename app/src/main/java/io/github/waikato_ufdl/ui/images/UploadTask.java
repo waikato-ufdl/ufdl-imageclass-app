@@ -42,7 +42,7 @@ public class UploadTask extends NetworkTask {
     @Override
     public void backgroundTask(Object image) {
         String label = labels[index];
-        String classificationLabel = (label != null) ? label : "unlabelled";
+        String classificationLabel = (!label.isEmpty()) ? label : "-";
         String imagePath = UriUtils.getPath(context, (Uri) image);
         if(imagePath != null) {
             File imageFile = new File(imagePath);
