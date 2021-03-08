@@ -7,12 +7,15 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="io.github.waikato_ufdl.ui.home.HomeFragment"
+        android:name="io.github.waikato_ufdl.ui.camera.cameraFragment"
         android:label="@string/menu_capture"
-        tools:layout="@layout/fragment_home" >
+        tools:layout="@layout/fragment_camera" >
         <action
             android:id="@+id/action_nav_home_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_nav_home_to_previewImage"
+            app:destination="@id/previewImage" />
     </fragment>
 
     <fragment
@@ -43,4 +46,12 @@
         android:id="@+id/website"
         app:action="android.intent.action.VIEW"
         app:data="@string/application_url"/>
+    <fragment
+        android:id="@+id/previewImage"
+        android:name="io.github.waikato_ufdl.ui.camera.PreviewImage"
+        android:label="PreviewImage" >
+        <action
+            android:id="@+id/action_previewImage_to_nav_home"
+            app:destination="@id/nav_home" />
+    </fragment>
 </navigation>

@@ -31,5 +31,26 @@
     <string name="search">Search</string>
     <string name="Copy">Copy</string>
     <string name="application_url">https://waikato-ufdl.github.io/</string>
+    <string name="Download">Download</string>
+    <string name="editDataset">Edit Details</string>
+    <string name="framework">Framework:</string>
+    <string name="model">Model:</string>
+    <string name="off">Off</string>
+    <string name="on">On</string>
+    <string name="login">Login</string>
+    <string name="select_all_loaded_images">Select all loaded images</string>
+    <string name="dataset">Dataset:</string>
+    <string name="use_predicted_label">Use predicted label</string>
+    <string name="enter_classification_label">Enter Classification Label</string>
+    <string name="image_label">Image Label:</string>
+    <string name="please_classify_the_image_and_select_a_dataset_to_store_the_image">Please classify the image and select a dataset to store the image:</string>
+    <string name="label">Label</string>
+    <string name="probability">Probability</string>
+
+
+    <string-array name="model_frameworks" translatable="false">
+        <item>PyTorch Mobile</item>
+        <item>TensorFlow Lite</item>
+    </string-array>
 
 </resources>

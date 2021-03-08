@@ -8,8 +8,15 @@
     <color name="white">#FFFFFF</color>
     <color name="darkGrey1">#121212</color>
     <color name="darkGrey2">#212121</color>
+    <color name="neroGrey">#282828</color>
     <color name="grey">#818181</color>
     <color name="orange">#FF8C00</color>
     <color name="grey2">#202020</color>
+    <color name="navyBlue">#243447</color>
     <color name="imageExcessBackground">#202020</color>
+    <color name="yellow">#FFD180</color>
+    <color name="nightRiderGrey">#303030</color>
+    <color name="cameraFeatureEnabledYellow">#FFDA30</color>
+    <color name="red">#E41815</color>
+
 </resources>

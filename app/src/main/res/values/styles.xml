@@ -8,6 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="backgroundColor">@color/lightGrey</item>
         <item name="textColor">@color/black</item>
+        <item name="imageLabelBackground">@color/yellow</item>
         <item name="tintColor">@color/white</item>
         <item name="buttonColor">@color/colorAccent</item>
         <item name="navMenuBackgroundColour">@color/lightGrey</item>
@@ -16,6 +17,8 @@
         <item name="editTextBackgroundColour">@color/lightGrey</item>
         <item name="editTextOutlineColour">@color/colorPrimary</item>
         <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
+        <item name="spinnerBackgroundColor">@color/yellow</item>
+        <item name="spinnerArrowColour">@color/black</item>
         <item name="windowActionModeOverlay">true</item>
     </style>
 
@@ -27,14 +30,18 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="backgroundColor">@color/darkGrey1</item>
         <item name="textColor">@color/white</item>
+        <item name="imageLabelBackground">@color/neroGrey</item>
         <item name="tintColor">@color/white</item>
         <item name="buttonColor">@color/colorAccent</item>
         <item name="navMenuBackgroundColour">@color/darkGrey2</item>
+        <item name="android:navigationBarColor">@color/material_blue_grey_95</item>
         <item name="navMenuIconColours">@color/lightGrey</item>
-        <item name="toolBarColour">@color/colorPrimary</item>
+        <item name="toolBarColour">@color/nightRiderGrey</item>
         <item name="editTextBackgroundColour">@color/grey2</item>
         <item name="editTextOutlineColour">@color/colorPrimary</item>
         <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
+        <item name="spinnerBackgroundColor">@color/darkGrey2</item>
+        <item name="spinnerArrowColour">@color/white</item>
         <item name="windowActionModeOverlay">true</item>
     </style>
 

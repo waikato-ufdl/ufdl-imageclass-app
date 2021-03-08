@@ -3,8 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_download_dataset"
+        android:title="@string/Download"
+        android:icon="@drawable/ic_baseline_arrow_circle_down_24"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_relabel_dataset"
-        android:title="@string/edit_label"
+        android:title="@string/editDataset"
         android:icon="@drawable/edit_icon"
         app:showAsAction="always" />
 

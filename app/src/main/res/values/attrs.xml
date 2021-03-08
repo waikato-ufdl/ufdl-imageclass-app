@@ -10,5 +10,8 @@
         <attr name="toolBarColour"  format="color"/>
         <attr name="editTextBackgroundColour"  format="color"/>
         <attr name="editTextOutlineColour"  format="color"/>
+        <attr name="imageLabelBackground"  format="color"/>
+        <attr name="spinnerBackgroundColor"  format="color"/>
+        <attr name="spinnerArrowColour"  format="color"/>
     </declare-styleable>
 </resources>

@@ -9,7 +9,7 @@
 
     <paths>
         <external-path
-            name="my_images"
+            name="images"
             path="Pictures"/>
     </paths>
 
