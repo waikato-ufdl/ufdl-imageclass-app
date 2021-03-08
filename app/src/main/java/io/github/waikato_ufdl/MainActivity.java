@@ -117,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .subscribe();
     }
 
-
     /***
      * Method to sync all unsynced images to the server.
      */
@@ -269,7 +268,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void requestPermissions(String[] permissions) {
         ActivityCompat.requestPermissions(this, permissions, VERIFY_PERMISSIONS_REQUEST);
     }
-
 
     /***
      * Callback for the result from requesting permission from the user

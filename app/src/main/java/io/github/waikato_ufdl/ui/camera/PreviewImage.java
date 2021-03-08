@@ -59,8 +59,10 @@ public class PreviewImage extends Fragment {
     private DBManager dbManager;
     private boolean imageSaved;
 
+    /***
+     * The default constructor for the preview image
+     */
     public PreviewImage() {
-        // Required empty public constructor
     }
 
     @Override
@@ -173,6 +175,11 @@ public class PreviewImage extends Fragment {
                 .subscribe();
     }
 
+    /***
+     * Method to move the current image file into the UFDL images folder.
+     * @param datasetName the name f the dataset in which the image belongs
+     * @return the repositioned image file
+     */
     public File getImageFile(String datasetName)
     {
         File destinationFile = new File(DatasetOperations.getImageStorageDirectory(requireContext(), datasetName, false), imageFile.getName());
@@ -233,7 +240,6 @@ public class PreviewImage extends Fragment {
         super.onResume();
         requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
     }
-
 
     /***
      * Method to change the rotation of the imageview upon orientation changes

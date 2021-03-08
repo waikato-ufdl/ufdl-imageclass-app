@@ -244,14 +244,12 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
         }
     }
 
-
     /***
      * Changes between the front facing camera and the back camera
      */
     public void toggleCameraFace() {
         binding.camera.toggleFacing();
     }
-
 
     /***
      * converts an image object into a bitmap
@@ -391,7 +389,6 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
             } else if (!tfliteModels.isEmpty()) {
                 framework = new Tuple(1, "TensorFlow Lite");
                 model = new Tuple(0, tfliteModels.get(0));
-                Log.e("TAG", framework + " " + model);
                 return true;
             }
         }
