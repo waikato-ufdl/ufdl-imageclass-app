@@ -56,7 +56,6 @@ public class PreviewImage extends Fragment {
     private String predictedLabel;
     private String previousLabel;
     private FragmentPreviewImageBinding binding;
-    private SessionManager sessionManager;
     private DBManager dbManager;
     private boolean imageSaved;
 
@@ -67,7 +66,7 @@ public class PreviewImage extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sessionManager = new SessionManager(requireContext());
+        SessionManager sessionManager = new SessionManager(requireContext());
         dbManager = sessionManager.getDbManager();
 
         //get the image path, and prediction details from the camera fragment
