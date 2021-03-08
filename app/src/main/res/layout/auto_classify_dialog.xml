@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/autoClassifyDialog"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:viewBindingIgnore="true"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Please select a model and the minimum confidence score required for the classifier to reclassify the image."
+        android:textColor="@android:color/black"
+        android:textSize="12sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Model:"
+        android:textColor="@color/colorAccent"
+        android:textSize="13sp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#D4D4D4"
+        android:layout_marginBottom="10dp">
+
+        <Spinner
+            android:id="@+id/modelSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:dropDownWidth="match_parent"
+            android:ellipsize="end"
+            android:popupBackground="#D4D4D4"
+            android:textSize="12sp"
+            android:spinnerMode="dialog"
+            />
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Minimum Confidence:"
+        android:textColor="@color/colorAccent"
+        android:textSize="13sp"
+        android:textAlignment="center"/>
+
+    <EditText
+        android:id="@+id/requiredConfidence"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:hint="Enter a decimal between 0 - 1"
+        android:paddingTop="0dp"
+        android:singleLine="true"
+        android:textSize="15sp"
+        android:autofillHints="probability"
+        android:inputType="number|numberDecimal"/>
+
+</LinearLayout>
