@@ -18,7 +18,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,11 +29,13 @@ import androidx.appcompat.app.ActionBar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.otaliastudios.cameraview.CameraException;
 import com.otaliastudios.cameraview.CameraListener;
 import com.otaliastudios.cameraview.CameraOptions;
+import com.otaliastudios.cameraview.CameraView;
 import com.otaliastudios.cameraview.PictureResult;
 import com.otaliastudios.cameraview.controls.Flash;
 import com.otaliastudios.cameraview.controls.Hdr;
@@ -51,22 +55,27 @@ import io.github.waikato_ufdl.MainActivity;
 import io.github.waikato_ufdl.Prediction;
 import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.SessionManager;
-import io.github.waikato_ufdl.databinding.FragmentCameraBinding;
 
 public class cameraFragment extends Fragment implements AdapterView.OnItemSelectedListener {
     private PredictionListViewModel predictionListViewModel;
     private PredictionAdapter predictionAdapter;
     private Classifier imageClassifier;
-    private FragmentCameraBinding binding;
-    private boolean IMAGE_ANALYZER_ENABLED = false;
+    private boolean IMAGE_ANALYZER_ENABLED;
     private Spinner modelSpinner, frameworkSpinner;
     private ArrayList<String> tfliteModels, pyTorchModels;
     private ArrayAdapter<String> arrayAdapter;
     private Tuple framework, model;
     private final String FRAMEWORK_PYTORCH = "PyTorch Mobile";
 
+    private RecyclerView predictionRecyclerView;
+    private CameraView camera;
+    private TextView zoom;
+    private Button menu, HDR, flash, flipCamera, capturePicture, analyzer, settings;
+
+    /***
+     * Default constructor for the camera fragment
+     */
     public cameraFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -78,9 +87,19 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //inflate the layout for this fragment
-        binding = FragmentCameraBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+        View view = inflater.inflate(R.layout.fragment_camera, container, false);
+        predictionRecyclerView = view.findViewById(R.id.predictionRecyclerView);
+        zoom = view.findViewById(R.id.zoomValue);
+        menu = view.findViewById(R.id.nav_button);
+        HDR = view.findViewById(R.id.HDR);
+        flash = view.findViewById(R.id.flash);
+        flipCamera = view.findViewById(R.id.flipCamera);
+        capturePicture = view.findViewById(R.id.capturePicture);
+        analyzer = view.findViewById(R.id.analyzer);
+        settings = view.findViewById(R.id.settings);
+        camera = view.findViewById(R.id.camera);
+
+        return view;
     }
 
     @Override
@@ -97,8 +116,8 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
         //initialise recyclerview and view model
         predictionListViewModel = new PredictionListViewModel();
         predictionAdapter = new PredictionAdapter(Prediction.itemCallback);
-        binding.predictionRecyclerView.setAdapter(predictionAdapter);
-        binding.predictionRecyclerView.setItemAnimator(null);
+        predictionRecyclerView.setAdapter(predictionAdapter);
+        predictionRecyclerView.setItemAnimator(null);
 
         //set the button click listeners
         setButtonClickListeners();
@@ -111,7 +130,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
      * method to start the camera
      */
     public void startCamera() {
-        binding.camera.addCameraListener(new CameraListener() {
+        camera.addCameraListener(new CameraListener() {
 
             /**
              * Method which runs when the camera opens
@@ -134,18 +153,29 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
             @Override
             public void onPictureTaken(@NonNull PictureResult result) {
                 super.onPictureTaken(result);
+                removeImageAnalyzer();
 
                 result.toBitmap(3000, 3000, bitmap -> {
                     Bundle bundle = new Bundle();
                     if (bitmap != null) {
-                        Prediction prediction = imageClassifier.predict(bitmap);
+                        String predictionInfo = "";
+                        String predictionLabel = "";
+
+                        Log.e("TAG", bitmap.getHeight() + " " + bitmap.getWidth());
+                        if (imageClassifier != null) {
+                            Prediction prediction = imageClassifier.predict(bitmap);
+                            predictionInfo = prediction.toString();
+                            predictionLabel = prediction.getLabel();
+                        }
 
                         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(new Date());
-                        String fileName = "IMG_" + timeStamp + "." + binding.camera.getPictureFormat().toString().toLowerCase();
+                        String fileName = "IMG_" + timeStamp + "." + camera.getPictureFormat().toString().toLowerCase();
                         String imagePath = ImageUtils.createImageFile(requireContext(), bitmap, fileName);
+
                         bundle.putString("imagePath", imagePath);
-                        bundle.putString("predictionInfo", prediction.toString());
-                        bundle.putString("predictedLabel", prediction.getLabel());
+                        bundle.putString("predictionInfo", predictionInfo);
+                        bundle.putString("predictedLabel", predictionLabel);
+
                         Navigation.findNavController(requireView()).navigate(R.id.action_nav_home_to_previewImage, bundle);
                     }
                 });
@@ -161,7 +191,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
             @Override
             public void onZoomChanged(float newValue, @NonNull float[] bounds, @Nullable PointF[] fingers) {
                 super.onZoomChanged(newValue, bounds, fingers);
-                binding.zoomValue.setText(newValue + " ");
+                zoom.setText(newValue + " ");
             }
 
             /**
@@ -193,24 +223,24 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
 
         //if the device supports Flash, then enable the flash button button and leave the icon visible to the user
         if (options.supports(Flash.ON)) {
-            binding.flash.setEnabled(true);
-            binding.flash.setVisibility(View.VISIBLE);
+            flash.setEnabled(true);
+            flash.setVisibility(View.VISIBLE);
         } else {
             //disable the flash button and hide it from the user
-            binding.flash.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_flash_off_24));
-            binding.flash.setEnabled(false);
-            binding.flash.setVisibility(View.GONE);
+            flash.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_flash_off_24));
+            flash.setEnabled(false);
+            flash.setVisibility(View.GONE);
         }
 
         //if the device supports HDR mode then enable the HDR button and leave the icon visibile to the user
         if (options.supports(Hdr.ON)) {
-            binding.HDR.setEnabled(true);
-            binding.HDR.setVisibility(View.VISIBLE);
+            HDR.setEnabled(true);
+            HDR.setVisibility(View.VISIBLE);
         } else {
             //disable and hide the HDR button
-            binding.HDR.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_hdr_off_24));
-            binding.HDR.setEnabled(false);
-            binding.HDR.setVisibility(View.GONE);
+            HDR.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_hdr_off_24));
+            HDR.setEnabled(false);
+            HDR.setVisibility(View.GONE);
         }
     }
 
@@ -218,14 +248,14 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
      * Toggle the flash mode state and change the flash icon depending on the state
      */
     public void toggleFlash() {
-        Flash currentZoomSetting = binding.camera.getFlash();
+        Flash currentZoomSetting = camera.getFlash();
 
         if (currentZoomSetting == Flash.ON) {
-            binding.camera.setFlash(Flash.OFF);
-            binding.flash.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_flash_off_24));
+            camera.setFlash(Flash.OFF);
+            flash.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_flash_off_24));
         } else {
-            binding.camera.setFlash(Flash.ON);
-            binding.flash.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_flash_on_24));
+            camera.setFlash(Flash.ON);
+            flash.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_flash_on_24));
         }
     }
 
@@ -233,14 +263,14 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
      * Toggle the HDR mode state and change the HDR icon that is visible to the user depending on the state
      */
     public void toggleHDR() {
-        Hdr currentZoomSetting = binding.camera.getHdr();
+        Hdr currentZoomSetting = camera.getHdr();
 
         if (currentZoomSetting == Hdr.OFF) {
-            binding.camera.setHdr(Hdr.ON);
-            binding.HDR.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_hdr_on_24));
+            camera.setHdr(Hdr.ON);
+            HDR.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_hdr_on_24));
         } else {
-            binding.camera.setHdr(Hdr.OFF);
-            binding.HDR.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_hdr_off_24));
+            camera.setHdr(Hdr.OFF);
+            HDR.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_hdr_off_24));
         }
     }
 
@@ -248,7 +278,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
      * Changes between the front facing camera and the back camera
      */
     public void toggleCameraFace() {
-        binding.camera.toggleFacing();
+        camera.toggleFacing();
     }
 
     /***
@@ -291,7 +321,8 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
      * Clear the frame processor and remove prediction list observers
      */
     private void removeImageAnalyzer() {
-        binding.camera.clearFrameProcessors();
+        analyzer.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
+        camera.clearFrameProcessors();
         predictionAdapter.submitList(null);
         predictionListViewModel.predictionList.removeObservers(getViewLifecycleOwner());
     }
@@ -300,13 +331,13 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
      * set the button click listeners for all camera buttons and features
      */
     public void setButtonClickListeners() {
-        binding.capturePicture.setOnClickListener(v -> captureImage());
-        binding.flash.setOnClickListener(v -> toggleFlash());
-        binding.HDR.setOnClickListener(v -> toggleHDR());
-        binding.flipCamera.setOnClickListener(v -> toggleCameraFace());
-        binding.navButton.setOnClickListener(v -> ((MainActivity) requireActivity()).toggleDrawer());
-        binding.analyzer.setOnClickListener(v -> toggleImageAnalyzer());
-        binding.settings.setOnClickListener(v -> displayModelSettings());
+        capturePicture.setOnClickListener(v -> captureImage());
+        flash.setOnClickListener(v -> toggleFlash());
+        HDR.setOnClickListener(v -> toggleHDR());
+        flipCamera.setOnClickListener(v -> toggleCameraFace());
+        menu.setOnClickListener(v -> ((MainActivity) requireActivity()).toggleDrawer());
+        analyzer.setOnClickListener(v -> toggleImageAnalyzer());
+        settings.setOnClickListener(v -> displayModelSettings());
     }
 
     /***
@@ -409,22 +440,20 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
      * Method to toggle the image analyzer on/off
      */
     private void toggleImageAnalyzer() {
-        if (binding.camera.isOpened()) {
-            if (model == null) {
-                Toast.makeText(requireContext(), "No model selected", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        if (!camera.isOpened()) return;
 
-            int buttonTint = R.color.white;
-            IMAGE_ANALYZER_ENABLED = !IMAGE_ANALYZER_ENABLED;
-            if (IMAGE_ANALYZER_ENABLED) {
-                buttonTint = R.color.cameraFeatureEnabledYellow;
-                startPredictionRecycler();
-                setCameraFrameProcessor();
-            } else {
-                removeImageAnalyzer();
-            }
-            binding.analyzer.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), buttonTint));
+        if (model == null) {
+            Toast.makeText(requireContext(), "No model selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        IMAGE_ANALYZER_ENABLED = !IMAGE_ANALYZER_ENABLED;
+        if (IMAGE_ANALYZER_ENABLED) {
+            analyzer.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.cameraFeatureEnabledYellow));
+            startPredictionRecycler();
+            setCameraFrameProcessor();
+        } else {
+            removeImageAnalyzer();
         }
     }
 
@@ -432,7 +461,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
      * Method to add a frame processor to the camera to perform image analysis
      */
     private void setCameraFrameProcessor() {
-        binding.camera.addFrameProcessor(frame -> {
+        camera.addFrameProcessor(frame -> {
             Bitmap bitmap = null;
 
             if (frame.getDataClass() == byte[].class) {
@@ -453,8 +482,8 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
      * Method to take a picture if the camera is not already doing so
      */
     private void captureImage() {
-        if (binding.camera.isTakingPicture()) return;
-        binding.camera.takePicture();
+        if (camera.isTakingPicture()) return;
+        camera.takePicture();
     }
 
     /**
@@ -483,7 +512,7 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onResume() {
         super.onResume();
-        new Thread(() -> binding.camera.open()).start();
+        new Thread(() -> camera.open()).start();
     }
 
     /***
@@ -492,24 +521,23 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onPause() {
         super.onPause();
-        new Thread(() -> binding.camera.close()).start();
+        removeImageAnalyzer();
+        new Thread(() -> camera.close()).start();
     }
 
     /***
-     * Destroy camera & set binding to null when view is destroyed
+     * Destroy camera when the view is destroyed
      */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
-        new Thread(() ->
-        {
-            binding.camera.destroy();
-            binding = null;
-        }).start();
-
+        removeImageAnalyzer();
+        camera.clearFrameProcessors();
+        camera.clearCameraListeners();
+        new Thread(() -> camera.destroy()).start();
         Log.e("TAG", "Destroyed");
     }
+
 
     /***
      * Callback method to be invoked when a spinner item has been selected
@@ -520,24 +548,40 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
      */
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if (parent.getItemAtPosition(position) == null) return;
-
         new Thread(() ->
         {
+            boolean frameworkChanged = false;
+            boolean modelChanged = false;
+
+            //if the framework has changed, update the current framework & update the spinners list to show models belonging to that framework
             if (parent == frameworkSpinner) {
                 String selectedFramework = parent.getItemAtPosition(position).toString();
 
-                if (!framework.value.equals(selectedFramework)) {
+                if (frameworkChanged = !framework.value.equals(selectedFramework)) {
                     framework.setKey(position);
                     framework.setValue(selectedFramework);
                     updateModelSpinnerEntries(framework.value);
                 }
             }
 
+            //if the selected model has changed, update the current model and use it to create a new classier.
             if (parent == modelSpinner) {
-                model.setKey(position);
-                model.setValue(parent.getItemAtPosition(position).toString());
-                createClassifier();
+                String selectedModel = parent.getItemAtPosition(position).toString();
+                if (model == null) model = new Tuple(0, "");
+                if (modelChanged = !model.value.equals(selectedModel)) {
+                    model.setKey(position);
+                    model.setValue(parent.getItemAtPosition(position).toString());
+                    createClassifier();
+                }
+            }
+
+            //if the framework has changed but the model hasn't changed, this implies the model's list is empty. Hence, nullify the model & remove the image analzyer
+            if (frameworkChanged && !modelChanged) {
+                requireActivity().runOnUiThread(() -> {
+                    model = null;
+                    removeImageAnalyzer();
+                });
+
             }
         }).start();
     }
