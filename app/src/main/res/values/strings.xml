@@ -53,7 +53,7 @@
     <string name="project">Project</string>
     <string name="tag_s">Tag(s)</string>
     <string name="folder">Folder</string>
-    <string name="captured_imaage">Captured Imaage</string>
+    <string name="captured_image">Captured Image</string>
     <string name="save_button">save button</string>
     <string name="datasetimage">datasetImage</string>
     <string name="classification_label">Classification label</string>
