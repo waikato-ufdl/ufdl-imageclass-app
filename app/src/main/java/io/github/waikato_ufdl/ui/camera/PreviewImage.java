@@ -4,7 +4,9 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +19,7 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
@@ -34,13 +36,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.github.waikato_ufdl.DBManager;
 import io.github.waikato_ufdl.DatasetOperations;
 import io.github.waikato_ufdl.ImageOperations;
+import io.github.waikato_ufdl.MainActivity;
 import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.SessionManager;
 import io.github.waikato_ufdl.databinding.FragmentPreviewImageBinding;
@@ -58,6 +60,8 @@ public class PreviewImage extends Fragment {
     private FragmentPreviewImageBinding binding;
     private DBManager dbManager;
     private boolean imageSaved;
+    private boolean isViewHidden = false;
+    private float viewOriginalXPosition;
 
     /***
      * The default constructor for the preview image
@@ -102,6 +106,22 @@ public class PreviewImage extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if (viewOriginalXPosition == 0.0f) {
+            viewOriginalXPosition = binding.saveButton.getX();
+        }
+        view.setOnClickListener(view1 ->
+        {
+            if (isViewHidden) {
+                binding.saveButton.show();
+                binding.predictionText.setVisibility(View.VISIBLE);
+                isViewHidden = false;
+            } else {
+                binding.saveButton.hide();
+                binding.predictionText.setVisibility(View.GONE);
+                isViewHidden = true;
+            }
+        });
+
         //load image into the imageview
         Glide.with(requireContext()).load(imageFile)
                 .apply(new RequestOptions()
@@ -112,9 +132,9 @@ public class PreviewImage extends Fragment {
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .into(binding.image);
 
-
         //display the prediction info into the prediction textview
-        binding.predictionText.setText(prediction);
+        if(prediction == null || prediction.isEmpty()) binding.predictionText.setVisibility(View.GONE);
+        else binding.predictionText.setText(prediction);
 
         //open save dialog when save button is pressed
         binding.saveButton.setOnClickListener(onClick -> displaySaveDialog());
@@ -130,6 +150,8 @@ public class PreviewImage extends Fragment {
         final CheckBox checkbox = layout.findViewById(R.id.checkboxUsePredicted);
         final EditText labelEditText = layout.findViewById(R.id.classificationLabel);
         final Spinner spinner = layout.findViewById(R.id.datasetSpinner);
+
+        if(predictedLabel == null || predictedLabel.isEmpty()) checkbox.setVisibility(View.GONE);
 
         //set on check changed listener & populate the spinner with dataset names
         checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> checkBoxChanged(isChecked, labelEditText));
@@ -180,12 +202,11 @@ public class PreviewImage extends Fragment {
      * @param datasetName the name f the dataset in which the image belongs
      * @return the repositioned image file
      */
-    public File getImageFile(String datasetName)
-    {
+    public File getImageFile(String datasetName) {
         File destinationFile = new File(DatasetOperations.getImageStorageDirectory(requireContext(), datasetName, false), imageFile.getName());
         try {
             FileUtils.moveFile(imageFile, destinationFile);
-            if(destinationFile.exists()) return destinationFile;
+            if (destinationFile.exists()) return destinationFile;
         } catch (IOException e) {
             Log.e("TAG", "Failed to move image");
         }
@@ -250,14 +271,34 @@ public class PreviewImage extends Fragment {
         super.onConfigurationChanged(newConfig);
 
         if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).show();
+            if(prediction != null && !prediction.isEmpty()) prediction = prediction.replaceAll(", ", "\n");
+            binding.saveButton.setTranslationX(viewOriginalXPosition);
         } else {
-            Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).hide();
-        }
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE || newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            binding.image.setRotation(0);
+            if(prediction != null && !prediction.isEmpty()) prediction = prediction.replaceAll(System.getProperty("line.separator"), ", ");
+            binding.saveButton.setTranslationX(viewOriginalXPosition + dipToPixels(235));
         }
 
+        toggleActionBar();
+        binding.image.setRotation(0);
+        binding.predictionText.setText(prediction);
         binding.image.invalidate();
+    }
+
+    public void toggleActionBar() {
+        ActionBar supportActionBar = ((MainActivity) requireActivity()).getSupportActionBar();
+        if (supportActionBar != null) {
+            if (supportActionBar.isShowing()) supportActionBar.hide();
+            else supportActionBar.show();
+        }
+    }
+
+    /***
+     * Converts dips to Pixels
+     * @param dipValue the dip value to convert
+     * @return the number of pixels converted from dips
+     */
+    public float dipToPixels(float dipValue) {
+        DisplayMetrics metrics = requireContext().getResources().getDisplayMetrics();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
     }
 }
