@@ -1,22 +1,25 @@
 package io.github.waikato_ufdl.ui.camera;
 
 /***
- A class which contains the information required to build a Classifier
+ A class to encapsulate the information required to build a Classifier
  */
 
 public class ClassifierDetails {
     private String name;
     private int width;
     private int height;
+    private String[] classes;
+
+    //Required Normalization Parameters for TensorFlow Lite
+    private float[] preProcessingNormalizationParams;   //[IMAGE_MEAN, IMAGE_STD]
+    private float[] postProcessingNormalizationParams;  //[PROBABILITY_MEAN, PROBABILITY_STD]
 
     /***
-     * Required Normalization Parameters for TensorFlow Lite
+     * Default constructor for ClassifierDetails
      */
-
-    private float[] preProcessingNormalizationParams; /** [IMAGE_MEAN, IMAGE_STD] */
-    private float[] postProcessingNormalizationParams; /** [PROBABILITY_MEAN, PROBABILITY_STD] */
-
-    private String[] classes;
+    public ClassifierDetails() {
+        super();
+    }
 
     /***
      * getter method to return pre-processing normalization parameters used for TensorFlow Lite models
