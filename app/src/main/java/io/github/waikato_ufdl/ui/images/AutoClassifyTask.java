@@ -6,7 +6,9 @@ import android.view.ActionMode;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import io.github.waikato_ufdl.Classifier;
 import io.github.waikato_ufdl.ImageOperations;
+import io.github.waikato_ufdl.Prediction;
 
 /**
  * A task used to reclassify all selected images with a label predicted by a classifier
@@ -14,26 +16,18 @@ import io.github.waikato_ufdl.ImageOperations;
 
 public class AutoClassifyTask extends NetworkTask {
     private final ArrayList<ClassifiedImage> images;
-    private final ArrayList<String> labels;
     protected int index;
+    private final Classifier classifier;
+    private final double confidence;
 
-    /***
-     * The constructor for generating an AutoClassification task
-     * @param fragment the fragment
-     * @param context the context
-     * @param images the arraylist of images to update
-     * @param labels the new classifcation labels for the images
-     * @param datasetName the name of the dataset in which the images belong
-     * @param mode the action mode
-     */
-    public AutoClassifyTask(ImagesFragment fragment, Context context, ArrayList<ClassifiedImage> images, ArrayList<String> labels, String datasetName, ActionMode mode) {
+    public AutoClassifyTask(ImagesFragment fragment, Context context, ArrayList<ClassifiedImage> images, Classifier classifier, double confidence, String datasetName, ActionMode mode) {
         super(fragment, context, datasetName, mode);
-
         index = 0;
-        processingMessage = "Uploading image ";
+        processingMessage = "Classifying image ";
         completedMessage = "Successfully uploaded selected images";
         this.images = images;
-        this.labels = labels;
+        this.classifier = classifier;
+        this.confidence = confidence;
     }
 
     /***
@@ -44,9 +38,15 @@ public class AutoClassifyTask extends NetworkTask {
     public void backgroundTask(Object image) {
         String imageFileName = ((ClassifiedImage) image).getImageFileName();
         String oldLabel = ((ClassifiedImage) image).getClassificationLabel();
-        String label = labels.get(index);
-        ImageOperations.updateImage(dbManager, datasetPK, datasetName, imageFileName, Collections.singletonList(oldLabel), label);
-        index++;
+
+        if (image != null) {
+            Prediction prediction = classifier.predict(((ClassifiedImage) image).getImageBitmap());
+
+            if (prediction.getConfidence() > confidence) {
+                String label = prediction.getLabel();
+                ImageOperations.updateImage(dbManager, datasetPK, datasetName, imageFileName, Collections.singletonList(oldLabel), label);
+            }
+        }
     }
 
     /***

@@ -33,6 +33,8 @@ import com.stfalcon.imageviewer.StfalconImageViewer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.github.waikato_ufdl.Classifier;
@@ -524,33 +526,20 @@ public class ImageListAdapter extends ListAdapter<ClassifiedImage, ImageListAdap
     }
 
     /***
-     * Method to begin the reclassification process
+     * Method to begin the auto-classification process
      * @param model the name of the model
      * @param confidence the minimum confidence score required in order for the current label to be overwritten
      * @param mode the action mode
      */
     private void classify(String model, double confidence, ActionMode mode) {
         Classifier classifier;
-        ArrayList<ClassifiedImage> updated = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
-
         ClassifierDetails details = ClassifierUtils.deserializeModelJSON(context, model);
 
         if (details != null) {
             classifier = Classifier.createInstance(context, details);
             if (classifier == null) return;
 
-            for (ClassifiedImage image : selectedImages) {
-                if (image != null) {
-                    Prediction prediction = classifier.predict(image.getImageBitmap());
-                    if (prediction.getConfidence() > confidence) {
-                        updated.add(image);
-                        labels.add(prediction.getLabel());
-                    }
-                }
-            }
-
-            AutoClassifyTask task = new AutoClassifyTask(fragment, context, updated, labels, datasetName, mode);
+            AutoClassifyTask task = new AutoClassifyTask(fragment, context, selectedImages, classifier, confidence, datasetName, mode);
             task.execute();
         }
     }
