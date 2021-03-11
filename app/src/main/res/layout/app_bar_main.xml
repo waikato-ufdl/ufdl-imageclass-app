@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="io.github.waikato_ufdl.MainActivity"
     tools:viewBindingIgnore="true">
 
     <com.google.android.material.appbar.AppBarLayout
