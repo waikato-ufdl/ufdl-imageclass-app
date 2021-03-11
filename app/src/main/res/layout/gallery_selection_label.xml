@@ -65,7 +65,8 @@
         android:textColor="?attr/textColor"
         android:hint="@string/classification_label"
         android:textColorHint="@color/grey"
-        android:autofillHints="@string/classification_label" />
+        android:autofillHints="@string/classification_label"
+        android:inputType="text" />
 
     <CheckBox
         android:id="@+id/labelCheckBox"
@@ -76,6 +77,7 @@
         android:layout_marginStart="25dp"
         android:textColor="?attr/textColor"
         android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:buttonTint="@color/colorAccent"
         android:layout_marginBottom="50dp"/>
 

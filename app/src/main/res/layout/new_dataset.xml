@@ -26,7 +26,9 @@
         android:padding="10dp"
         android:textColor="?attr/textColor"
         android:textColorHint="@color/grey"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        android:autofillHints="@string/dataset_name"
+        android:inputType="text" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -46,7 +48,9 @@
         android:textColorHint="@color/grey"
         android:gravity="top|start"
         android:padding="10dp"
-        android:lines="3"/>
+        android:lines="3"
+        android:inputType="text"
+        android:autofillHints="@string/dataset_description" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -77,8 +81,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="License"
-        android:text="LICENCE"
+        android:hint="@string/license"
+        android:text="@string/licence"
         android:textColor="@color/colorAccent"
         android:textColorHint="@color/grey"
         android:textSize="@dimen/settingsLabelSizes" />
@@ -120,7 +124,9 @@
         android:textColorHint="@color/grey"
         android:gravity="top|start"
         android:padding="10dp"
-        android:lines="2"/>
+        android:lines="2"
+        android:inputType="text"
+        android:autofillHints="@string/tags" />
 
     <Switch
         android:id="@+id/isPublicSwitch"
