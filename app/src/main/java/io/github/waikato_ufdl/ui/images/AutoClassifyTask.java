@@ -11,7 +11,7 @@ import io.github.waikato_ufdl.ImageOperations;
 import io.github.waikato_ufdl.Prediction;
 
 /**
- * A task used to reclassify all selected images with a label predicted by a classifier
+ * A task used to automate the labelling process using a classifier to label images
  */
 
 public class AutoClassifyTask extends NetworkTask {
@@ -24,7 +24,7 @@ public class AutoClassifyTask extends NetworkTask {
         super(fragment, context, datasetName, mode);
         index = 0;
         processingMessage = "Classifying image ";
-        completedMessage = "Successfully uploaded selected images";
+        completedMessage = "Successfully re-classified selected images";
         this.images = images;
         this.classifier = classifier;
         this.confidence = confidence;
