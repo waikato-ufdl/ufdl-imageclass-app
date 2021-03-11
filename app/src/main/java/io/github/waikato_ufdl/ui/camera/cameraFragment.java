@@ -550,14 +550,11 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         new Thread(() ->
         {
-            boolean frameworkChanged = false;
-            boolean modelChanged = false;
-
             //if the framework has changed, update the current framework & update the spinners list to show models belonging to that framework
             if (parent == frameworkSpinner) {
                 String selectedFramework = parent.getItemAtPosition(position).toString();
 
-                if (frameworkChanged = !framework.value.equals(selectedFramework)) {
+                if (!framework.value.equals(selectedFramework)) {
                     framework.setKey(position);
                     framework.setValue(selectedFramework);
                     updateModelSpinnerEntries(framework.value);
@@ -568,22 +565,31 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
             if (parent == modelSpinner) {
                 String selectedModel = parent.getItemAtPosition(position).toString();
                 if (model == null) model = new Tuple(0, "");
-                if (modelChanged = !model.value.equals(selectedModel)) {
+                if (!model.value.equals(selectedModel)) {
                     model.setKey(position);
                     model.setValue(parent.getItemAtPosition(position).toString());
                     createClassifier();
                 }
             }
 
-            //if the framework has changed but the model hasn't changed, this implies the model's list is empty. Hence, nullify the model & remove the image analzyer
-            if (frameworkChanged && !modelChanged) {
+            //if the model list for the current framework is empty, nullify the model & remove the image analzyer
+            if (modelListIsEmpty()) {
                 requireActivity().runOnUiThread(() -> {
                     model = null;
                     removeImageAnalyzer();
                 });
-
             }
         }).start();
+    }
+
+    /***
+     * Check if the model list for the current selected fragment is empty or not
+     * @return true if the list of models is empty or false if it's not empty.
+     */
+    public boolean modelListIsEmpty()
+    {
+        if(framework.value.equals(FRAMEWORK_PYTORCH)) return pyTorchModels.isEmpty();
+        return tfliteModels.isEmpty();
     }
 
     /***
