@@ -1,55 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
     tools:viewBindingIgnore="true">
 
+    <ImageView
+        android:id="@+id/dataset_folder"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:layout_weight="2"
+        android:contentDescription="@string/folder"
+        android:src="@drawable/dataset_folder" />
+
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_weight="4"
+        android:orientation="vertical"
         android:padding="5dp">
 
-        <ImageView
-            android:id="@+id/dataset_folder"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:src="@drawable/dataset_folder"
-            android:layout_weight="2"
-            android:contentDescription="@string/folder" />
-
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/dataseName"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_weight="4"
-            android:padding="5dp">
+            android:text="@string/dataset_name_header"
+            android:textColor="?attr/textColor" />
 
-            <TextView
-                android:id="@+id/dataseName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/dataset_name_header"
-                android:textColor="?attr/textColor" />
+        <TextView
+            android:id="@+id/projectName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/project"
+            android:textColor="?attr/textColor" />
 
-            <TextView
-                android:id="@+id/projectName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/project"
-                android:textColor="?attr/textColor"/>
-
-            <TextView
-                android:id="@+id/datasetTags"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/tag_s"
-                android:textColor="?attr/textColor"/>
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/datasetTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tag_s"
+            android:textColor="?attr/textColor" />
 
     </LinearLayout>
-
 </LinearLayout>
