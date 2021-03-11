@@ -70,7 +70,7 @@ public class ImagesFragment extends Fragment {
     protected RecyclerView recyclerView;
     private GridLayoutManager gridLayoutManager;
     private ProgressBar progressBar;
-    private final int MAX_GALLERY_SELECTION = 20;
+    private final int MAX_GALLERY_SELECTION = 200;
     private File cacheFolder;
 
     //Lazy loading variables
@@ -83,7 +83,7 @@ public class ImagesFragment extends Fragment {
     private final int REQUEST_CODE = 1;
 
     //specify the number of images to load upon scroll
-    public final int PAGE_LIMIT = 8;
+    public final int PAGE_LIMIT = 16;
 
     //variables related to the popup menu which asks users to label images
     private List<Uri> galleryImages;
@@ -463,10 +463,7 @@ public class ImagesFragment extends Fragment {
                 }
             });
 
-            saveImages.setOnClickListener(v ->
-            {
-                confirmAddFromGallery(viewPager, dialog);
-            });
+            saveImages.setOnClickListener(v -> confirmAddFromGallery(viewPager, dialog));
             dialog.show();
         }
     }
