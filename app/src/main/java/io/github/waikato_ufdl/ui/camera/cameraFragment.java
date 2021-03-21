@@ -531,10 +531,12 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        removeImageAnalyzer();
-        camera.clearFrameProcessors();
-        camera.clearCameraListeners();
-        new Thread(() -> camera.destroy()).start();
+        new Thread(() ->
+        {
+            camera.clearFrameProcessors();
+            camera.clearCameraListeners();
+            camera.destroy();
+        }).start();
         Log.e("TAG", "Destroyed");
     }
 
@@ -586,9 +588,8 @@ public class cameraFragment extends Fragment implements AdapterView.OnItemSelect
      * Check if the model list for the current selected fragment is empty or not
      * @return true if the list of models is empty or false if it's not empty.
      */
-    public boolean modelListIsEmpty()
-    {
-        if(framework.value.equals(FRAMEWORK_PYTORCH)) return pyTorchModels.isEmpty();
+    public boolean modelListIsEmpty() {
+        if (framework.value.equals(FRAMEWORK_PYTORCH)) return pyTorchModels.isEmpty();
         return tfliteModels.isEmpty();
     }
 
