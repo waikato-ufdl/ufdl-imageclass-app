@@ -4,8 +4,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -18,23 +16,20 @@ import java.io.IOException;
 
 public class UriUtils
 {
-    /**
-     * Method for return file path of Gallery image
-     *
-     * @param context
-     * @param uri
-     * @return path of the selected image file from gallery
-     */
-
     private static Uri filePathUri = null;
+
+    /***
+     * Method for return file path given a Uri
+     * @param context the context
+     * @param uri the uri
+     * @return the fileapth of an image given its URI
+     */
     public static String getPath(final Context context, final Uri uri)
     {
-        //check here to KITKAT or new version
-        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
         filePathUri = uri;
 
         // DocumentProvider
-        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+        if (DocumentsContract.isDocumentUri(context, uri)) {
 
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
@@ -53,7 +48,7 @@ public class UriUtils
                 final String id = DocumentsContract.getDocumentId(uri);
 
                 final Uri contentUri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+                        Uri.parse("content://downloads/public_downloads"), Long.parseLong(id));
 
                 //return getDataColumn(context, uri, null, null);
                 return getDataColumn(context, contentUri, null, null);
@@ -117,8 +112,8 @@ public class UriUtils
         final String[] projection = {
                 column
         };
-        FileInputStream input = null;
-        FileOutputStream output = null;
+        FileInputStream input;
+        FileOutputStream output;
 
         try {
             cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
@@ -150,7 +145,6 @@ public class UriUtils
                 output.close();
                 return new File(filePath).getAbsolutePath();
             } catch (IOException ignored) {
-                ignored.printStackTrace();
             }
         } finally{
             if (cursor != null)
