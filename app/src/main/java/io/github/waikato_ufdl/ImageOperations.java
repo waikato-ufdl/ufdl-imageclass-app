@@ -23,32 +23,13 @@ public class ImageOperations {
      * @param label the classification label of the image
      */
     public static void uploadImage(DBManager dbManager, int datasetPK, String dataset, File imageFile, String label) {
-        try {
-            if (SessionManager.isOnlineMode) {
-                ImageOperations.upload(dbManager, datasetPK, dataset, imageFile, label);
-            } else {
-                uploadToLocalDatabase(dbManager, dataset, imageFile.getName(), label, imageFile.getPath());
-            }
-        } catch (Exception e) {
-            uploadToLocalDatabase(dbManager, dataset, imageFile.getName(), label, imageFile.getPath());
+        dbManager.insertUnsyncedImage(imageFile.getName(), label, imageFile.getAbsolutePath(), null, dataset);
+
+        if (SessionManager.isOnlineMode) {
+            ImageOperations.upload(dbManager, datasetPK, dataset, imageFile, label);
         }
     }
 
-    /***
-     * Uploads an image to the local database with a sync status of CREATE.
-     * @param dbManager the database manager
-     * @param dataset the name of the dataset to store the image
-     * @param image the name of the image to upload
-     * @param label the classification label of the image
-     * @param path the file path of the image
-     */
-    protected static void uploadToLocalDatabase(DBManager dbManager, String dataset, String image, String label, String path) {
-        if (!dbManager.insertUnsyncedImage(image, label, path, null, dataset)) {
-            //set the sync status to synced & change label when the user attempts to upload images which are waiting to be synced (where the sync status = DELETE)
-            dbManager.setImageSynced(dataset, image);
-            dbManager.updateImageCategory(dataset, image, label);
-        }
-    }
 
     /***
      * Performs an API request to upload an image to the server. Then sets the sync status of the image to SYNCED in the local database.
@@ -57,22 +38,21 @@ public class ImageOperations {
      * @param dataset the name of the dataset to store the image
      * @param imageFile the image file to upload
      * @param label the classification label of the image
-     * @throws Exception if API request fails
      */
-    public static void upload(DBManager dbManager, int datasetPK, String dataset, File imageFile, String label) throws Exception {
-        ImageClassificationDatasets action = null;
+    public static void upload(DBManager dbManager, int datasetPK, String dataset, File imageFile, String label) {
         try {
-            action = SessionManager.getClient().action(ImageClassificationDatasets.class);
-        } catch (Exception exception) {
-            Log.e("TAG", "Connection Failure");
-        }
-        //add the file to the server
-        if (action.addFile(datasetPK, imageFile, imageFile.getName())) {
-            //if the file has successfully been uploaded then update the image categories
-            if (action.addCategories(datasetPK, Collections.singletonList(imageFile.getName()), Collections.singletonList(label))) {
-                //set the image sync status to synced on the local database
-                dbManager.setImageSynced(dataset, imageFile.getName());
+            ImageClassificationDatasets action = SessionManager.getClient().action(ImageClassificationDatasets.class);
+            //add the file to the server
+            if (action.addFile(datasetPK, imageFile, imageFile.getName())) {
+                //if the file has successfully been uploaded then update the image categories
+                if (action.addCategories(datasetPK, Collections.singletonList(imageFile.getName()), Collections.singletonList(label))) {
+                    //set the image sync status to synced on the local database
+                    if (!dbManager.insertSyncedImage(imageFile.getName(), label, imageFile.getAbsolutePath(), null, dataset))
+                        dbManager.setImageSynced(dataset, imageFile.getName());
+                }
             }
+        } catch (Exception e) {
+            Log.e("TAG", "Failed to upload image");
         }
     }
 
@@ -170,6 +150,10 @@ public class ImageOperations {
             }
         } catch (Exception e) {
             Log.e("TAG", "API Request Failed -- Image Deletion Failed\n" + e.getMessage());
+            if (e.getMessage() != null && e.getMessage().contains("Doesn't exist")) {
+                dbManager.setImageSynced(dataset, image);
+                dbManager.deleteSyncedImage(dataset, image);
+            }
         }
     }
 }
