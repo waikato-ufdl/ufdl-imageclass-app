@@ -20,7 +20,6 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.github.waikatoufdl.ufdl4j.Client;
-import com.github.waikatoufdl.ufdl4j.action.Datasets;
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
 import com.github.waikatoufdl.ufdl4j.action.Licenses;
 import com.github.waikatoufdl.ufdl4j.action.Projects;
@@ -50,6 +49,7 @@ public class SettingsFragment extends Fragment {
      * Default constructor for the Settings Fragment
      */
     public SettingsFragment() {
+
     }
 
     @Override
@@ -178,7 +178,11 @@ public class SettingsFragment extends Fragment {
                         //display loading dialog
                         loadingDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
                         loadingDialog.setTitleText("Logging in...");
-                        loadingDialog.setCancelable(false);
+                        loadingDialog.setCancelable(true);
+                        loadingDialog.setOnCancelListener(view -> {
+                            d.dispose();
+                            loadingDialog.dismiss();
+                        });
                         loadingDialog.show();
                     }
 
@@ -264,7 +268,7 @@ public class SettingsFragment extends Fragment {
     private void storeLoginDetails(String serverURL, String username, String password) {
         new Thread(() -> {
             try {
-                int pk = SessionManager.getClient().users().load(username).getPK();
+                int pk = new Client("http://127.0.0.1:8000", "admin", "admin").users().load(username).getPK();
                 boolean firstLogin = dbManager.getUserPK(serverURL, username, password) == -1;
                 Log.d("TAG", "First time logged in: " + firstLogin);
                 dbManager.storeUserDetails(pk, serverURL, username, password);
@@ -348,9 +352,12 @@ public class SettingsFragment extends Fragment {
             for (Projects.Project project : client.projects().list())
                 dbManager.insertProject(project.getPK(), project.getName());
 
-            for (Datasets.Dataset dataset : action.list())
-                dbManager.insertSyncedDataset(dataset.getPK(), dataset.getName(), dataset.getDescription(), dataset.getProject(), dataset.getLicense(), dataset.isPublic(), dataset.getTags());
-
+            action.list().forEach(dataset ->
+            {
+                if (dataset.getCreator() == sessionManager.getUserPK()) {
+                    dbManager.insertSyncedDataset(dataset.getPK(), dataset.getName(), dataset.getDescription(), dataset.getProject(), dataset.getLicense(), dataset.isPublic(), dataset.getTags());
+                }
+            });
             return true;
         })
                 // Execute in IO thread, i.e. background thread.
