@@ -1,10 +1,27 @@
 package io.github.waikato_ufdl.ui.images;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ImagesFragmentViewModel extends ViewModel {
-    MutableLiveData<String> mutableLiveData = new MutableLiveData<>();
+    MutableLiveData<String> mutableText = new MutableLiveData<>();
+    private MutableLiveData<List<ClassifiedImage>> mutableList;
+
+
+    public LiveData<List<ClassifiedImage>> getImageList(){
+        if (mutableList == null) {
+            mutableList = new MutableLiveData<>();
+        }
+        return mutableList;
+    }
+
+    public void setImageList(ArrayList<ClassifiedImage> imageList) {
+        mutableList.setValue(imageList);
+    }
 
     /**
      * Method to set text
@@ -12,7 +29,7 @@ public class ImagesFragmentViewModel extends ViewModel {
      */
     public void setText(String s)
     {
-        mutableLiveData.setValue(s);
+        mutableText.setValue(s);
     }
 
     /**
@@ -21,6 +38,6 @@ public class ImagesFragmentViewModel extends ViewModel {
      */
     public MutableLiveData<String> getText()
     {
-        return mutableLiveData;
+        return mutableText;
     }
 }

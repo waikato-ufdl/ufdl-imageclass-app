@@ -1,10 +1,11 @@
 package io.github.waikato_ufdl.ui.images;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.AssetManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,6 +13,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,24 +21,31 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.bumptech.glide.Glide;
 import com.github.waikatoufdl.ufdl4j.action.ImageClassificationDatasets;
+import com.stfalcon.imageviewer.StfalconImageViewer;
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
@@ -46,24 +55,27 @@ import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import io.github.waikato_ufdl.Classifier;
 import io.github.waikato_ufdl.DBManager;
-import io.github.waikato_ufdl.DatasetOperations;
 import io.github.waikato_ufdl.NetworkConnectivityMonitor;
 import io.github.waikato_ufdl.R;
 import io.github.waikato_ufdl.SessionManager;
+import io.github.waikato_ufdl.ui.camera.ClassifierDetails;
+import io.github.waikato_ufdl.ui.camera.ClassifierUtils;
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 
 import static android.app.Activity.RESULT_OK;
 
-public class ImagesFragment extends Fragment {
+public class ImagesFragment extends Fragment implements ImageListAdapter.InteractionListener {
     SessionManager sessionManager;
-    private ArrayList<ClassifiedImage> images;
     private int datasetKey;
     private String datasetName;
     private ImageListAdapter adapter;
@@ -71,21 +83,15 @@ public class ImagesFragment extends Fragment {
     private GridLayoutManager gridLayoutManager;
     private ProgressBar progressBar;
     private final int MAX_GALLERY_SELECTION = 200;
-    private File cacheFolder;
-
-    //Lazy loading variables
     private ImageClassificationDatasets action;
-    private String[] imageFileNames;
-    private boolean retrievedAll, isScrolling, isLoading, datasetModified;
-
-    private int currentItems, totalItems, scrolledItems;
-    private int totalImages;
+    private boolean selectedAll, filterIsActive, retrievedAll, isActionMode;
     private final int REQUEST_CODE = 1;
+    private SearchView searchView;
 
     //specify the number of images to load upon scroll
-    public final int PAGE_LIMIT = 16;
+    public static final int PAGE_LIMIT = 16;
 
-    //variables related to the popup menu which asks users to label images
+    //variables related to the popup menu which asks users to label images after gallery selection
     private List<Uri> galleryImages;
     private String[] labels;
 
@@ -93,10 +99,16 @@ public class ImagesFragment extends Fragment {
     private int indexPosition, prevIndex;
     private DBManager dbManager;
 
-    public ImagesFragment() {
-        // Required empty public constructor
-    }
+    private ArrayList<ClassifiedImage> selectedImages;
+    private ImagesFragmentViewModel imagesViewModel;
+    private StfalconImageViewer<ClassifiedImage> viewer;
+    private int numImagesLoaded;
 
+    /***
+     * Default constructor for the ImagesFragment
+     */
+    public ImagesFragment() {
+    }
 
     /***
      * initialises the contents the the options menu
@@ -110,7 +122,8 @@ public class ImagesFragment extends Fragment {
         //inflate the options menu
         inflater.inflate(R.menu.context_menu_search, menu);
         MenuItem item = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) item.getActionView();
+        searchView = (SearchView) item.getActionView();
+        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
         //set a query listener on the search bar
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -134,6 +147,7 @@ public class ImagesFragment extends Fragment {
             public boolean onQueryTextChange(String newText) {
                 //filter the images to check for classified images with a specific label
                 search(newText);
+                filterIsActive = true;
                 return false;
             }
         });
@@ -157,7 +171,10 @@ public class ImagesFragment extends Fragment {
              */
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                adapter.searchCategory(images);
+                if (imagesViewModel != null && imagesViewModel.getImageList() != null)
+                    adapter.submitList(imagesViewModel.getImageList().getValue());
+
+                filterIsActive = false;
                 return true;
             }
         });
@@ -166,20 +183,13 @@ public class ImagesFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         sessionManager = new SessionManager(requireContext());
         requireContext().setTheme(sessionManager.getTheme());
 
         if (getArguments() != null) {
-            //get Bundle from the previous fragment & initialise variables
             datasetKey = getArguments().getInt("datasetPK");
             datasetName = getArguments().getString("datasetName");
-            cacheFolder = DatasetOperations.getImageStorageDirectory(requireContext(), datasetName, true);
         }
-
-        retrievedAll = false;
-        isLoading = false;
-        datasetModified = true;
         dbManager = sessionManager.getDbManager();
         setHasOptionsMenu(true);
     }
@@ -189,11 +199,7 @@ public class ImagesFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         requireActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_images, container, false);
-        images = dbManager.getCachedImageList(datasetName);
-        //initialising views & initialising variables
         recyclerView = view.findViewById(R.id.imageRecyclerView);
         progressBar = view.findViewById(R.id.progressBar);
         ImageButton addImages = view.findViewById(R.id.fab_add_images);
@@ -201,6 +207,10 @@ public class ImagesFragment extends Fragment {
         //set on click listener which will start up the gallery image selection user interface
         addImages.setOnClickListener(v -> startGalleryImagePicker());
         setupImageGrid();
+        selectedImages = new ArrayList<>();
+        viewer = null;
+        numImagesLoaded = 0;
+        initialiseViewModel();
 
         //create network connectivity monitor to observe any connectivity changes whilst on this fragment
         NetworkConnectivityMonitor connectivityMonitor = new NetworkConnectivityMonitor(requireContext());
@@ -213,11 +223,10 @@ public class ImagesFragment extends Fragment {
                 datasetKey = dbManager.getDatasetPK(datasetName);
             }
 
-            //if there is an internet connection and there is no visible items in the recyler view
-            if (isConnected && (gridLayoutManager.findFirstVisibleItemPosition() == RecyclerView.NO_POSITION ||
-                    gridLayoutManager.findLastVisibleItemPosition() <= PAGE_LIMIT) && dbManager.getUnsycnedImages().isEmpty() && !isLoading) {
-                //start the process of displaying the dataset's images to the gridview
-                new Thread(this::processImages).start();
+            //if there are no visible items in the recycler view
+            if (recyclerIsEmpty()) {
+                if (isConnected & !retrievedAll) downloadAll();
+                else process();
             }
         });
 
@@ -225,10 +234,42 @@ public class ImagesFragment extends Fragment {
     }
 
     /***
+     * Checks to see if the recyclerview is empty (no visible items)
+     * @return true if there are no visible items or false if there are items that are visible.
+     */
+    private boolean recyclerIsEmpty() {
+        return (gridLayoutManager.findFirstVisibleItemPosition() == RecyclerView.NO_POSITION ||
+                gridLayoutManager.findLastVisibleItemPosition() <= PAGE_LIMIT);
+    }
+
+    /***
+     * Initialises the images view model
+     */
+    private void initialiseViewModel() {
+        imagesViewModel = new ViewModelProvider(this).get(ImagesFragmentViewModel.class);
+        imagesViewModel.getImageList().observe(getViewLifecycleOwner(), images -> adapter.submitList(images));
+        imagesViewModel.setImageList(new ArrayList<>());
+    }
+
+
+    public void process() {
+        if (imagesViewModel == null) return;
+        if (imagesViewModel.getImageList().getValue() == null) return;
+        ArrayList<ClassifiedImage> list = new ArrayList<>(imagesViewModel.getImageList().getValue());
+        if (list.size() == dbManager.getImageCount(datasetName)) return;
+        showProgressBar();
+
+        ArrayList<ClassifiedImage> moreImages = dbManager.loadImages(datasetName, PAGE_LIMIT, list.size());
+        list.addAll(moreImages);
+        imagesViewModel.setImageList(list);
+        numImagesLoaded = list.size();
+        new Handler(Looper.getMainLooper()).postDelayed(this::hideProgressBar, 3000);
+    }
+
+    /***
      * Opens the gallery for image selection
      */
     public void startGalleryImagePicker() {
-        isLoading = true;
         int galleryTheme = (sessionManager.loadDarkModeState()) ? R.style.Matisse_Dracula : R.style.Matisse_Zhihu;
 
         Matisse.from(ImagesFragment.this)
@@ -248,35 +289,20 @@ public class ImagesFragment extends Fragment {
                 .forResult(REQUEST_CODE);
     }
 
-    /***
-     * calls lazy load if an internet connection is available
-     */
-    public void processImages() {
-        try {
-            if (SessionManager.isOnlineMode) {
-                LazyLoadImages();
-            }
-        } catch (Exception e) {
-            new Handler(Looper.getMainLooper()).postDelayed(() -> progressBar.setVisibility(View.GONE), 1500);
-
-            if (!SessionManager.isOnlineMode) {
-                requireActivity().runOnUiThread(() -> Toast.makeText(getContext(), "No Internet Connection", Toast.LENGTH_SHORT).show());
-            }
-        }
-    }
 
     /***
      * Method to populate and display the dataset's images to a gridview using the arraylist of ClassifiedImages
      */
     private void setupImageGrid() {
         //get the recycler view, set it's layout to a gridlayout with 2 columns & then set the adapter
-        adapter = new ImageListAdapter(this, datasetName);
-        adapter.submitList(images);
+        adapter = new ImageListAdapter(requireContext(), this);
+        adapter.submitList(new ArrayList<>());
         gridLayoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(gridLayoutManager);
         OverScrollDecoratorHelper.setUpOverScroll(recyclerView, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
         recyclerView.setAdapter(adapter);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            boolean isScrolling;
 
             /***
              * Callback method to be invoked when the RecyclerView's scroll state changes
@@ -302,40 +328,32 @@ public class ImagesFragment extends Fragment {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                //only trigger on scrolling up when all data hasn't been retrieved
-                if (dy > 0 && !retrievedAll) {
-                    currentItems = gridLayoutManager.getChildCount();
-                    totalItems = gridLayoutManager.getItemCount();
-                    scrolledItems = gridLayoutManager.findFirstVisibleItemPosition();
+                if (dy > 0) {
+                    int currentItems = gridLayoutManager.getChildCount();
+                    int totalItems = gridLayoutManager.getItemCount();
+                    int scrolledItems = gridLayoutManager.findFirstVisibleItemPosition();
 
-                    //if the user has scrolled to the bottom of the recyclerview, load more images
-                    if (isScrolling && (currentItems + scrolledItems == totalItems) && !isLoading) {
-
-                        if (SessionManager.isOnlineMode) {
-                            isScrolling = false;
-                            isLoading = true;
-
-                            //show progress bar and attempt to lazy load images
-                            progressBar.setVisibility(View.VISIBLE);
-                            new Thread(() -> processImages()).start();
-
-                        } else {
-                            requireActivity().runOnUiThread(() -> Toast.makeText(getContext(), "No Internet Connection", Toast.LENGTH_SHORT).show());
-                        }
+                    if (isScrolling && (currentItems + scrolledItems == totalItems)) {
+                        isScrolling = false;
+                        if (!selectedAll && !filterIsActive) process();
                     }
-                } else {
-                    requireActivity().runOnUiThread(() -> progressBar.setVisibility(View.GONE));
                 }
             }
         });
     }
 
     /***
+     * Method to show the progress bar in order to signal data is loading.
+     */
+    public void showProgressBar() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    /***
      * Method to hide the progress bar in order to signal the end of any data loading
      */
     public void hideProgressBar() {
-        requireActivity().runOnUiThread(() -> progressBar.setVisibility(View.GONE));
-        isLoading = false;
+        progressBar.setVisibility(View.GONE);
     }
 
     /***
@@ -472,8 +490,7 @@ public class ImagesFragment extends Fragment {
      * Disables an edit text
      * @param editText the edit text to disable
      */
-    public void disableEditText(EditText editText)
-    {
+    public void disableEditText(EditText editText) {
         editText.setHint("");
         editText.setFocusable(true);
         editText.setFocusableInTouchMode(true);
@@ -484,8 +501,7 @@ public class ImagesFragment extends Fragment {
      * Enables a EditText
      * @param editText the edit text to enable
      */
-    public void enableEditText(EditText editText)
-    {
+    public void enableEditText(EditText editText) {
         editText.setHint("Classification label");
         editText.setFocusable(true);
         editText.setFocusableInTouchMode(true);
@@ -495,11 +511,10 @@ public class ImagesFragment extends Fragment {
     /***
      * Displays a confirmation dialog for saving images to the dataset and then begins an upload task on user confirmation
      * @param viewPager the viewpager in which the images are displayed
-     * @param dialog the popup dialo
+     * @param dialog the popup dialog
      */
     public void confirmAddFromGallery(ViewPager2 viewPager, Dialog dialog) {
         String informativeMessage;
-
         if (viewPager.getAdapter() == null) return;
 
         if (allLabelsFilled(viewPager.getAdapter().getItemCount())) {
@@ -508,7 +523,7 @@ public class ImagesFragment extends Fragment {
             informativeMessage = "All label fields have not been filled out. Any images with empty labels will be classified as '-'. Are you sure you wish to save these images?";
         }
 
-        //if the user cancels deletion close the popup but leave them on the selection mode
+        //if the user cancels deletion close the popup but leave them in the selection mode
         new SweetAlertDialog(requireContext(), SweetAlertDialog.WARNING_TYPE)
                 .setTitleText("Are you sure?")
                 .setContentText(informativeMessage)
@@ -517,28 +532,20 @@ public class ImagesFragment extends Fragment {
                     sDialog.dismissWithAnimation();
 
                     //upload images to backend
-                    UploadTask uploadImages = new UploadTask(ImagesFragment.this, getContext(), galleryImages, labels, datasetName);
+                    UploadTask uploadImages = new UploadTask(requireContext(), galleryImages, labels, datasetName) {
+                        @Override
+                        public void runOnCompletion() {
+                            //load images to the recycler view if the current amount of images is less than the page limit
+                            if (gridLayoutManager.getItemCount() < PAGE_LIMIT || (gridLayoutManager.getChildCount() & 1) == 1) process();
+                        }
+                    };
                     uploadImages.execute();
-
                     dialog.dismiss();
                 })
                 .setCancelButton("No", SweetAlertDialog::dismissWithAnimation)
                 .show();
     }
 
-    /***
-     * A method to reload the current fragment
-     */
-    public void reload() {
-        // Reload current fragment
-        isLoading = true;
-        FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-        if (Build.VERSION.SDK_INT >= 26) {
-            ft.setReorderingAllowed(false);
-        }
-        ft.detach(this).attach(this).commit();
-        isLoading = false;
-    }
 
     /***
      * A method to check if all images have been labelled
@@ -552,7 +559,6 @@ public class ImagesFragment extends Fragment {
                 return false;
             }
         }
-
         return true;
     }
 
@@ -567,28 +573,10 @@ public class ImagesFragment extends Fragment {
             editText.setText(labels[position]);
         }
         //else show an empty text box
-        else
-            editText.getText().clear();
+        else editText.getText().clear();
 
         //position the cursor to the end of the text
         editText.setSelection(editText.getText().length());
-    }
-
-
-    /***
-     * A method to set the boolean value indicating whether a dataset change has taken place
-     * @param bool true if a dataset has been modified
-     */
-    public void setDatasetModified(boolean bool) {
-        datasetModified = bool;
-    }
-
-    /***
-     * A method to set the boolean value indicating whether all dataset contents have been retrieved
-     * @param bool true if all images have been retrieved from backend
-     */
-    public void setRetrievedAll(boolean bool) {
-        retrievedAll = bool;
     }
 
     /***
@@ -596,111 +584,499 @@ public class ImagesFragment extends Fragment {
      * @param keyword the keyword to filter the list by
      */
     private void search(String keyword) {
+        if (imagesViewModel == null) return;
+        if (imagesViewModel.getImageList().getValue() == null) return;
         ArrayList<ClassifiedImage> filteredSearchList = new ArrayList<>();
 
-        //iterate through the classified images
-        for (ClassifiedImage image : images) {
-            //if the classification label contains the keyword entered by the user, add the image to the filtered list
+        dbManager.getCachedImageList(datasetName).forEach(image -> {
             if (image.getClassificationLabel().toLowerCase().contains(keyword.toLowerCase())) {
                 filteredSearchList.add(image);
             }
-        }
+        });
 
         //display the filtered list
-        adapter.searchCategory(filteredSearchList);
+        adapter.submitList(filteredSearchList);
     }
 
     /***
-     * A method to lazy load a certain number of images at a time to the recyclerview
-     * @throws Exception if API request fails
+     * Downloads image files from the server and updates the UI. If the image files have already been downloaded, update the UI using images stored in Local Database.
      */
+    public void downloadAll() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            try {
+                new DownloadTask(requireContext(), datasetName, true) {
+                    @Override
+                    public void onPageLimitLoaded() {
+                        process();
+                    }
+                }.execute();
+            } catch (DownloadTask.ImagesAlreadyExistException e) {
+                retrievedAll = true;
+                requireActivity().runOnUiThread(this::process);
+            } catch (Exception e) {
+                Log.e("TAG", "Error occurred while trying to download image files: \n" + e.getMessage());
+                requireActivity().runOnUiThread(this::process);
+            }
+        });
+        executor.shutdown();
+    }
 
-    public void LazyLoadImages() throws Exception {
-        isLoading = true;
-        int startIndex = images.size();
-        int loadedItems = 0;
-        byte[] img;
-        String imageFileName;
-        List<String> allLabels;
-        String classificationLabel;
+    /***
+     * A method which triggers when a user clicks on an image. If the action mode is enabled, the image will be highlighted on selection. Else, start the image viewer.
+     * @param position the position of the image that was clicked
+     * @param image the classified image that was clicked
+     */
+    @Override
+    public void onImageClick(int position, ClassifiedImage image) {
+        //if action mode is enabled, change image selection state
+        if (isActionMode) {
+            onImageSelect(position, image);
+        } else {
+            if (image == null) return;
+            startImageViewer(image, position);
+        }
+    }
 
-        //if there are no images loaded or the dataset has been modified
-        if (startIndex == 0 || datasetModified) {
-            datasetModified = false;
-            //load the dataset files
-            imageFileNames = action.load(datasetKey).getFiles();
-            totalImages = imageFileNames.length;
+    /***
+     * Changes the selection state of an image.
+     * @param position the position of the selected item in the adapter list.
+     */
+    private void onImageSelect(int position, ClassifiedImage image) {
+        String selectionText = imagesViewModel.getText().getValue();
+        int numSelected = (selectionText != null) ? Integer.parseInt(imagesViewModel.getText().getValue()) : 0;
+
+        //if an image has been selected
+        if (!image.isSelected()) {
+            //set its isSelected state to true
+            image.setSelected(true);
+            numSelected++;
+        } else {
+            //else an image has been deselected so set its selection state to false
+            image.setSelected(false);
+            numSelected--;
         }
 
-        //if all images have not been retrieved from the dataset
-        if (startIndex < totalImages) {
+        //update the view in the recycler view to show selection state & update selection text
+        adapter.notifyItemChanged(position);
+        imagesViewModel.setText(String.valueOf(numSelected));
 
-            for (int i = startIndex; i < totalImages; i++) {
+        /*
+        ClassifiedImage selectedImage;
+        String selectionText = imagesViewModel.getText().getValue();
+        int numSelected = (selectionText != null) ? Integer.parseInt(imagesViewModel.getText().getValue()) : 0;
 
-                //if we have haven't yet retrieved all images or reached the limit of images to lazy load
-                if ((startIndex + loadedItems) < totalImages && loadedItems < PAGE_LIMIT) {
-                    //get the name of the image file
-                    imageFileName = imageFileNames[i];
+        if (imagesViewModel == null) return;
+        if (imagesViewModel.getImageList().getValue() == null) return;
 
-                    try {
-                        //retrieve the image data and classification label of the image
-                        img = action.getFile(datasetKey, imageFileName);
-                        allLabels = action.getCategories(datasetKey, imageFileName);
-                        classificationLabel = (allLabels.size() > 0) ? allLabels.get(0) : "-";
-                    } catch (Exception e) {
-                        continue;
-                    }
+        selectedImage = (ClassifiedImage) image.clone();
+        if (!selectedImage.isSelected()) {
+            selectedImage.setSelected(true);
+            numSelected++;
+        } else {
+            selectedImage.setSelected(false);
+            numSelected--;
+        }
 
-                    //create a classifiedImage object, cache the image and then and add it to the images arrayList
-                    ClassifiedImage image = new ClassifiedImage(img, classificationLabel, imageFileName);
-                    if (cacheImage(image)) {
-                        images.add(image);
-                        loadedItems++;
+        ArrayList<ClassifiedImage> imageList = new ArrayList<>(imagesViewModel.getImageList().getValue());
+        imageList.remove(position);
+        imageList.add(position, selectedImage);
+        imagesViewModel.setImageList(imageList);
+        imagesViewModel.setText(String.valueOf(numSelected));
 
-                        //update the recycler view
-                        requireActivity().runOnUiThread(() -> {
-                            adapter.notifyItemInserted(images.size() - 1);
+         */
+    }
 
-                            if (adapter.viewer != null) {
-                                adapter.viewer.updateImages(images);
-                            }
-                        });
-                    }
-                }
-                //if all images have been retrieved from backend, hide the progress bar
-                else if (startIndex + loadedItems > totalImages) {
-                    Log.d("TAG", "Retrieved All");
-                    retrievedAll = true;
-                    hideProgressBar();
-                    return;
+    /***
+     * Starts the image viewer to display the image which was pressed.
+     * @param image the classified image object at the selected position.
+     * @param position the adapter position of the selected item
+     */
+    @SuppressLint("DefaultLocale")
+    private void startImageViewer(ClassifiedImage image, int position) {
+        View view = View.inflate(requireContext(), R.layout.pager_overlay_view, null);
+        TextView index = view.findViewById(R.id.imageIndex);
+        TextView label = view.findViewById(R.id.imageLabel);
+        ImageListAdapter.ViewHolder holder = ((ImageListAdapter.ViewHolder) recyclerView.findViewHolderForAdapterPosition(position));
+        if (holder == null) return;
+
+        //set the overlay text views with the appropriate details
+        index.setText(String.format("%d/%d", position + 1, adapter.getItemCount()));
+        label.setText(image.getClassificationLabel());
+
+        if (viewer == null) {
+            viewer = new StfalconImageViewer.Builder<>(requireContext(), adapter.getCurrentList(), (imageView, picture) ->
+                    Glide.with(requireContext())
+                            .load((picture.getFullImageFilePath() != null) ? picture.getFullImageFilePath() : picture.getCachedFilePath())
+                            .placeholder(R.drawable.progress_animation)
+                            .into(imageView))
+                    .withStartPosition(position)
+                    .withTransitionFrom(holder.image)
+                    .withOverlayView(view)
+                    .withDismissListener(() -> viewer = null)
+                    .withImageChangeListener(pos -> {
+
+                        viewer.updateImages(adapter.getCurrentList());
+                        UpdateTransitionImage(pos);
+
+                        if (pos <= adapter.getItemCount()) {
+                            //update the image index position and classification label text
+                            index.setText(String.format("%d/%d", pos + 1, adapter.getItemCount()));
+                            label.setText(adapter.getItemAtPos(pos).getClassificationLabel());
+                        }
+                    }).show();
+        }
+    }
+
+
+    /***
+     * A method to update the image viewer's transition image view.
+     * @param position the index position of the image being displayed in the image viewer.
+     */
+    public void UpdateTransitionImage(int position) {
+        ImageListAdapter.ViewHolder ImageViewHolder = (ImageListAdapter.ViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
+
+        if (ImageViewHolder != null) {
+            ImageView imageView = ImageViewHolder.image;
+            if (imageView != null) {
+                viewer.updateTransitionImage(imageView);
+            }
+        }
+    }
+
+    /***
+     * Handles long clicks events on images. If the action mode is not enabled, enable it to enter multi-selection mode. If the action mode is enabled, long click should
+     * just toggle image selection.
+     * @param position the adapter position of the selected image
+     * @param image the selected classified image object
+     */
+    @Override
+    public void onImageLongClick(int position, ClassifiedImage image) {
+        //if action mode in not enabled, initialise action mode
+        if (!isActionMode) {
+            requireActivity().startActionMode(actionModeCallback);
+        }
+        onImageSelect(position, image);
+    }
+
+
+    ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
+        /***
+         * Called when action mode is first created. The menu supplied will be used to generate action buttons for the action mode.
+         * @param mode ActionMode being created
+         * @param menu Menu used to populate action buttons
+         * @return true if the action mode should be created, false if entering this mode should be aborted.
+         */
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            //Initialise menu inflater & inflate menu
+            MenuInflater menuInflater = mode.getMenuInflater();
+            menuInflater.inflate(R.menu.context_menu_contents, menu);
+
+            //display all icons on the action bar rather than in a dropdown
+            for (int i = 0; i < menu.size(); i++) {
+                menu.getItem(i).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            }
+            return true;
+        }
+
+        /***
+         * Called to refresh an action mode's action menu whenever it is invalidated.
+         * @param mode ActionMode being prepared
+         * @param menu Menu used to populate action buttons
+         * @return true if the menu or action mode was updated, false otherwise.
+         */
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            isActionMode = true;
+
+            //Whenever, a user selects/deselects an item
+            imagesViewModel.getText().observe(getViewLifecycleOwner(), s -> {
+                //update the action bar title to show the number of selected images
+                mode.setTitle(String.format("%s", s));
+            });
+
+            return true;
+        }
+
+        /***
+         * Called to report a user click on an action button.
+         * @param mode The current ActionMode
+         * @param item The item that was clicked
+         * @return true if this callback handled the event, false if the standard MenuItem invocation should continue.
+         */
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            int itemId = item.getItemId();
+
+            if (imagesViewModel != null && imagesViewModel.getText() != null && imagesViewModel.getText().getValue() != null) {
+                int numSelected = Integer.parseInt(imagesViewModel.getText().getValue());
+
+                if (numSelected == 0 && itemId != R.id.action_select_all) {
+                    Toast.makeText(requireContext(), "Please select atleast one image", Toast.LENGTH_SHORT).show();
+                    return false;
                 }
             }
 
-            //hide the progress bar
-            hideProgressBar();
+            if (itemId == R.id.action_delete) {//when user presses delete
+                deleteConfirmation(mode);
+            } else if (itemId == R.id.action_relabel) {//when the user presses edit
+                confirmEditCategories(mode);
+            } else if (itemId == R.id.action_select_all) {
+                if (!filterIsActive) selectAll();
+                else filteredSelectAll();
+            } else if (itemId == R.id.action_classify) {
+                showAutoClassifierDialog(mode);
+            }
+
+            return false;
         }
 
-        //if all images have been retrieved, set retrieved all to true and hide the progress bar
-        if (startIndex >= totalImages) {
-            Log.d("TAG", "Retrieved All Images");
-            retrievedAll = true;
-            hideProgressBar();
+        /***
+         * Called when the action mode is about to be destroyed.
+         * @param mode The current ActionMode being destroyed
+         */
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            isActionMode = false;
+            imagesViewModel.setText(String.valueOf(0));
+            deselectAll();
+            selectedAll = false;
+            selectedImages.clear();
+        }
+    };
+
+    /***
+     * A method to confirm the deletion process via a popup before deleting images
+     * @param mode the action mode
+     */
+    public void deleteConfirmation(ActionMode mode) {
+        //if the user cancels deletion close the popup but leave them on the selection mode
+        new SweetAlertDialog(requireContext(), SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Are you sure?")
+                .setContentText("You won't be able to recover the image(s) after deletion")
+                .setConfirmText("Delete")
+                .setConfirmClickListener(sDialog -> {
+                    sDialog.dismissWithAnimation();
+
+                    adapter.getCurrentList().forEach(image -> {
+                        if (image.isSelected()) selectedImages.add(image);
+                    });
+
+                    //delete the selected images
+                    DeleteTask deleteImages = new DeleteTask(requireContext(), selectedImages, datasetName) {
+                        @Override
+                        public void runOnCompletion() {
+                            updateUI();
+                            mode.finish();
+                            if (gridLayoutManager.getItemCount() < PAGE_LIMIT) process();
+                        }
+                    };
+                    deleteImages.execute();
+                })
+                .setCancelButton("Cancel", SweetAlertDialog::dismissWithAnimation)
+                .show();
+    }
+
+
+    /***
+     * Loads the same number of images which were in the recycler prior to select all
+     */
+    private void updateUI() {
+        //imagesViewModel.setImageList(null);
+        imagesViewModel.setImageList(dbManager.loadImages(datasetName, numImagesLoaded, 0));
+        if(filterIsActive) search(searchView.getQuery().toString());
+    }
+
+    /***
+     * A method which displays a confirmation dialog prompting the user to confirm the reclassification of images
+     * @param mode the action mode
+     */
+    public void confirmEditCategories(ActionMode mode) {
+        final EditText editText = new EditText(requireContext());
+        //if the user clicks cancel close the popup but leave them on the selection mode
+        new SweetAlertDialog(requireContext(), SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Reclassify all selected images as: ")
+                .setConfirmText("Reclassify")
+                .setCustomView(editText)
+                .setConfirmClickListener(sweetAlertDialog -> {
+                    String newClassification = editText.getText().toString().trim();
+
+                    //if a value has been entered
+                    if (newClassification.length() > 0) {
+                        sweetAlertDialog.dismiss();
+
+                        adapter.getCurrentList().forEach(image -> {
+                            if (image.isSelected()) selectedImages.add(image);
+                        });
+
+                        //reclassify selected images
+                        ReclassifyTask editCategoriesTask = new ReclassifyTask(requireContext(), selectedImages, newClassification, datasetName) {
+                            @Override
+                            public void runOnCompletion() {
+                                updateUI();
+                                mode.finish();
+                            }
+                        };
+                        editCategoriesTask.execute();
+
+                    } else
+                        editText.setError("Please enter a classification label");
+                })
+                .setCancelButton("Cancel", SweetAlertDialog::dismissWithAnimation)
+                .show();
+    }
+
+
+    /***
+     * Display a popup dialog where the user will be able to select a model & the minimum prediction confidence required in order
+     * for the classifier to be able to overwrite the existing label.
+     * @param mode the action mode
+     */
+    public void showAutoClassifierDialog(ActionMode mode) {
+        //inflate the layout of the dialog & initialise the layout views
+        final View layout = View.inflate(requireContext(), R.layout.auto_classify_dialog, null);
+        final EditText confidenceEditText = layout.findViewById(R.id.requiredConfidence);
+        final Spinner spinner = layout.findViewById(R.id.modelSpinner);
+        populateModelSpinner(spinner);
+
+        //display the dialog
+        new SweetAlertDialog(requireContext(), SweetAlertDialog.NORMAL_TYPE)
+                .setConfirmText("Run Classifier")
+                .setCustomView(layout)
+                .setConfirmClickListener(dialog -> {
+                    if (spinner.getSelectedItem() == null) {
+                        Toast.makeText(requireContext(), "There are no models to use", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        return;
+                    }
+
+                    String selectedModel = spinner.getSelectedItem().toString();
+                    double confidence = getConfidence(confidenceEditText);
+
+                    if (confidence > 0 && confidence <= 1) {
+                        dialog.dismiss();
+                        classify(selectedModel, confidence, mode);
+                    } else
+                        confidenceEditText.setError("Required value must be greater than 0 and less than or equal to 1");
+
+                })
+                .show();
+    }
+
+    /***
+     * Gets the confidence score entered by the user in double format if the input is valid or displays an error on the edittext
+     * @param confidenceEditText the edit text which contains the user input
+     * @return double value between 0 to 1 on success or -1 if error occured.
+     */
+    private double getConfidence(EditText confidenceEditText) {
+        try {
+            return Double.parseDouble(confidenceEditText.getText().toString().trim());
+        } catch (Exception e) {
+            confidenceEditText.setError("Required value must be greater than 0 and less than or equal to 1");
+        }
+
+        return -1;
+    }
+
+    /***
+     * Method to begin the auto-classification process
+     * @param model the name of the model
+     * @param confidence the minimum confidence score required in order for the current label to be overwritten
+     * @param mode the action mode
+     */
+    private void classify(String model, double confidence, ActionMode mode) {
+        Classifier classifier;
+        ClassifierDetails details = ClassifierUtils.deserializeModelJSON(requireContext(), model);
+
+        if (details != null) {
+            classifier = Classifier.createInstance(requireContext(), details);
+            if (classifier == null) return;
+
+            adapter.getCurrentList().forEach(image -> {
+                if (image.isSelected()) selectedImages.add(image);
+            });
+
+            AutoClassifyTask task = new AutoClassifyTask(requireContext(), selectedImages, classifier, confidence, datasetName) {
+                @Override
+                public void runOnCompletion() {
+                    updateUI();
+                    mode.finish();
+                }
+            };
+            task.execute();
         }
     }
 
     /***
-     * A method to cache images and store the image info to the local SQLite database
-     * @param image the classified image object which contains the image data & info
-     * @return true if the image has been successfully cached & inserted into the local database
+     * Method to populate the spinner with model names
+     * @param spinner the spinner to populate
      */
-    public boolean cacheImage(ClassifiedImage image) {
-        String filename = image.getImageFileName();
-        String classificationLabel = image.getClassificationLabel();
-        byte[] imageData = image.getImageBytes();
+    private void populateModelSpinner(Spinner spinner) {
+        AssetManager assetManager = requireContext().getAssets();
+        ArrayList<String> models = new ArrayList<>();
+        try {
+            for (String modelName : assetManager.list("")) {
+                if (modelName.endsWith(".pt") || modelName.endsWith(".tflite")) {
+                    models.add(modelName);
+                }
+            }
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(requireContext(), R.layout.support_simple_spinner_dropdown_item, models);
+            spinner.setAdapter(arrayAdapter);
+        } catch (IOException e) {
+            Log.e("TAG", "Failed to populate model spinner\n" + e.getMessage());
+        }
+    }
 
-        boolean cacheSuccessful = DatasetOperations.downloadImage(requireContext(), dbManager, cacheFolder, filename, imageData, classificationLabel, true);
-        image.setCachePath(new File(cacheFolder, filename).getPath());
-        return cacheSuccessful;
+    /***
+     * select all images in the adapter list
+     */
+    public void selectAll() {
+        selectedAll = true;
+        ArrayList<ClassifiedImage> images = dbManager.getCachedImageList(datasetName);
+        images.forEach(image -> image.setSelected(true));
+        //imagesViewModel.setImageList(null);
+        imagesViewModel.setImageList(images);
+        imagesViewModel.setText(String.valueOf(images.size()));
+
+        //adapter.notifyItemRangeChanged(0, images.size()-1);
+
+        /*
+        int totalImages = (int) dbManager.getImageCount(datasetName);
+        selectedAll = true;
+        selectedImages.clear();
+        selectedImages.addAll(adapter.getCurrentList());
+        selectedImages.forEach(image -> image.setSelected(true));
+        selectedImages.removeIf(image -> !image.isSelected());
+        adapter.submitList(selectedImages);
+        visibleSelection.addAll(selectedImages);
+        selectedImages.addAll(dbManager.loadImages(datasetName, totalImages - adapter.getItemCount(), selectedImages.size()));
+        imagesViewModel.setText(String.valueOf(selectedImages.size()));
+
+         */
+
+
+
+        /*
+        selectedImages.clear();
+        selectedImages.addAll(adapter.getCurrentList());
+        selectedImages.forEach(image -> image.setSelected(true));
+        adapter.notifyDataSetChanged();
+        imagesViewModel.setText(String.valueOf(selectedImages.size()));
+         */
+    }
+
+
+    public void deselectAll() {
+        updateUI();
+        imagesViewModel.setText(String.valueOf(0));
+    }
+
+    public void filteredSelectAll() {
+        selectedAll = true;
+        adapter.getCurrentList().forEach(image -> image.setSelected(true));
+        adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+        imagesViewModel.setText(String.valueOf(adapter.getItemCount()));
     }
 
     @Override
@@ -709,6 +1085,3 @@ public class ImagesFragment extends Fragment {
         recyclerView.setAdapter(null);
     }
 }
-
-
-
