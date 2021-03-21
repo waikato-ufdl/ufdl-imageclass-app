@@ -147,7 +147,8 @@ public class ManageFragment extends Fragment {
      * @param keyword the keyword to filter the list by
      */
     private void filter(String keyword) {
-        if (datasetViewModel == null || datasetViewModel.getDatasetList() == null) return;
+        if (datasetViewModel == null) return;
+        if (datasetViewModel.getDatasetList().getValue() == null) return;
         ArrayList<ImageDataset> filteredSearchList = new ArrayList<>();
 
         datasetViewModel.getDatasetList().getValue().forEach(dataset -> {
@@ -333,12 +334,11 @@ public class ManageFragment extends Fragment {
                     actionMode.finish();
                     sDialog.dismiss();
                     boolean isCache = !fullSizeDownload.isChecked();
-                    executor.execute(() -> DatasetOperations.downloadDataset(requireContext(), dbManager, selectedDataset, isCache, binding.progressBar));
+                    executor.execute(() -> DatasetOperations.downloadDataset(requireContext(), dbManager, selectedDataset, isCache, binding.progressBar, binding.cancelDownload));
                 })
                 .setCancelButton("Cancel", SweetAlertDialog::dismiss)
                 .show();
     }
-
 
     /**
      * Initialises & populates the project & license spinners used in the dataset creation & update popup window

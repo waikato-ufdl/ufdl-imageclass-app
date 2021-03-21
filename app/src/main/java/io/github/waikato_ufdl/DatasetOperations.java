@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -148,6 +149,7 @@ public class DatasetOperations {
             }
         } catch (Exception e) {
             Log.e("TAG", "API request failed -- Dataset Deletion Failed. Error:\n" + e.getMessage());
+
         }
     }
 
@@ -183,7 +185,7 @@ public class DatasetOperations {
      * @param isCache true to compress images
      * @param progressBar the progress bar to display
      */
-    public static void downloadDataset(Context context, DBManager dbManager, ImageDataset selectedDataset, boolean isCache, ProgressBar progressBar) {
+    public static void downloadDataset(Context context, DBManager dbManager, ImageDataset selectedDataset, boolean isCache, ProgressBar progressBar, Button cancelButton) {
         try {
             ImageClassificationDatasets action = SessionManager.getClient().action(ImageClassificationDatasets.class);
             int datasetPK = selectedDataset.getPK();
@@ -201,16 +203,18 @@ public class DatasetOperations {
                     })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(getDownloadObserver(progressBar, imageFileNames.length));
+                    .subscribe(getDownloadObserver(progressBar, cancelButton, imageFileNames.length));
 
         } catch (Exception e) {
             new Handler(Looper.getMainLooper()).post(() ->
             {
                 progressBar.setVisibility(View.GONE);
+                cancelButton.setVisibility(View.GONE);
                 Toast.makeText(context, "Error occurred while downloading datasets: \n +" + e.getMessage(), Toast.LENGTH_LONG).show();
             });
         }
     }
+
 
     /***
      * Downloads an image and stores it within an app-specific directory.
@@ -284,7 +288,7 @@ public class DatasetOperations {
      * @param numFiles the number of files to download
      * @return RxJava observer
      */
-    private static Observer<Boolean> getDownloadObserver(ProgressBar progressBar, int numFiles) {
+    private static Observer<Boolean> getDownloadObserver(ProgressBar progressBar, Button cancelButton, int numFiles) {
         return new Observer<Boolean>() {
             int currentProgress = 1;
 
@@ -295,6 +299,11 @@ public class DatasetOperations {
                     progressBar.setMax(numFiles);
                     progressBar.setSecondaryProgress(numFiles);
                     progressBar.setProgress(currentProgress);
+                    cancelButton.setVisibility(View.VISIBLE);
+                    cancelButton.setOnClickListener(view -> {
+                        d.dispose();
+                        onComplete();
+                    });
                 });
             }
 
@@ -310,7 +319,10 @@ public class DatasetOperations {
 
             @Override
             public void onComplete() {
-                new Handler(Looper.getMainLooper()).post(() -> progressBar.setVisibility(View.GONE));
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    progressBar.setVisibility(View.GONE);
+                    cancelButton.setVisibility(View.GONE);
+                });
             }
         };
     }
