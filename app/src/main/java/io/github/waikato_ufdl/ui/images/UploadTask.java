@@ -1,6 +1,5 @@
 package io.github.waikato_ufdl.ui.images;
 
-
 import android.content.Context;
 import android.net.Uri;
 
@@ -13,7 +12,7 @@ import io.github.waikato_ufdl.UriUtils;
 /**
  * An UploadTask will be used to upload images selected from the user's gallery to the backend
  */
-public class UploadTask extends NetworkTask {
+public abstract class UploadTask extends NetworkTask {
     private final List<Uri> galleryImages;
     private final String[] labels;
     protected int index;
@@ -21,14 +20,13 @@ public class UploadTask extends NetworkTask {
     /**
      * The constructor for generating an UploadTask
      *
-     * @param fragment      the ImagesFragment
      * @param context       the context
      * @param galleryImages the list of URI's of images selected from gallery
      * @param labels        the classification labels associated with the selected images
      * @param datasetName   the name of the dataset being modified
      */
-    public UploadTask(ImagesFragment fragment, Context context, List<Uri> galleryImages, String[] labels, String datasetName) {
-        super(fragment, context, datasetName, null);
+    public UploadTask(Context context, List<Uri> galleryImages, String[] labels, String datasetName) {
+        super(context, datasetName);
         index = 0;
         processingMessage = "Uploading image ";
         completedMessage = "Successfully uploaded selected images";
@@ -42,7 +40,7 @@ public class UploadTask extends NetworkTask {
     @Override
     public void backgroundTask(Object image) {
         String label = labels[index];
-        String classificationLabel = (label == null || !label.isEmpty()) ? label : "-";
+        String classificationLabel = (label != null && !label.isEmpty()) ? label : "-";
         String imagePath = UriUtils.getPath(context, (Uri) image);
         if(imagePath != null) {
             File imageFile = new File(imagePath);
@@ -64,8 +62,5 @@ public class UploadTask extends NetworkTask {
      * Method will set the retrievedAll variable to false so that the newly added images will be loaded from the backend
      */
     @Override
-    public void runOnCompletion() {
-        super.runOnCompletion();
-        fragment.setRetrievedAll(false);
-    }
+    public abstract void runOnCompletion();
 }

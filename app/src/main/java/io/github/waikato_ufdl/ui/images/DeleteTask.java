@@ -1,30 +1,28 @@
 package io.github.waikato_ufdl.ui.images;
 
 import android.content.Context;
-import android.view.ActionMode;
 
 import java.util.ArrayList;
 
 import io.github.waikato_ufdl.ImageOperations;
+
 
 /**
  * A DeleteTask will be used to delete selected images from the backend (if online mode) or
  * set the sync status of the images to delete (in offline mode).
  */
 
-public class DeleteTask extends NetworkTask {
+public abstract class DeleteTask extends NetworkTask {
     private final ArrayList<ClassifiedImage> selectedImages;
 
     /**
      * The constructor for generating an UploadTask
      *
-     * @param fragment the ImagesFragment
      * @param context  the context
      * @param images   the list of selected images (ClassifiedImage objects)
-     * @param mode     the action mode
      */
-    public DeleteTask(ImagesFragment fragment, Context context, ArrayList<ClassifiedImage> images, String datasetName, ActionMode mode) {
-        super(fragment, context, datasetName, mode);
+    public DeleteTask(Context context, ArrayList<ClassifiedImage> images, String datasetName) {
+        super(context, datasetName);
 
         this.selectedImages = images;
         processingMessage = "Deleting image ";
@@ -50,4 +48,7 @@ public class DeleteTask extends NetworkTask {
     public void execute() {
         run(selectedImages);
     }
+
+    @Override
+    public abstract void runOnCompletion();
 }

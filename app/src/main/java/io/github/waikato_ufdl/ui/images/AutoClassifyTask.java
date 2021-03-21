@@ -1,7 +1,6 @@
 package io.github.waikato_ufdl.ui.images;
 
 import android.content.Context;
-import android.view.ActionMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,14 +13,22 @@ import io.github.waikato_ufdl.Prediction;
  * A task used to automate the labelling process using a classifier to label images
  */
 
-public class AutoClassifyTask extends NetworkTask {
+public abstract class AutoClassifyTask extends NetworkTask {
     private final ArrayList<ClassifiedImage> images;
     protected int index;
     private final Classifier classifier;
     private final double confidence;
 
-    public AutoClassifyTask(ImagesFragment fragment, Context context, ArrayList<ClassifiedImage> images, Classifier classifier, double confidence, String datasetName, ActionMode mode) {
-        super(fragment, context, datasetName, mode);
+    /***
+     * The constructor for generating an auto-classification task
+     * @param context the context
+     * @param images the list of images to auto-classify
+     * @param classifier the classifier
+     * @param confidence the minimum confidence score required for the classify to overwrite the current label
+     * @param datasetName the name of the dataset in which the images are being classified
+     */
+    public AutoClassifyTask(Context context, ArrayList<ClassifiedImage> images, Classifier classifier, double confidence, String datasetName) {
+        super(context, datasetName);
         index = 0;
         processingMessage = "Classifying image ";
         completedMessage = "Successfully re-classified selected images";
@@ -31,8 +38,8 @@ public class AutoClassifyTask extends NetworkTask {
     }
 
     /***
-     * Method to reclassify images with labels predicted by a classifier
-     * @param image either a ClassifiedImage object or URI object
+     * Method to reclassify images with labels predicted by a classifier in a background thread.
+     * @param image the classified image object
      */
     @Override
     public void backgroundTask(Object image) {
@@ -50,10 +57,16 @@ public class AutoClassifyTask extends NetworkTask {
     }
 
     /***
-     * Execute the reclassification task
+     * Execute the auto-classification task.
      */
     @Override
     public void execute() {
         run(images);
     }
+
+    /**
+     * Define what should occur upon completion of the auto-completion task.
+     */
+    @Override
+    public abstract void runOnCompletion();
 }
