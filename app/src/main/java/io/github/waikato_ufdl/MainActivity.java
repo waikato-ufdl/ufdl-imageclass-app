@@ -32,7 +32,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     NetworkConnectivityMonitor networkMonitor;
     private AppBarConfiguration mAppBarConfiguration;
@@ -103,7 +102,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 DatasetOperations.delete(this, dbManager, dataset.getName());
                                 break;
                         }
-                    } catch (Exception e){ Log.e("TAG", "Sync Error:" + e.getMessage());}
+                    } catch (Exception e) {
+                        Log.e("TAG", "Dataset Sync Error:\n" + e.getMessage());
+                    }
                     return true;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
