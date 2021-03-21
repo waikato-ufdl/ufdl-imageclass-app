@@ -3,7 +3,6 @@ package io.github.waikato_ufdl.ui.images;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
-import android.view.ActionMode;
 
 import java.util.List;
 
@@ -20,28 +19,25 @@ public abstract class NetworkTask {
     protected int datasetPK;
     protected String datasetName;
     protected Context context;
-    protected ActionMode mode;
     protected String processingMessage;
     protected String completedMessage;
     protected int progressIndex;
-    protected ImagesFragment fragment;
     protected DBManager dbManager;
+    protected SweetAlertDialog loadingDialog;
+    protected int totalImages;
 
     /**
      * The constructor for generating a Network Task
      *
-     * @param fragment    the ImagesFragment
      * @param context     the context
      * @param datasetName the name of the dataset
-     * @param mode        the action mode
      */
-    protected NetworkTask(ImagesFragment fragment, Context context, String datasetName, ActionMode mode) {
-        this.fragment = fragment;
+    protected NetworkTask(Context context, String datasetName) {
         this.datasetName = datasetName;
         this.context = context;
-        this.mode = mode;
         this.dbManager = new SessionManager(context).getDbManager();
         this.datasetPK = dbManager.getDatasetPK(datasetName);
+        this.loadingDialog = new SweetAlertDialog(context, SweetAlertDialog.PROGRESS_TYPE);
     }
 
     /***
@@ -49,8 +45,7 @@ public abstract class NetworkTask {
      * @param images a list of either classifiedImage objects or a list of Uri objects depending on the task being performed
      */
     public void run(List<?> images) {
-        SweetAlertDialog loadingDialog = new SweetAlertDialog(context, SweetAlertDialog.PROGRESS_TYPE);
-        int totalImages = images.size();
+        totalImages = images.size();
         progressIndex = 1;
 
         Observable.fromCallable(() -> (images))
@@ -59,8 +54,8 @@ public abstract class NetworkTask {
                     try {
                         //perform a task on the background thread
                         backgroundTask(image);
-                    } catch (Exception ignored) {
-                        Log.e("TAG", "Network Request Failed: only local changes will be made");
+                    } catch (Exception e) {
+                        Log.e("TAG", "Network Request Failed: only local changes will be made. " + e.getMessage());
                     }
                     return image;
                 })
@@ -72,20 +67,13 @@ public abstract class NetworkTask {
                     /** display a progress dialog */
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
-
-                        loadingDialog.getProgressHelper().stopSpinning();
-                        loadingDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-                        loadingDialog.setContentText(processingMessage + progressIndex + " of " + totalImages);
-                        loadingDialog.setCancelable(false);
-                        loadingDialog.show();
+                        runOnSubscribe(d);
                     }
 
                     /** Update the progress dialog upon each item processed*/
                     @Override
                     public void onNext(@NonNull Object o) {
-                        progressIndex++;
-                        loadingDialog.setContentText(processingMessage + progressIndex + " of " + totalImages);
-                        loadingDialog.getProgressHelper().setProgress(((float) progressIndex) / totalImages);
+                        runOnNext();
                     }
 
                     /** display an error dialog informing the user that something went wrong*/
@@ -102,9 +90,9 @@ public abstract class NetworkTask {
                         loadingDialog
                                 .setTitleText("Success!")
                                 .setContentText(completedMessage)
+                                .showCancelButton(false)
                                 .setConfirmText("OK")
                                 .setConfirmClickListener(sweetAlertDialog -> {
-                                    //when the user clicks ok, dismiss the popup
                                     sweetAlertDialog.dismissWithAnimation();
                                     runOnCompletion();
                                 })
@@ -114,29 +102,47 @@ public abstract class NetworkTask {
     }
 
     /***
-     * an abstract method which will contain the networking code to run based on the task
+     * an abstract method to define the network task which should occur on a background thread
      * @param image either a ClassifiedImage object or URI object
      * @throws Exception if API request fails
      */
     public abstract void backgroundTask(Object image) throws Exception;
 
     /**
-     * Method which will be used to execute the run method after providing it a list of classifiedImage objects or URI objects
+     * Executes the run method to begin the Network Task after providing it a list of objects such as classifiedImages, URIs or strings depending on the task.
      */
-    public abstract void execute();
+    public abstract void execute() throws Exception;
 
     /**
-     * Method which runs once a task has successfuly completed. It will mainly be used to update the UI or end the action mode.
+     * Method which runs once the network task has successfully completed. It will mainly be used to update the UI or end the action mode.
      */
     public void runOnCompletion() {
-        fragment.setDatasetModified(true);
+    }
 
-        //reload the fragment to refresh the UI
-        fragment.reload();
+    /***
+     * Called when starting a network task. Setup and display a loading dialog by default once a task begins to run.
+     * @param disposable the disposable resource
+     */
+    public void runOnSubscribe(Disposable disposable) {
+        loadingDialog.getProgressHelper().stopSpinning();
+        loadingDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        loadingDialog.setContentText(processingMessage + progressIndex + " of " + totalImages);
+        loadingDialog.setCancelText("Cancel");
+        loadingDialog.setCanceledOnTouchOutside(false);
+        loadingDialog.setCancelClickListener(view -> {
+            disposable.dispose();
+            view.dismiss();
+            runOnCompletion();
+        });
+        loadingDialog.show();
+    }
 
-        if (mode != null) {
-            //finish action mode once a user has confirmed the reclassification
-            mode.finish();
-        }
+    /***
+     * Called upon completion of each background task. Updates the loading dialog as progress is made by default.
+     */
+    public void runOnNext() {
+        progressIndex++;
+        loadingDialog.setContentText(processingMessage + progressIndex + " of " + totalImages);
+        loadingDialog.getProgressHelper().setProgress(((float) progressIndex) / totalImages);
     }
 }
