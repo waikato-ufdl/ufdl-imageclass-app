@@ -3,6 +3,7 @@ package io.github.waikato_ufdl;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -34,7 +35,7 @@ public class DBManager {
     public synchronized void open() {
         if (dbHelper == null) {
             sessionManager = new SessionManager(context);
-            dbHelper = new DatabaseHelper(context);
+            dbHelper = DatabaseHelper.getInstance(context);
             database = dbHelper.getWritableDatabase();
 
             //enable foreign keys
@@ -679,9 +680,8 @@ public class DBManager {
      * @param filepath the filepath of the full image
      * @param cachePath the filepath of the cached path
      * @param datasetName the name of the dataset in which the image belongs
-     * @return true if the image has been successfully inserted or else -1 on failure.
      */
-    public boolean insertUnsyncedImage(String filename, String category, String filepath, String cachePath, String datasetName) {
+    public void insertUnsyncedImage(String filename, String category, String filepath, String cachePath, String datasetName) {
         open();
 
         ContentValues contentValues = new ContentValues();
@@ -695,7 +695,6 @@ public class DBManager {
 
         long result = database.insert(DatabaseHelper.TABLE_IMAGE, null, contentValues);
         if (result == -1) Log.e(TAG, "Failed to insert local Image: " + filename);
-        return result > 0;
     }
 
     /***
@@ -705,17 +704,17 @@ public class DBManager {
      * @param isCache whether the path is for a cache file or not.
      */
     public void insertImagePath(String filename, String path, boolean isCache) {
-        if(path == null) return;
+        if (path == null) return;
 
         open();
         ContentValues contentValues = new ContentValues();
-        if(isCache) contentValues.put(DatabaseHelper.IMAGE_COL_CACHE_PATH, path);
+        if (isCache) contentValues.put(DatabaseHelper.IMAGE_COL_CACHE_PATH, path);
         else contentValues.put(DatabaseHelper.IMAGE_COL_FILE_PATH, path);
 
         int result = database.update(DatabaseHelper.TABLE_IMAGE, contentValues, DatabaseHelper.IMAGE_COL_NAME + " = ? AND " +
                 DatabaseHelper.IMAGE_COL_USER_PK + " = ?", new String[]{filename, Integer.toString(sessionManager.getUserPK())});
 
-        if(result == -1) Log.e(TAG, "Failed to update");
+        if (result == -1) Log.e(TAG, "Failed to update");
     }
 
     /***
@@ -736,27 +735,6 @@ public class DBManager {
         if (cursor.moveToFirst()) path = cursor.getString(0);
         cursor.close();
         return path;
-    }
-
-    /***
-     * Updates the image category
-     * @param datasetName the name of the dataset in which the image belongs
-     * @param fileName the name of the image to update
-     * @param category the new classification label
-     */
-    public void updateImageCategory(String datasetName, String fileName, String category) {
-        open();
-
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelper.IMAGE_COL_NAME, fileName);
-        contentValues.put(DatabaseHelper.IMAGE_COL_LABEL, category);
-        contentValues.put(DatabaseHelper.IMAGE_COL_DATASET_NAME, datasetName);
-        contentValues.put(DatabaseHelper.IMAGE_COL_SYNC_OPS, UPDATE);
-        int result = database.update(DatabaseHelper.TABLE_IMAGE, contentValues,
-                DatabaseHelper.DS_COL_NAME + " = ? AND " + DatabaseHelper.IMAGE_COL_NAME + " = ? AND " + DatabaseHelper.IMAGE_COL_USER_PK + " = ?",
-                new String[]{datasetName, fileName, Integer.toString(sessionManager.getUserPK())});
-
-        if (result == 0) Log.e(TAG, "Failed to update the image category for " + datasetName);
     }
 
     /***
@@ -962,5 +940,62 @@ public class DBManager {
 
         if (result == 0)
             Log.e(TAG, "Failed to set the sync status of image named" + filename + " to synced");
+    }
+
+
+    /***
+     * get the next n (Page limit) images in a dataset after a particular index
+     * @param dataset the name of the dataset to load the images from
+     * @param offset the number of images to skip
+     * @return a batch of images in a dataset
+     */
+    public ArrayList<ClassifiedImage> loadImages(String dataset, int limit, int offset) {
+        open();
+        ArrayList<ClassifiedImage> imageList = new ArrayList<>();
+
+        String[] columns = new String[]{
+                DatabaseHelper.IMAGE_COL_NAME,
+                DatabaseHelper.IMAGE_COL_LABEL,
+                DatabaseHelper.IMAGE_COL_FILE_PATH,
+                DatabaseHelper.IMAGE_COL_CACHE_PATH,
+        };
+
+        Cursor cursor = database.query(DatabaseHelper.TABLE_IMAGE, columns, DatabaseHelper.IMAGE_COL_DATASET_NAME + " LIKE ? AND " +
+                        DatabaseHelper.IMAGE_COL_SYNC_OPS + " NOT LIKE ? AND " + DatabaseHelper.IMAGE_COL_USER_PK + " = ?",
+                new String[]{dataset, Integer.toString(DELETE), Integer.toString(sessionManager.getUserPK())}, null, null, null, offset + "," + limit);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ClassifiedImage image = new ClassifiedImage(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getString(3));
+                imageList.add(image);
+            }
+            while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return imageList;
+    }
+
+    /***
+     * Gets the count of all images in a dataset regardless of the sync status
+     * @param dataset the dataset in which the images belong
+     * @return number of images in the dataset
+     */
+    public long getImageCount(String dataset) {
+        open();
+        return DatabaseUtils.queryNumEntries(database, DatabaseHelper.TABLE_IMAGE,
+                DatabaseHelper.IMAGE_COL_DATASET_NAME + " LIKE ? AND " + DatabaseHelper.IMAGE_COL_USER_PK + " = ?", new String[]{dataset, Integer.toString(sessionManager.getUserPK())});
+    }
+
+    /***
+     * Gets the count of the synced images in a particular dataset
+     * @param dataset the dataset in which the images belong
+     * @return the number of synced images in the dataset
+     */
+    public long getSyncedImageCount(String dataset) {
+        open();
+        return DatabaseUtils.queryNumEntries(database, DatabaseHelper.TABLE_IMAGE,
+                DatabaseHelper.IMAGE_COL_DATASET_NAME + " LIKE ? AND " + DatabaseHelper.IMAGE_COL_USER_PK + " = ? AND " +
+                DatabaseHelper.IMAGE_COL_SYNC_OPS + " != ?", new String[]{dataset, Integer.toString(sessionManager.getUserPK()), Integer.toString(CREATE)});
     }
 }
