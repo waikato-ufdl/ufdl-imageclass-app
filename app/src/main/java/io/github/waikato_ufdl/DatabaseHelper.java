@@ -41,8 +41,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String PROJECT_COL_PK = "PROJECT_PK";
     public static final String PROJECT_COL_NAME = "PROJECT_NAME";
 
-    public DatabaseHelper(Context context) {
+    private static DatabaseHelper sInstance;
+
+    private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
+    }
+
+    public static synchronized DatabaseHelper getInstance(Context context) {
+        if (sInstance == null) {
+            sInstance = new DatabaseHelper(context.getApplicationContext());
+        }
+        return sInstance;
     }
 
     /***
