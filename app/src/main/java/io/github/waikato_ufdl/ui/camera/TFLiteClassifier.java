@@ -38,12 +38,6 @@ public class TFLiteClassifier extends Classifier {
     private static float IMAGE_STD;
 
     /***
-     * Post-processing normalization parameters.
-     */
-    private static float PROBABILITY_MEAN;
-    private static float PROBABILITY_STD;
-
-    /***
      * Image size along the x axis.
      */
     private final int imageResizeX;
@@ -98,8 +92,10 @@ public class TFLiteClassifier extends Classifier {
         IMAGE_MEAN = preProcessingNormalizationParams[0];
         IMAGE_STD = preProcessingNormalizationParams[1];
 
-        PROBABILITY_MEAN = postProcessingNormalizationParams[0];
-        PROBABILITY_STD = postProcessingNormalizationParams[1];
+
+         //Post-processing normalization parameters.
+        float PROBABILITY_MEAN = postProcessingNormalizationParams[0];
+        float PROBABILITY_STD = postProcessingNormalizationParams[1];
 
         // Reads type and shape of input and output tensors, respectively.
         int imageTensorIndex = 0; // input
@@ -111,8 +107,8 @@ public class TFLiteClassifier extends Classifier {
         int[] outputImageShape = tensorClassifier.getOutputTensor(probabilityTensorIndex).shape();
         DataType outputDataType = tensorClassifier.getOutputTensor(probabilityTensorIndex).dataType();
 
-        imageResizeX = inputImageShape[1];
-        imageResizeY = inputImageShape[2];
+        imageResizeY = inputImageShape[1];
+        imageResizeX = inputImageShape[2];
 
         // Creates the input tensor.
         inputImageBuffer = new TensorImage(inputDataType);
