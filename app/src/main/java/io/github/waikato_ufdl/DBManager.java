@@ -382,10 +382,8 @@ public class DBManager {
         contentValues.put(DatabaseHelper.DS_COL_SYNC_OPS, CREATE);
         contentValues.put(DatabaseHelper.DS_COL_USER_PK, sessionManager.getUserPK());
 
-        long result;
         try {
-            result = database.insertOrThrow(DatabaseHelper.TABLE_DATASET, null, contentValues);
-            if (result == -1) Log.e(TAG, "Error: Failed to insert local dataset named: " + name);
+            database.insertOrThrow(DatabaseHelper.TABLE_DATASET, null, contentValues);
         } catch (SQLException e) {
             Log.e(TAG, "Error: Failed to insert local dataset named:" + name + "\n" + e.getMessage());
         }
@@ -506,8 +504,7 @@ public class DBManager {
         contentValues.put(DatabaseHelper.DS_COL_USER_PK, sessionManager.getUserPK());
 
         try {
-            long result = database.insertOrThrow(DatabaseHelper.TABLE_DATASET, null, contentValues);
-            if (result == -1) Log.e(TAG, "Failed to insert a synced dataset named " + name);
+            database.insertOrThrow(DatabaseHelper.TABLE_DATASET, null, contentValues);
         } catch (SQLException e) {
             Log.e(TAG, "Failed to insert a synced dataset named " + name + "\n" + e.getMessage());
         }
@@ -941,7 +938,6 @@ public class DBManager {
         if (result == 0)
             Log.e(TAG, "Failed to set the sync status of image named" + filename + " to synced");
     }
-
 
     /***
      * get the next n (Page limit) images in a dataset after a particular index

@@ -187,6 +187,7 @@ public class PreviewImage extends Fragment {
             return true;
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(throwable -> Log.e("TAG", "Error:\n" + throwable.getMessage()))
                 .doOnComplete(() ->
                 {
                     //close the dialog and return to the camera fragment

@@ -193,6 +193,7 @@ public class SettingsFragment extends Fragment {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
+                        Log.e("TAG", e.getMessage());
                     }
 
                     @Override
